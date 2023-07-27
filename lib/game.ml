@@ -20,8 +20,12 @@ type t =
 
 (* creates the first instance of the game that shows up after the beginning
    screen *)
-let create (players : Player.t list) : t =
-  { player_list = players; game_type = Trivia; game_state = Ongoing }
+exception Error of string
+
+let create (players : Player.t list) : t or Error = (* create an or error so that we can ensure that ONLY 4 players are created *)
+  if List.length players <> 4
+  then raise (Error "The game must have 4 players")
+  else { player_list = players; game_type = Trivia; game_state = Ongoing }
 ;;
 
 (* try-catch for when not 4 is created *)
@@ -55,17 +59,17 @@ let%expect_test "changing player state" =
   print_s [%message "" (gg : t)];
   [%expect
     {|
-  (gg
-   ((player_list
-     (((name anoushka) (score 0) (living true))
-      ((name nneoma) (score 0) (living true))
-      ((name hao) (score 0) (living false))
-      ((name ben) (score 0) (living true))))
-    (game_type Trivia) (game_state Game_over))) |}]
-;;
-
-(*[%expect {| (player (name hao) (score 0) (living false))|}]; print_s
-  [%message "" (game : t)]; [%expect {| (game ((player_list (((name anoushka)
+  (gg ((player_list (((name anoushka)
   (score 0) (living true)) ((name nneoma) (score 0) (living true)) ((name
   hao) (score 0) (living false)) ((name ben) (score 0) (living true))))
-  (game_type Trivia) (game_state Ongoing))) |}];*)
+  (game_type Trivia) (game_state Game_over))) |}]
+;;
+
+let%expect_test "checking it only allows 4 players" =
+  let gme = create (Player.create_multi_players []) in
+  print_s [%message "" (gme : t)];
+  [%expect
+    {|
+  (gme ((player_list (())
+  (game_type Trivia) (game_state Game_over))) |}]
+;;
