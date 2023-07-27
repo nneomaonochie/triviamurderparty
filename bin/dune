@@ -1,4 +1,4 @@
 (executable
  (public_name triviamurderparty)
  (name main)
- (libraries core async graphics cohttp yojson triviamurderparty))
+ (libraries core triviamurderparty core_unix.command_unix))
