@@ -19,12 +19,17 @@ type t =
 [@@deriving sexp_of, compare]
 
 (* creates the first instance of the game that shows up after the beginning
-   screen *)
-exception Error of string
+   screen exception Error of string*)
 
-let create (players : Player.t list) : t or Error = (* create an or error so that we can ensure that ONLY 4 players are created *)
+(* failwith is simpler tahn the error thing *)
+
+let create (players : Player.t list) : t =
+  (* create an or error so that we can ensure that ONLY 4 players are
+     created *)
   if List.length players <> 4
-  then raise (Error "The game must have 4 players")
+  then
+    failwith "The game must have 4 players"
+    (*raise (Error "The game must have 4 players")*)
   else { player_list = players; game_type = Trivia; game_state = Ongoing }
 ;;
 
