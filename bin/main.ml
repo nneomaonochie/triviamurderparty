@@ -1,1 +1,3 @@
-let () = print_endline "Hello, World!"
+open! Core
+
+let () = Command_unix.run Triviamurderparty.command
