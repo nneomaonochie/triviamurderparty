@@ -10,7 +10,7 @@ type t =
 [@@deriving compare, equal, sexp_of]
 
 (* creates a Player using a given string *)
-val create_single_player : string -> Player.t
+val create_single_player : string -> t
 
 (* creates a Player.t list using a string of player names *)
-val create_multi_players : string list -> Player.t list
+val create_multi_players : string list -> t list
