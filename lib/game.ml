@@ -17,3 +17,9 @@ type t =
   ; mutable game_state : Game_state.t (* mutable *)
   }
 [@@deriving sexp_of, compare]
+
+(* creates the first instance of the game that shows up after the beginning
+   screen *)
+let create (players : Player.t list) : Game.t =
+  { player_list = players; game_type = Trivia; game_state = Ongoing }
+;;
