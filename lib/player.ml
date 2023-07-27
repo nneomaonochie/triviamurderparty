@@ -7,6 +7,14 @@ type t =
   }
 [@@deriving compare, equal, sexp_of]
 
+let create_single_player player_name : Player.t =
+  { name = player_name; score = 0; living = true }
+;;
+
+let create_multi_players (multi_players : string list) : Player.t list =
+  List.map multi_players ~f:create_single_player
+;;
+
 (* expect tests *)
 let%expect_test "test player initialization" =
   print_endline "hello";
