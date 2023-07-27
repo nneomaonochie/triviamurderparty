@@ -20,4 +20,4 @@ type t =
   }
 [@@deriving sexp_of, compare]
 
-val create : Player.t list -> Game.t
+val create : Player.t list -> t
