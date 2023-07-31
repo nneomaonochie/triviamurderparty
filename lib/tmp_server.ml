@@ -179,6 +179,18 @@ end = struct
     >>| Result.ok_exn
   ;;
 
+  let send_char server_addr ~charc =
+    Rpc.Connection.with_client
+      (Tcp.Where_to_connect.of_host_and_port server_addr)
+      (fun connection ->
+      let%map.Deferred.Or_error response =
+        Rpc.Rpc.dispatch Protocol.rpc_char connection { query_char = charc }
+      in
+      Core.print_s
+        [%message "Received response" (response : Protocol.Response.t)])
+    >>| Result.ok_exn
+  ;;
+
   let send_message_command =
     Command.async_or_error
       ~summary:"send single message to server"
@@ -199,10 +211,29 @@ end = struct
       ~behave_nicely_in_pipeline:true
   ;;
 
+  let send_char_command =
+    Command.async_or_error
+      ~summary:"send single char to server"
+      [%map_open.Command
+        let () = return ()
+        and server_addr =
+          flag
+            "-server"
+            (required host_and_port)
+            ~doc:"HOST_AND_PORT server to query (e.g. localhost:1337)"
+        and charc =
+          flag "-char" (required char) ~doc:"CHAR message to send to server"
+        in
+        fun () -> send_char server_addr ~charc]
+      ~behave_nicely_in_pipeline:true
+  ;;
+
   let command =
     Command.group
       ~summary:"rpc client"
-      [ "send-message", send_message_command ]
+      [ "send-message", send_message_command
+      ; "send-char", send_char_command
+      ]
   ;;
 end
 
