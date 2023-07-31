@@ -32,16 +32,16 @@ let pick_random_question () : Question.t =
   let random_idx = Random.int array_size in
   let elem = List.nth_exn array random_idx in
   let q = elem |> member "question" |> to_string in
-  let one = elem |> member "1" |> to_string in
-  let two = elem |> member "2" |> to_string in
-  let three = elem |> member "3" |> to_string in
-  let four = elem |> member "4" |> to_string in
+  let one = elem |> member "Q" |> to_string in
+  let two = elem |> member "W" |> to_string in
+  let three = elem |> member "E" |> to_string in
+  let four = elem |> member "R" |> to_string in
   let ans_choices =
     []
-    @ [ String.concat [ "1: "; one ] ]
-    @ [ String.concat [ "2: "; two ] ]
-    @ [ String.concat [ "3: "; three ] ]
-    @ [ String.concat [ "4: "; four ] ]
+    @ [ String.concat [ "Q: "; one ] ]
+    @ [ String.concat [ "W: "; two ] ]
+    @ [ String.concat [ "E: "; three ] ]
+    @ [ String.concat [ "R: "; four ] ]
   in
   let c_ans = elem |> member "answer" |> to_string in
   { question = q; answer_choices = ans_choices; correct_answer = c_ans }
