@@ -80,7 +80,6 @@ end
 module Server : sig
   val command : Command.t
 end = struct
-
   (* gets the query from the client *)
   let handle_query_string client query =
     Core.print_s
@@ -140,26 +139,14 @@ end = struct
           (required int)
           ~doc:"INT port that the server should listen on"
       in
-      fun () -> 
+      fun () ->
         (* this is where we do our beginning functions *)
-      let game = Game.create [ (* initialize player function to abstraction *)]
-      (* to do later: intialize_graphics *)
-      
-        
-        
-        
-
-
-
-
-
-
-
-
-
+        let game = Game.create () in
+        (* to do later: intialize_graphics *)
         serve port]
-        (* the first call with string will be to change the PC names *)
   ;;
+
+  (* the first call with string will be to change the PC names *)
 
   let command =
     Command.async
