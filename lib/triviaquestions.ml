@@ -26,7 +26,7 @@ let pick_random_question () : Question.t =
   let open Yojson.Basic.Util in
   let array =
     get_question_array
-      "/usr/local/home/jsipuser/triviamurder/bin/trivia.json"
+      "/usr/local/home/jsipuser/triviamurderparty/lib/trivia.json"
   in
   let array_size = List.length array in
   let random_idx = Random.int array_size in
