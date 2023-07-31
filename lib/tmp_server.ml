@@ -80,10 +80,6 @@ end
 module Server : sig
   val command : Command.t
 end = struct
-  (* In the server, we have to define implementations for all of the RPCs the
-     server will support. For each RPC, we need to provide a function that
-     takes in the query type specified by the RPC and produces a response
-     type. *)
 
   (* gets the query from the client *)
   let handle_query_string client query =
@@ -124,8 +120,6 @@ end = struct
         ]
   ;;
 
-  (* add a separate RPC *)
-
   let serve port =
     let%bind server =
       Rpc.Connection.serve
@@ -146,7 +140,25 @@ end = struct
           (required int)
           ~doc:"INT port that the server should listen on"
       in
-      fun () -> serve port]
+      fun () -> 
+        (* this is where we do our beginning functions *)
+      let game = Game.create [ (* initialize player function to abstraction *)]
+      (* to do later: intialize_graphics *)
+      
+        
+        
+        
+
+
+
+
+
+
+
+
+
+        serve port]
+        (* the first call with string will be to change the PC names *)
   ;;
 
   let command =
