@@ -20,7 +20,7 @@ module Protocol : sig
   module Query_char : sig
     type t = { query_char : char } [@@deriving sexp_of]
 
-    val to_string : t -> char
+    val to_char : t -> char
   end
 
   (* [Response] defines the type that the server sends back to the client.
@@ -46,13 +46,14 @@ end = struct
     let to_string { query_message } = query_message
   end
 
-  (* module Query_char = struct (* Deriving "bin_io" here automatically gives
-     us a way to convert values into a binary protocol, which lets us safely
-     perform the input and output needed to send values between the client
-     and the server. *) type t = { query_char : char } [@@deriving sexp_of,
-     bin_io]
+  module Query_char = struct
+    (* Deriving "bin_io" here automatically gives us a way to convert values
+       into a binary protocol, which lets us safely perform the input and
+       output needed to send values between the client and the server. *)
+    type t = { query_char : char } [@@deriving sexp_of, bin_io]
 
-     let to_string { query_message } = query_message end *)
+    let to_char { query_char } = query_char
+  end
 
   module Response = struct
     type t = { response_message : string } [@@deriving sexp_of, bin_io]
