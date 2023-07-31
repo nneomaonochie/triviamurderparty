@@ -3,7 +3,7 @@ open Async
 
 let main : unit -> unit Deferred.t =
  fun () ->
-  Triviaquestions.print_random_question ();
+  let _q = Triviaquestions.pick_random_question () in
   return ()
 ;;
 
