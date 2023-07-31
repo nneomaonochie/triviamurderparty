@@ -9,6 +9,9 @@ module Game_kind = struct
   [@@deriving compare, equal, sexp_of]
 end
 
+(* we need to try to store the client IP address with the player its attached
+   to *)
+
 type t =
   { (* players should stay the same, but a player being dead or alive should
        be mutable *)
