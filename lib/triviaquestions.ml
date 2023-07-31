@@ -26,22 +26,22 @@ let pick_random_question () : Question.t =
   let open Yojson.Basic.Util in
   let array =
     get_question_array
-      "/usr/local/home/jsipuser/triviamurder/bin/trivia.json"
+      "/usr/local/home/jsipuser/triviamurderparty/lib/trivia.json"
   in
   let array_size = List.length array in
   let random_idx = Random.int array_size in
   let elem = List.nth_exn array random_idx in
   let q = elem |> member "question" |> to_string in
-  let one = elem |> member "A" |> to_string in
-  let two = elem |> member "B" |> to_string in
-  let three = elem |> member "C" |> to_string in
-  let four = elem |> member "D" |> to_string in
+  let one = elem |> member "Q" |> to_string in
+  let two = elem |> member "W" |> to_string in
+  let three = elem |> member "E" |> to_string in
+  let four = elem |> member "R" |> to_string in
   let ans_choices =
     []
-    @ [ String.concat [ "A: "; one ] ]
-    @ [ String.concat [ "B: "; two ] ]
-    @ [ String.concat [ "C: "; three ] ]
-    @ [ String.concat [ "D: "; four ] ]
+    @ [ String.concat [ "Q: "; one ] ]
+    @ [ String.concat [ "W: "; two ] ]
+    @ [ String.concat [ "E: "; three ] ]
+    @ [ String.concat [ "R: "; four ] ]
   in
   let c_ans = elem |> member "answer" |> to_string in
   { question = q; answer_choices = ans_choices; correct_answer = c_ans }
