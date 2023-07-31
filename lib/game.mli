@@ -14,7 +14,8 @@ end
 type t =
   { (* players should stay the same, but a player being dead or alive should
        be mutable *)
-    player_list : Player.t list
+    player_list :
+      Socket.Address.Inet.t Player.t Base.Hashtbl.t (*Player.t list*)
   ; mutable game_type : Game_kind.t
   ; mutable game_state : Game_state.t
   }
