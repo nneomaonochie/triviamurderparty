@@ -9,8 +9,12 @@ type t =
   }
 [@@deriving compare, equal, sexp_of]
 
-(* creates a Player using a given string *)
-val create_single_player : string -> t
+(* creates a default Player.t *)
+val create_single_player : unit -> t
 
-(* creates a Player.t list using a string of player names *)
-val create_multi_players : string list -> t list
+(* creates a Player.t list of default players *)
+val create_multi_players : unit -> t list
+
+(* changes a player's name so long as the previous name was an empty
+   string *)
+val update_name : t -> string -> unit

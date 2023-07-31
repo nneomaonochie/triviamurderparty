@@ -15,9 +15,9 @@ type t =
   { (* players should stay the same, but a player being dead or alive should
        be mutable *)
     player_list : Player.t list
-  ; mutable game_type : Game_kind.t (* mutable *)
-  ; mutable game_state : Game_state.t (* mutable *)
+  ; mutable game_type : Game_kind.t
+  ; mutable game_state : Game_state.t
   }
 [@@deriving sexp_of, compare]
 
-val create : Player.t list -> t
+val create : unit -> t
