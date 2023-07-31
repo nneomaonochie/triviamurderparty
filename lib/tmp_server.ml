@@ -17,6 +17,7 @@ module Protocol : sig
     val to_string : t -> string
   end
 
+  (* this is for queries that only require one key *)
   module Query_char : sig
     type t = { query_char : char } [@@deriving sexp_of]
 
@@ -69,38 +70,58 @@ end = struct
 
   let rpc_char =
     Rpc.Rpc.create
-      ~name:"send-message"
+      ~name:"send-answer"
       ~version:0
       ~bin_query:Query_char.bin_t
       ~bin_response:Response.bin_t
   ;;
 end
 
-module Server = struct
+module Server : sig
+  val command : Command.t
+end = struct
   (* In the server, we have to define implementations for all of the RPCs the
      server will support. For each RPC, we need to provide a function that
      takes in the query type specified by the RPC and produces a response
      type. *)
 
   (* gets the query from the client *)
-  let handle_query client query =
+  let handle_query_string client query =
     Core.print_s
       [%message
         "Received query"
           (client : Socket.Address.Inet.t)
-          (query : Protocol.Query.t)];
+          (query : Protocol.Query_string.t)];
     (* changing this into a deferred type *)
     return
       { Protocol.Response.response_message =
           [%string
-            "I have received your query! You said: %{query#Protocol.Query}"]
+            "I have received your query! You said: \
+             %{query#Protocol.Query_string}"]
+      }
+  ;;
+
+  let handle_query_char client query =
+    Core.print_s
+      [%message
+        "Received query"
+          (client : Socket.Address.Inet.t)
+          (query : Protocol.Query_char.t)];
+    let s = Char.to_string (Protocol.Query_char.to_char query) in
+    (* changing this into a deferred type *)
+    return
+      { Protocol.Response.response_message =
+          [%string "I have received your query! You said: CHAR"]
       }
   ;;
 
   let implementations =
     Rpc.Implementations.create_exn
       ~on_unknown_rpc:`Close_connection
-      ~implementations:[ Rpc.Rpc.implement Protocol.rpc handle_query ]
+      ~implementations:
+        [ Rpc.Rpc.implement Protocol.rpc_string handle_query_string
+        ; Rpc.Rpc.implement Protocol.rpc_char handle_query_char
+        ]
   ;;
 
   (* add a separate RPC *)
@@ -115,11 +136,78 @@ module Server = struct
     in
     Tcp.Server.close_finished server
   ;;
+
+  let main =
+    [%map_open.Command
+      let () = return ()
+      and port =
+        flag
+          "-port"
+          (required int)
+          ~doc:"INT port that the server should listen on"
+      in
+      fun () -> serve port]
+  ;;
+
+  let command =
+    Command.async
+      ~summary:"start rpc server"
+      main
+      ~behave_nicely_in_pipeline:true
+  ;;
 end
 
-module Client = struct end
+module Client : sig
+  val command : Command.t
+end = struct
+  (* In the client, we need to define a way to fire (or dispatch) the RPCs
+     that we care about. This requires knowing how to communicate to the
+     server (by knowing the server address), constructing the query type, and
+     doing something with the response that the server gives back. *)
+  let send_message server_addr ~message =
+    Rpc.Connection.with_client
+      (Tcp.Where_to_connect.of_host_and_port server_addr)
+      (fun connection ->
+      let%map.Deferred.Or_error response =
+        Rpc.Rpc.dispatch
+          Protocol.rpc_string
+          connection
+          { query_message = message }
+      in
+      Core.print_s
+        [%message "Received response" (response : Protocol.Response.t)])
+    >>| Result.ok_exn
+  ;;
 
-module RPC = struct
-  (* we could use a RPC for asking a user's name (String), and getting a
-     user's answer (char) *)
+  let send_message_command =
+    Command.async_or_error
+      ~summary:"send single message to server"
+      [%map_open.Command
+        let () = return ()
+        and server_addr =
+          flag
+            "-server"
+            (required host_and_port)
+            ~doc:"HOST_AND_PORT server to query (e.g. localhost:1337)"
+        and message =
+          flag
+            "-message"
+            (required string)
+            ~doc:"STRING message to send to server"
+        in
+        fun () -> send_message server_addr ~message]
+      ~behave_nicely_in_pipeline:true
+  ;;
+
+  let command =
+    Command.group
+      ~summary:"rpc client"
+      [ "send-message", send_message_command ]
+  ;;
 end
+
+let command =
+  Command.group
+    ~summary:"simple rpc client and server application"
+    [ "server", Server.command; "client", Client.command ]
+;;
