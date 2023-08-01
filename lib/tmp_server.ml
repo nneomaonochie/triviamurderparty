@@ -84,7 +84,7 @@ module Server : sig
 end = struct
   (* gets the query from the client *)
 
-  let handle_query_string client query (*(game : Game.t)*) =
+  let handle_query_string client query =
     let game : Game.t = Stack.pop_exn game_stack in
     let game =
       match game.game_state with
@@ -196,6 +196,8 @@ end = struct
         (* this is where we do our beginning functions *)
         let game : Game.t = Game.create () in
         Stack.push game_stack game;
+        let bool = Tmp_graphics.player_creation_screen () in
+        ();
         (* to do later: intialize_graphics *)
         serve port game]
   ;;

@@ -8,10 +8,10 @@ module Game_kind : sig
        that minigame *)
     (* this list WILL be revised when the minigames have been actually
        created *)
-    | Math_mayhem of Player.t list
-    | Decisions of Player.t list
-    | Button_mash of Player.t list
-  [@@deriving compare, equal, sexp_of]
+    | Math_mayhem of (Socket.Address.Inet.t * Player.t) list
+    | Decisions of (Socket.Address.Inet.t * Player.t) list
+    | Button_mash of (Socket.Address.Inet.t * Player.t) list
+  [@@deriving compare, sexp_of]
 end
 
 type t =
@@ -27,4 +27,4 @@ type t =
 val create : unit -> t
 val get_ip_address : Socket.Address.Inet.t -> string
 val set_up_players : Socket.Address.Inet.t -> string -> t -> t
-val ask_question : Game.t -> unit
+val ask_question : t -> unit
