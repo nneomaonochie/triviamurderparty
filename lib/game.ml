@@ -1,4 +1,5 @@
 open! Core
+open! Async
 
 module Game_kind = struct
   type t =
@@ -13,16 +14,14 @@ end
    to *)
 
 type t =
-  { (* players should stay the same, but a player being dead or alive should
-       be mutable *)
-    player_list : Player.t list
+  { mutable player_list : (Socket.Address.Inet.t * Player.t) list
   ; mutable game_type : Game_kind.t
   ; mutable game_state : Game_state.t
   }
 [@@deriving sexp_of, compare]
 
 let create () : t =
-  { player_list = Player.create_multi_players ()
+  { player_list = [] (*Player.create_multi_players ()*)
   ; game_type = Trivia
   ; game_state = Player_Initializion
   }
