@@ -25,4 +25,5 @@ type t =
 [@@deriving sexp_of, compare]
 
 val create : unit -> t
+val get_ip_address : Socket.Address.Inet.t -> string
 val set_up_players : Socket.Address.Inet.t -> string -> t -> t
