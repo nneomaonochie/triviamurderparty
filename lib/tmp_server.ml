@@ -83,35 +83,26 @@ module Server : sig
   val command : Command.t
 end = struct
   (* gets the query from the client *)
-  let handle_query_string client query (game : Game.t)
-    : Protocol.Response.t Deferred.t
-    =
-    let () =
+
+  let handle_query_string client query (*(game : Game.t)*) =
+    let game : Game.t = Stack.pop_exn game_stack in
+    let game =
       match game.game_state with
       | Player_Initializion ->
+        Game.set_up_players
+          client
+          (Protocol.Query_string.to_string query)
+          game
         (* we want to fill up the game's player list to be 4 exactly *)
-        if List.length game.player_list < 4
-        then
-          (* we need to ensure that we have 4 unique clients *)
-          if not
-               (List.exists game.player_list ~f:(fun (c, _) ->
-                  Socket.Address.Inet.compare c client = 0))
-          then (
-            game.player_list
-              <- game.player_list
-                 @ [ ( client
-                     , Player.name_create_single_player
-                         (Protocol.Query_string.to_string query) )
-                   ];
-            if List.length game.player_list = 4
-            then game.game_state <- Ongoing)
-      | _ -> ()
+      | _ -> game
     in
+    Stack.push game_stack game;
     Core.print_s
       [%message
         "Received query"
           (client : Socket.Address.Inet.t)
           (query : Protocol.Query_string.t)];
+    Core.print_s [%message "" (Stack.top_exn game_stack : Game.t)];
     (* changing this into a deferred type *)
     return
       { Protocol.Response.response_message =
