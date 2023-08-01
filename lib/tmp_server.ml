@@ -3,6 +3,8 @@
 open! Core
 open! Async
 
+let game_stack = Stack.create ()
+
 (* [Protocol] defines the communication between the server and the client. *)
 module Protocol : sig
   (* [Query] defines the type that the client sends to the server. Here, the
@@ -119,7 +121,7 @@ end = struct
       }
   ;;
 
-  let handle_query_char client query (game : Game.t) =
+  let handle_query_char client query (*(game : Game.t)*) =
     (* 1. which client put in what char 2. the only keys we allow are Q,W,E,R
        3. if client is correct or not *)
     Core.print_s
@@ -135,19 +137,23 @@ end = struct
       }
   ;;
 
-  let implementations =
+  let implementations (game : Game.t)
+    : Socket.Address.Inet.t Rpc.Implementations.t
+    =
     Rpc.Implementations.create_exn
       ~on_unknown_rpc:`Close_connection
       ~implementations:
-        [ Rpc.Rpc.implement Protocol.rpc_string handle_query_string game
-        ; Rpc.Rpc.implement Protocol.rpc_char handle_query_char game
+        [ Rpc.Rpc.implement
+            Protocol.rpc_string
+            handle_query_string (* game *)
+        ; Rpc.Rpc.implement Protocol.rpc_char handle_query_char (* game *)
         ]
   ;;
 
   let serve port (game : Game.t) =
     let%bind server =
       Rpc.Connection.serve
-        ~implementations
+        ~implementations:(implementations game)
         ~initial_connection_state:(fun addr _conn -> addr)
         ~where_to_listen:(Tcp.Where_to_listen.of_port port)
         ()
@@ -167,6 +173,7 @@ end = struct
       fun () ->
         (* this is where we do our beginning functions *)
         let game : Game.t = Game.create () in
+        Stack.push game_stack game;
         (* to do later: intialize_graphics *)
         serve port game]
   ;;
