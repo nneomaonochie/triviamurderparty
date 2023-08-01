@@ -4,10 +4,10 @@ open! Async
 module Game_kind = struct
   type t =
     | Trivia of Question.t
-    | Math_mayhem of Player.t list
-    | Decisions of Player.t list
-    | Button_mash of Player.t list
-  [@@deriving compare, equal, sexp_of]
+    | Math_mayhem of (Socket.Address.Inet.t * Player.t) list
+    | Decisions of (Socket.Address.Inet.t * Player.t) list
+    | Button_mash of (Socket.Address.Inet.t * Player.t) list
+  [@@deriving compare, sexp_of]
 end
 
 (* we need to try to store the client IP address with the player its attached
@@ -50,14 +50,17 @@ let set_up_players client (query : string) t : t =
             TIME... *)
          (List.exists t.player_list ~f:(fun (c, _) ->
             String.equal (get_ip_address c) (get_ip_address client)))
-    then (
+    then
       t.player_list
         <- t.player_list @ [ client, Player.name_create_single_player query ];
-      if List.length t.player_list = 4 then t.game_state <- Ongoing);
+  if List.length t.player_list = 4
+  then
+    t.game_state
+      <- Ongoing (* Tmp_graphics.display_beginning_instructions t); *);
   t
 ;;
 
-let ask_question (game : Game.t) =
+let ask_question (game : t) =
   match game.game_type with
   | Trivia _ ->
     game.game_type <- Trivia (Triviaquestions.pick_random_question ())
