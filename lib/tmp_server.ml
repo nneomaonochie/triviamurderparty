@@ -112,35 +112,53 @@ end = struct
       }
   ;;
 
-  let handle_query_char client query =
+  let find_player
+    (player_list : (Socket.Address.Inet.t * Player.t) list)
+    (client_ip : Socket.Address.Inet.t)
+    =
+    let desired_ip = Game.get_ip_address client_ip in
+    let _, player =
+      List.find_exn player_list ~f:(fun player ->
+        let c, p = player in
+        let comparison_ip = Game.get_ip_address c in
+        if String.equal comparison_ip desired_ip then true else false)
+    in
+    player
+  ;;
+
+  let handle_query_char client query : Protocol.Response.t Deferred.t =
     let game = Stack.pop_exn game_stack in
     let question = game.game_type in
-    match question with
-    | Trivia q ->
-      let correct_ans = q.correct_answer in
-      let players = game.player_list in
-      let c, player =
-        List.find_exn players ~f:(fun player ->
-          let c, p = player in
-          if Socket.Address.Inet.compare c client = 0 then true else false)
-      in
-      ()
-    | _ ->
-      ();
-      Stack.push game_stack game;
-      (* 1. which client put in what char 2. the only keys we allow are
-         Q,W,E,R 3. if client is correct or not *)
-      Core.print_s
-        [%message
-          "Received query"
-            (client : Socket.Address.Inet.t)
-            (query : Protocol.Query_char.t)];
-      let s = Char.to_string (Protocol.Query_char.to_char query) in
-      (* changing this into a deferred type *)
-      return
-        { Protocol.Response.response_message =
-            [%string "I have received your query! You said: CHAR"]
-        }
+    let ip_addr = Game.get_ip_address client in
+    let () =
+      match question with
+      | Trivia q ->
+        let correct_ans = q.correct_answer in
+        let players = game.player_list in
+        let player_ans =
+          String.of_char (Protocol.Query_char.to_char query)
+        in
+        let answer_is_correct = String.equal player_ans correct_ans in
+        if answer_is_correct
+        then (
+          let player = find_player players client in
+          player.score <- player.score + 1)
+        else ()
+      | _ -> ()
+    in
+    Stack.push game_stack game;
+    (* 1. which client put in what char 2. the only keys we allow are Q,W,E,R
+       3. if client is correct or not *)
+    Core.print_s
+      [%message
+        "Received query"
+          (client : Socket.Address.Inet.t)
+          (query : Protocol.Query_char.t)];
+    (* changing this into a deferred type *)
+    return
+      { Protocol.Response.response_message =
+          [%string "I have received your query! You said: CHAR"]
+      }
   ;;
 
   let implementations (game : Game.t)

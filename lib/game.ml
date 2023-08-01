@@ -57,6 +57,13 @@ let set_up_players client (query : string) t : t =
   t
 ;;
 
+let ask_question (game : Game.t) =
+  match game.game_type with
+  | Trivia _ ->
+    game.game_type <- Trivia (Triviaquestions.pick_random_question ())
+  | _ -> ()
+;;
+
 (* try-catch for when not 4 is created *)
 
 (* expect tests for game creation let%expect_test "test game creation" = let
