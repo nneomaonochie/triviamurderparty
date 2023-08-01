@@ -4,4 +4,4 @@
 
     [command] implements shell/console commands for starting up servers and
     clients. *)
-val command : Async.Command.t
+(* val command : Async.Command.t *)

@@ -3,8 +3,6 @@
 open! Core
 open! Async
 
-
-
 (* [Protocol] defines the communication between the server and the client. *)
 module Protocol : sig
   (* [Query] defines the type that the client sends to the server. Here, the
@@ -82,24 +80,25 @@ end
 module Server : sig
   val command : Command.t
 end = struct
-
   (* gets the query from the client *)
-  let handle_query_string client query =
-    Core.print_s
-      [%message
-        "Received query"
-          (client : Socket.Address.Inet.t)
-          (query : Protocol.Query_string.t)];
-    (* changing this into a deferred type *)
-    return
-      { Protocol.Response.response_message =
-          [%string
-            "I have received your query! You said: \
-             %{query#Protocol.Query_string}"]
-      }
+  let handle_query_string client query (game : Game.t) =
+    (* match game.game_state with | Player_Initializion -> if List.length
+       game.player_list < 4 then (if not (List.find
+
+       game.player_list <- game.player_list @ [ client,
+       Player.create_single_player () ])
+
+       | _ -> () ; Core.print_s [%message "Received query" (client :
+       Socket.Address.Inet.t) (query : Protocol.Query_string.t)]; (* changing
+       this into a deferred type *) return {
+       Protocol.Response.response_message = [%string "I have received your
+       query! You said: \ %{query#Protocol.Query_string}"] } *)
+    ()
   ;;
 
-  let handle_query_char client query =
+  let handle_query_char client query (game : Game.t) =
+    (* 1. which client put in what char 2. the only keys we allow are Q,W,E,R
+       3. if client is correct or not *)
     Core.print_s
       [%message
         "Received query"
@@ -117,12 +116,12 @@ end = struct
     Rpc.Implementations.create_exn
       ~on_unknown_rpc:`Close_connection
       ~implementations:
-        [ Rpc.Rpc.implement Protocol.rpc_string handle_query_string
-        ; Rpc.Rpc.implement Protocol.rpc_char handle_query_char
+        [ Rpc.Rpc.implement Protocol.rpc_string handle_query_string game
+        ; Rpc.Rpc.implement Protocol.rpc_char handle_query_char game
         ]
   ;;
 
-  let serve port =
+  let serve port (game : Game.t) =
     let%bind server =
       Rpc.Connection.serve
         ~implementations
@@ -142,26 +141,14 @@ end = struct
           (required int)
           ~doc:"INT port that the server should listen on"
       in
-      fun () -> 
+      fun () ->
         (* this is where we do our beginning functions *)
-      let game = Game.create [ (* initialize player function to abstraction *)]
-      (* to do later: intialize_graphics *)
-      
-        
-        
-        
-
-
-
-
-
-
-
-
-
-        serve port]
-        (* the first call with string will be to change the PC names *)
+        let game : Game.t = Game.create () in
+        (* to do later: intialize_graphics *)
+        serve port game]
   ;;
+
+  (* the first call with string will be to change the PC names *)
 
   let command =
     Command.async
