@@ -28,6 +28,19 @@ let create () : t =
   }
 ;;
 
+(* this parses the IP address from a client *)
+let get_ip_address client : string =
+  let colon_index =
+    String.index_exn (Socket.Address.Inet.to_string client) ':'
+  in
+  (* this gives the IP address without the extra bits at *)
+  let client_str =
+    String.slice (Socket.Address.Inet.to_string client) 0 colon_index
+  in
+  print_s [%message client_str];
+  client_str
+;;
+
 let set_up_players client (query : string) t : t =
   if List.length t.player_list < 4
   then
@@ -36,9 +49,7 @@ let set_up_players client (query : string) t : t =
          (* they repeat IP adresses byt clients are differnet based off of
             TIME... *)
          (List.exists t.player_list ~f:(fun (c, _) ->
-            String.equal
-              (Tmp_server.get_ip_address c)
-              (Tmp_server.get_ip_address client)))
+            String.equal (get_ip_address c) (get_ip_address client)))
     then (
       t.player_list
         <- t.player_list @ [ client, Player.name_create_single_player query ];

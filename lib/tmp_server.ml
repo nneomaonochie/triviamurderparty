@@ -5,18 +5,6 @@ open! Async
 
 let game_stack = Stack.create ()
 
-let get_ip_address client : string =
-  let colon_index =
-    String.index_exn (Socket.Address.Inet.to_string client) ':'
-  in
-  (* this gives the IP address without the extra bits at *)
-  let client_str =
-    String.slice (Socket.Address.Inet.to_string client) 0 colon_index
-  in
-  print_s [%message client_str];
-  client_str
-;;
-
 (* [Protocol] defines the communication between the server and the client. *)
 module Protocol : sig
   (* [Query] defines the type that the client sends to the server. Here, the

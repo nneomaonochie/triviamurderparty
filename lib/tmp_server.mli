@@ -6,6 +6,5 @@ open! Async
 
     [command] implements shell/console commands for starting up servers and
     clients. *)
-val get_ip_address : Socket.Address.Inet.t -> string
 
 val command : Async.Command.t
