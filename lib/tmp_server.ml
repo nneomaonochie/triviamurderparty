@@ -84,7 +84,7 @@ module Server : sig
 end = struct
   (* gets the query from the client *)
 
-  let handle_query_string client query (*(game : Game.t)*) =
+  let handle_query_string client query =
     let game : Game.t = Stack.pop_exn game_stack in
     let game =
       match game.game_state with
@@ -112,35 +112,35 @@ end = struct
       }
   ;;
 
-  let handle_query_char client query =
+  let handle_query_char client query : Protocol.Response.t Deferred.t =
     let game = Stack.pop_exn game_stack in
     let question = game.game_type in
-    match question with
-    | Trivia q ->
-      let correct_ans = q.correct_answer in
-      let players = game.player_list in
-      let c, player =
-        List.find_exn players ~f:(fun player ->
-          let c, p = player in
-          if Socket.Address.Inet.compare c client = 0 then true else false)
-      in
-      ()
-    | _ ->
-      ();
-      Stack.push game_stack game;
-      (* 1. which client put in what char 2. the only keys we allow are
-         Q,W,E,R 3. if client is correct or not *)
-      Core.print_s
-        [%message
-          "Received query"
-            (client : Socket.Address.Inet.t)
-            (query : Protocol.Query_char.t)];
-      let s = Char.to_string (Protocol.Query_char.to_char query) in
-      (* changing this into a deferred type *)
-      return
-        { Protocol.Response.response_message =
-            [%string "I have received your query! You said: CHAR"]
-        }
+    let () =
+      match question with
+      | Trivia q ->
+        let correct_ans = q.correct_answer in
+        let players = game.player_list in
+        let c, player =
+          List.find_exn players ~f:(fun player ->
+            let c, p = player in
+            if Socket.Address.Inet.compare c client = 0 then true else false)
+        in
+        ()
+      | _ -> ()
+    in
+    Stack.push game_stack game;
+    (* 1. which client put in what char 2. the only keys we allow are Q,W,E,R
+       3. if client is correct or not *)
+    Core.print_s
+      [%message
+        "Received query"
+          (client : Socket.Address.Inet.t)
+          (query : Protocol.Query_char.t)];
+    (* changing this into a deferred type *)
+    return
+      { Protocol.Response.response_message =
+          [%string "I have received your query! You said: CHAR"]
+      }
   ;;
 
   let implementations (game : Game.t)
