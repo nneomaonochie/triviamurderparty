@@ -4,10 +4,10 @@ open! Async
 module Game_kind = struct
   type t =
     | Trivia of Question.t
-    | Math_mayhem of Player.t list
-    | Decisions of Player.t list
-    | Button_mash of Player.t list
-  [@@deriving compare, equal, sexp_of]
+    | Math_mayhem of (Socket.Address.Inet.t * Player.t) list
+    | Decisions of (Socket.Address.Inet.t * Player.t) list
+    | Button_mash of (Socket.Address.Inet.t * Player.t) list
+  [@@deriving compare, sexp_of]
 end
 
 (* we need to try to store the client IP address with the player its attached
