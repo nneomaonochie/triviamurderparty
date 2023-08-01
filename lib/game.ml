@@ -1,25 +1,27 @@
 open! Core
+open! Async
 
 module Game_kind = struct
   type t =
-    | Trivia
+    | Trivia of Triviaquestions.Question.t
     | Math_mayhem of Player.t list
     | Decisions of Player.t list
     | Button_mash of Player.t list
   [@@deriving compare, equal, sexp_of]
 end
 
+(* we need to try to store the client IP address with the player its attached
+   to *)
+
 type t =
-  { (* players should stay the same, but a player being dead or alive should
-       be mutable *)
-    player_list : Player.t list
+  { mutable player_list : (Socket.Address.Inet.t * Player.t) list
   ; mutable game_type : Game_kind.t
   ; mutable game_state : Game_state.t
   }
 [@@deriving sexp_of, compare]
 
 let create () : t =
-  { player_list = Player.create_multi_players ()
+  { player_list = [] (*Player.create_multi_players ()*)
   ; game_type = Trivia
   ; game_state = Player_Initializion
   }

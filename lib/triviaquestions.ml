@@ -5,15 +5,6 @@ open! Yojson
 (* Module that will store questions that are randomly selected from JSON
    file*)
 
-module Question = struct
-  type t =
-    { question : string
-    ; answer_choices : string list
-    ; correct_answer : string
-    }
-  [@@deriving compare, equal, sexp_of]
-end
-
 (* Converting JSON file into Yojson datatype*)
 let get_data_from_file filename = Yojson.Basic.from_file filename
 
@@ -23,7 +14,7 @@ let get_question_array file_name =
   json |> to_list
 ;;
 
-let pick_random_question () : Question.t =
+let pick_random_question () : Question.Question.t =
   let open Yojson.Basic.Util in
   let array =
     get_question_array
@@ -50,5 +41,5 @@ let pick_random_question () : Question.t =
 
 let print_random_question () =
   let q = pick_random_question () in
-  print_s [%message "Random Question: " (q : Question.t)]
+  print_s [%message "Random Question: " (q : Question.Question.t)]
 ;;
