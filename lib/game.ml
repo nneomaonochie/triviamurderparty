@@ -28,6 +28,20 @@ let create () : t =
   }
 ;;
 
+let set_up_players client (query : string) t : t =
+  if List.length t.player_list < 4
+  then
+    (* we need to ensure that we have 4 unique clients *)
+    if not
+         (List.exists t.player_list ~f:(fun (c, _) ->
+            Socket.Address.Inet.compare c client = 0))
+    then (
+      t.player_list
+        <- t.player_list @ [ client, Player.name_create_single_player query ];
+      if List.length t.player_list = 4 then t.game_state <- Ongoing);
+  t
+;;
+
 (* try-catch for when not 4 is created *)
 
 (* expect tests for game creation let%expect_test "test game creation" = let
