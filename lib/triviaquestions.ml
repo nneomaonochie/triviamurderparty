@@ -14,7 +14,7 @@ let get_question_array file_name =
   json |> to_list
 ;;
 
-let pick_random_question () : Question.Question.t =
+let pick_random_question () : Question.t =
   let open Yojson.Basic.Util in
   let array =
     get_question_array
@@ -41,5 +41,5 @@ let pick_random_question () : Question.Question.t =
 
 let print_random_question () =
   let q = pick_random_question () in
-  print_s [%message "Random Question: " (q : Question.Question.t)]
+  print_s [%message "Random Question: " (q : Question.t)]
 ;;
