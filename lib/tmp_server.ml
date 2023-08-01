@@ -172,6 +172,9 @@ end = struct
         ]
   ;;
 
+  (* idea: add an admin command for manual intervention in case the timing
+     flops *)
+
   let serve port (game : Game.t) =
     let%bind server =
       Rpc.Connection.serve
