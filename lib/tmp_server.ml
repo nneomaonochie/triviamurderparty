@@ -3,6 +3,8 @@
 open! Core
 open! Async
 
+
+
 (* [Protocol] defines the communication between the server and the client. *)
 module Protocol : sig
   (* [Query] defines the type that the client sends to the server. Here, the
@@ -80,6 +82,7 @@ end
 module Server : sig
   val command : Command.t
 end = struct
+
   (* gets the query from the client *)
   let handle_query_string client query =
     Core.print_s
@@ -139,14 +142,26 @@ end = struct
           (required int)
           ~doc:"INT port that the server should listen on"
       in
-      fun () ->
+      fun () -> 
         (* this is where we do our beginning functions *)
-        let game = Game.create () in
-        (* to do later: intialize_graphics *)
-        serve port]
-  ;;
+      let game = Game.create [ (* initialize player function to abstraction *)]
+      (* to do later: intialize_graphics *)
+      
+        
+        
+        
 
-  (* the first call with string will be to change the PC names *)
+
+
+
+
+
+
+
+
+        serve port]
+        (* the first call with string will be to change the PC names *)
+  ;;
 
   let command =
     Command.async
