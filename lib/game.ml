@@ -33,6 +33,8 @@ let set_up_players client (query : string) t : t =
   then
     (* we need to ensure that we have 4 unique clients *)
     if not
+         (* they repeat IP adresses byt clients are differnet based off of
+            TIME... *)
          (List.exists t.player_list ~f:(fun (c, _) ->
             Socket.Address.Inet.compare c client = 0))
     then (
