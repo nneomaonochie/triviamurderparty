@@ -3,7 +3,7 @@ open! Async
 
 module Game_kind = struct
   type t =
-    | Trivia of Triviaquestions.Question.t
+    | Trivia of Question.t
     | Math_mayhem of Player.t list
     | Decisions of Player.t list
     | Button_mash of Player.t list
@@ -22,7 +22,8 @@ type t =
 
 let create () : t =
   { player_list = [] (*Player.create_multi_players ()*)
-  ; game_type = Trivia
+  ; game_type =
+      Trivia { question = ""; answer_choices = []; correct_answer = "" }
   ; game_state = Player_Initializion
   }
 ;;

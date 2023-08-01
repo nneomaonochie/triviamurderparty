@@ -83,24 +83,6 @@ module Server : sig
   val command : Command.t
 end = struct
   (* gets the query from the client *)
-<<<<<<< HEAD
-  let handle_query_string client query (game : Game.t) =
-    (* match game.game_state with | Player_Initializion -> if List.length
-       game.player_list < 4 then (if not (List.find
-
-       game.player_list <- game.player_list @ [ client,
-       Player.create_single_player () ])
-
-       | _ -> () ; Core.print_s [%message "Received query" (client :
-       Socket.Address.Inet.t) (query : Protocol.Query_string.t)]; (* changing
-       this into a deferred type *) return {
-       Protocol.Response.response_message = [%string "I have received your
-       query! You said: \ %{query#Protocol.Query_string}"] } *)
-    ()
-  ;;
-
-  let handle_query_char client query (game : Game.t) =
-=======
   let handle_query_string client query (game : Game.t)
     : Protocol.Response.t Deferred.t
     =
@@ -139,8 +121,11 @@ end = struct
       }
   ;;
 
-  let handle_query_char client query (*(game : Game.t)*) =
->>>>>>> 5af60703a21b1b6923bcb3fca5a6ad0976197904
+  let handle_query_char client query (game : Game.t) =
+    let question = game.game_type in
+    let correct_answer =
+      match question with Trivia q -> q.correct_answer | _ -> ""
+    in
     (* 1. which client put in what char 2. the only keys we allow are Q,W,E,R
        3. if client is correct or not *)
     Core.print_s
