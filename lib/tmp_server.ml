@@ -3,6 +3,8 @@
 open! Core
 open! Async
 
+let game_stack = Stack.create ()
+
 (* [Protocol] defines the communication between the server and the client. *)
 module Protocol : sig
   (* [Query] defines the type that the client sends to the server. Here, the
@@ -81,6 +83,7 @@ module Server : sig
   val command : Command.t
 end = struct
   (* gets the query from the client *)
+<<<<<<< HEAD
   let handle_query_string client query (game : Game.t) =
     (* match game.game_state with | Player_Initializion -> if List.length
        game.player_list < 4 then (if not (List.find
@@ -97,6 +100,47 @@ end = struct
   ;;
 
   let handle_query_char client query (game : Game.t) =
+=======
+  let handle_query_string client query (game : Game.t)
+    : Protocol.Response.t Deferred.t
+    =
+    let () =
+      match game.game_state with
+      | Player_Initializion ->
+        (* we want to fill up the game's player list to be 4 exactly *)
+        if List.length game.player_list < 4
+        then
+          (* we need to ensure that we have 4 unique clients *)
+          if not
+               (List.exists game.player_list ~f:(fun (c, _) ->
+                  Socket.Address.Inet.compare c client = 0))
+          then (
+            game.player_list
+              <- game.player_list
+                 @ [ ( client
+                     , Player.name_create_single_player
+                         (Protocol.Query_string.to_string query) )
+                   ];
+            if List.length game.player_list = 4
+            then game.game_state <- Ongoing)
+      | _ -> ()
+    in
+    Core.print_s
+      [%message
+        "Received query"
+          (client : Socket.Address.Inet.t)
+          (query : Protocol.Query_string.t)];
+    (* changing this into a deferred type *)
+    return
+      { Protocol.Response.response_message =
+          [%string
+            "I have received your query! You said: \
+             %{query#Protocol.Query_string}"]
+      }
+  ;;
+
+  let handle_query_char client query (*(game : Game.t)*) =
+>>>>>>> 5af60703a21b1b6923bcb3fca5a6ad0976197904
     (* 1. which client put in what char 2. the only keys we allow are Q,W,E,R
        3. if client is correct or not *)
     Core.print_s
@@ -112,19 +156,23 @@ end = struct
       }
   ;;
 
-  let implementations =
+  let implementations (game : Game.t)
+    : Socket.Address.Inet.t Rpc.Implementations.t
+    =
     Rpc.Implementations.create_exn
       ~on_unknown_rpc:`Close_connection
       ~implementations:
-        [ Rpc.Rpc.implement Protocol.rpc_string handle_query_string game
-        ; Rpc.Rpc.implement Protocol.rpc_char handle_query_char game
+        [ Rpc.Rpc.implement
+            Protocol.rpc_string
+            handle_query_string (* game *)
+        ; Rpc.Rpc.implement Protocol.rpc_char handle_query_char (* game *)
         ]
   ;;
 
   let serve port (game : Game.t) =
     let%bind server =
       Rpc.Connection.serve
-        ~implementations
+        ~implementations:(implementations game)
         ~initial_connection_state:(fun addr _conn -> addr)
         ~where_to_listen:(Tcp.Where_to_listen.of_port port)
         ()
@@ -144,6 +192,7 @@ end = struct
       fun () ->
         (* this is where we do our beginning functions *)
         let game : Game.t = Game.create () in
+        Stack.push game_stack game;
         (* to do later: intialize_graphics *)
         serve port game]
   ;;
