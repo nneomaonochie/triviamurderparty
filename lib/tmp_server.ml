@@ -83,35 +83,16 @@ module Server : sig
   val command : Command.t
 end = struct
   (* gets the query from the client *)
-<<<<<<< HEAD
-  let handle_query_string client query (game : Game.t) =
-    (* match game.game_state with | Player_Initializion -> if List.length
-       game.player_list < 4 then (if not (List.find
-
-       game.player_list <- game.player_list @ [ client,
-       Player.create_single_player () ])
-
-       | _ -> () ; Core.print_s [%message "Received query" (client :
-       Socket.Address.Inet.t) (query : Protocol.Query_string.t)]; (* changing
-       this into a deferred type *) return {
-       Protocol.Response.response_message = [%string "I have received your
-       query! You said: \ %{query#Protocol.Query_string}"] } *)
-    ()
-  ;;
-
-  let handle_query_char client query (game : Game.t) =
-=======
-  let handle_query_string client query (game : Game.t)
-    : Protocol.Response.t Deferred.t
-    =
+  let handle_query_string client query (*(game : Game.t)*) =
+    let game : Game.t = Stack.pop_exn game_stack in
     let () =
       match game.game_state with
       | Player_Initializion ->
         (* we want to fill up the game's player list to be 4 exactly *)
         if List.length game.player_list < 4
         then
-          (* we need to ensure that we have 4 unique clients *)
-          if not
+          if (* we need to ensure that we have 4 unique clients *)
+             not
                (List.exists game.player_list ~f:(fun (c, _) ->
                   Socket.Address.Inet.compare c client = 0))
           then (
@@ -125,11 +106,13 @@ end = struct
             then game.game_state <- Ongoing)
       | _ -> ()
     in
+    Stack.push game_stack game;
     Core.print_s
       [%message
         "Received query"
           (client : Socket.Address.Inet.t)
           (query : Protocol.Query_string.t)];
+    Core.print_s [%message "" (Stack.top_exn game_stack : Game.t)];
     (* changing this into a deferred type *)
     return
       { Protocol.Response.response_message =
@@ -140,7 +123,6 @@ end = struct
   ;;
 
   let handle_query_char client query (*(game : Game.t)*) =
->>>>>>> 5af60703a21b1b6923bcb3fca5a6ad0976197904
     (* 1. which client put in what char 2. the only keys we allow are Q,W,E,R
        3. if client is correct or not *)
     Core.print_s
