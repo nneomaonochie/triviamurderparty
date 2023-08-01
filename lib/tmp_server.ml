@@ -124,7 +124,11 @@ end = struct
       }
   ;;
 
-  let handle_query_char client query (*(game : Game.t)*) =
+  let handle_query_char client query (game : Game.t) =
+    let question = game.game_type in
+    let correct_answer =
+      match question with Trivia q -> q.correct_answer | _ -> ""
+    in
     (* 1. which client put in what char 2. the only keys we allow are Q,W,E,R
        3. if client is correct or not *)
     Core.print_s
