@@ -21,7 +21,7 @@ type t =
 [@@deriving sexp_of, compare]
 
 let create () : t =
-  { player_list = [] (*Player.create_multi_players ()*)
+  { player_list = []
   ; game_type =
       Trivia { question = ""; answer_choices = []; correct_answer = "" }
   ; game_state = Player_Initializion
@@ -36,7 +36,9 @@ let set_up_players client (query : string) t : t =
          (* they repeat IP adresses byt clients are differnet based off of
             TIME... *)
          (List.exists t.player_list ~f:(fun (c, _) ->
-            Socket.Address.Inet.compare c client = 0))
+            String.equal
+              (Tmp_server.get_ip_address c)
+              (Tmp_server.get_ip_address client)))
     then (
       t.player_list
         <- t.player_list @ [ client, Player.name_create_single_player query ];
