@@ -8,14 +8,17 @@ type t =
 [@@deriving compare, equal, sexp_of]
 
 (* this is the default player *)
-let create_single_player () = { name = ""; score = 0; living = true }
+let default_create_single_player () = { name = ""; score = 0; living = true }
+
+(* creates a player with the name *)
+let name_create_single_player str = { name = str; score = 0; living = true }
 
 (* creates a list of 4 default players *)
 let create_multi_players () =
-  [ create_single_player ()
-  ; create_single_player ()
-  ; create_single_player ()
-  ; create_single_player ()
+  [ default_create_single_player ()
+  ; default_create_single_player ()
+  ; default_create_single_player ()
+  ; default_create_single_player ()
   ]
 ;;
 

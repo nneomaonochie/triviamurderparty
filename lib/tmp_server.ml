@@ -81,18 +81,30 @@ module Server : sig
   val command : Command.t
 end = struct
   (* gets the query from the client *)
-  let handle_query_string client query (game : Game.t) =
-    match game.game_state with 
-    | Player_Initializion -> 
-      if List.length game.player_list < 4 then
-      (if not (List.find 
-        
-        game.player_list <- game.player_list @ [ client, Player.create_single_player () ])
-
-
-
-    | _ -> ()
-    ;
+  let handle_query_string client query (game : Game.t)
+    : Protocol.Response.t Deferred.t
+    =
+    let () =
+      match game.game_state with
+      | Player_Initializion ->
+        (* we want to fill up the game's player list to be 4 exactly *)
+        if List.length game.player_list < 4
+        then
+          (* we need to ensure that we have 4 unique clients *)
+          if not
+               (List.exists game.player_list ~f:(fun (c, _) ->
+                  Socket.Address.Inet.compare c client = 0))
+          then (
+            game.player_list
+              <- game.player_list
+                 @ [ ( client
+                     , Player.name_create_single_player
+                         (Protocol.Query_string.to_string query) )
+                   ];
+            if List.length game.player_list = 4
+            then game.game_state <- Ongoing)
+      | _ -> ()
+    in
     Core.print_s
       [%message
         "Received query"
@@ -108,8 +120,7 @@ end = struct
   ;;
 
   let handle_query_char client query (game : Game.t) =
-    (* 1. which client put in what char 
-       2. the only keys we allow are Q,W,E,R
+    (* 1. which client put in what char 2. the only keys we allow are Q,W,E,R
        3. if client is correct or not *)
     Core.print_s
       [%message
