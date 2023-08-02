@@ -15,16 +15,28 @@ let display_beginning_instructions () = ()
 (* this asks user input for players' names so that we can initiatilize the
    players and create a game *)
 let player_creation_screen () =
-  Graphics.open_graph (Printf.sprintf "\n   %dx%d" 1200 800);
+  Graphics.open_graph " 1200x800";
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1200 800;
+  Graphics.set_color Color.dark_red;
+  let _result =
+    List.init 1000 ~f:(fun _ ->
+      Graphics.draw_arc
+        (Random.int 1200)
+        (Random.int 800)
+        (Random.int 150)
+        (Random.int 150)
+        (Random.int 30)
+        (Random.int 30))
+  in
+  ();
+  Graphics.set_color Color.dark_blue;
+  Graphics.draw_rect 375 400 600 200;
+  Graphics.fill_rect 375 400 600 200;
   Graphics.moveto 400 500;
   Graphics.set_color Color.red;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
-  Graphics.draw_string "Please enter your name into the console";
-  Graphics.set_color Color.dark_blue;
-  Graphics.draw_rect 375 400 600 200;
-  Graphics.set_color Color.dark_red
+  Graphics.draw_string "Please enter your name into the console"
 ;;
 
 (* this places characters on a screen adjusting for the spacing depending on
@@ -75,7 +87,18 @@ let display_players (players : (Socket.Address.Inet.t * Player.t) list)
 ;;
 
 (* these are the graphics for specific game_kind*)
-let create_trivia_graphics () = ()
+let create_trivia_graphics (game : Game.t) =
+  let d = display_players game.player_list in
+  ();
+  let question_to_display =
+    match game.game_type with
+    | Trivia q -> q
+    | _ -> { question = ""; answer_choices = []; correct_answer = "" }
+  in
+  Graphics.moveto 500 500;
+  Graphics.draw_string question_to_display.question
+;;
+
 let create_leaderboard_graphics (game : Game.t) = ()
 
 (* pastes the arithmetic stuff where they are supposed to be *)
@@ -86,7 +109,7 @@ let paste_math_mayhem_qs
   Graphics.set_color Color.white;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
   Graphics.moveto x_coord (player_block_size - 100);
-  let ques, ans = Math_mayhem.get_questions () in
+  let ques, ans = "", "" (* Math_mayhem.get_questions ()*) in
   Graphics.draw_string ques
 ;;
 
@@ -106,9 +129,11 @@ let create_math_mayhem_graphics
       ~size:(List.length player_positions)
       (module String)
   in
-  (* the first questions are displayed *)
-  List.iter player_positions ~f:paste_math_mayhem_qs correct_answers
+  ()
 ;;
+
+(* the first questions are displayed *)
+(* List.iter player_positions ~f:paste_math_mayhem_qs correct_answers *)
 
 let create_decision_graphics () = ()
 let create_clicker_graphics () = ()
