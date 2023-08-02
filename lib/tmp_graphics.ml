@@ -20,14 +20,27 @@ let player_creation_screen () =
   Graphics.fill_rect 0 0 1200 800
 ;;
 
-(* display instructions for how TMP works after the game is created *)
 let display_beginning_instructions () = ()
 
 
 
 (* this will deal with the spacing *)
 let display_players players = 
+
+  (* this is pseudocode - i could hardcode the starting points for each numPlayer and add the rect every X spaces,
+     
+  i could calculate based off the cebnter (odds is player in middle, evens is space in middle, do what makes sense)*)
+  for (int x = top_left_x_coor; x < 1200 - top_left_x_coor; x += 250) { Graphics.fill rect x 700 player_block_size player_block_size;}
+
+
+
+
+
   (* spacing is based off of numPlayers *)
+  (1200 / 2 ) - (125 / 2 ) -> this one player will be in the DEAD center (bc its based off the top left coordinate)
+
+  if odd numplayers, center player is smack dab in middle, if even, the space is smack dab in middle
+  (* BETWEEN players, the spacing is always 250 from the top left corner (in between its 150)*)
   
 ;;
 
