@@ -94,6 +94,15 @@ end = struct
           (Protocol.Query_string.to_string query)
           game
         (* we want to fill up the game's player list to be 4 exactly *)
+      | Ongoing ->
+        (match game.game_type with
+         | Math_mayhem _ ->
+           (* the players response to the question being shown *)
+           Tmp_graphics.math_mayhem_player_response
+             client
+             (Protocol.Query_string.to_string query);
+           game
+         | _ -> game)
       | _ -> game
     in
     (* Tmp_graphics.create_math_mayhem_graphics game.player_list; *)

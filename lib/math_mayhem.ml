@@ -29,17 +29,10 @@ let get_questions () =
       second * -1 (* if the operand is subtract, then we are subtracting *)
   in
   let question_string =
-    (* the question we will show to the client *)
     Int.to_string first ^ operator_str ^ Int.to_string second ^ " = ? "
   in
   question_string, correct_answer
 ;;
-(* this will probably be the end of the loop *)
-
-(* 3. display question to player - this will utilize Protocol.Response.t *)
-(* Graphics => Graphics 4 quadrants for each players each time i return a
-   question stirng -> if they get get correct answer, new string show
-   everything a player need to look at *)
 
 (* 4. get player responses - each correct answer is +25 to score *)
 (* wrong answers - in OG game they get stunned for X secs, may just implement

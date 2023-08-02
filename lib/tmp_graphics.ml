@@ -55,7 +55,7 @@ let rec paste_players x_coord ~players_left ~player_positions
       player_y_coord
       player_block_size
       player_block_size;
-    (* if player looks dead, you need to visually show that *)
+    (* if player looks dead, put an x *)
     Graphics.moveto x_coord 750;
     Graphics.set_font
       "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
@@ -77,10 +77,7 @@ let display_players (players : (Socket.Address.Inet.t * Player.t) list)
   if List.length players = 0
   then failwith "We need at least one player to display.";
   (* I am making it exclusively a list of players *)
-  let display_player_list =
-    players
-    (* List.unzip players |> fun (_, player_list) -> player_list *)
-  in
+  let display_player_list = players in
   let num_players = List.length display_player_list in
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1200 800;
@@ -107,40 +104,44 @@ let create_leaderboard_graphics (game : Game.t) = ()
 
 (* pastes the arithmetic stuff where they are supposed to be *)
 let paste_math_mayhem_qs
+  ~(correct_answers : (string, int) Base.Hashtbl.t)
   (((client, player), x_coord) : (Socket.Address.Inet.t * Player.t) * int)
-  (correct_answers : (string, int) Base.Hashtbl.t)
   =
-  (* i need to fill in a rectangle to cover previous questions but i dont
-     know the dimensiosn yet *)
-  (* Graphics.set_color Color.blue; Graphics.fill_rect *)
+  Graphics.set_color Color.black;
+  Graphics.fill_rect x_coord (player_y_coord - 50) 150 30;
   Graphics.set_color Color.white;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
-<<<<<<< HEAD
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--25-*-*-*-*-*-iso8859-1";
   Graphics.moveto x_coord (player_y_coord - 50);
   let ques, ans = Math_mayhem.get_questions () in
   Graphics.draw_string ques;
   let client_ip = Game.get_ip_address client in
-  (* if we already have client as a member, we update - if not we add *)
-  print_s [%message (ques, ans : string * int)];
-  Hashtbl.set
-    correct_answers
-    ~key:client_ip
-    ~data:ans (* can you set values that werent already there *)
-=======
-  Graphics.moveto x_coord (player_block_size - 100);
-  let ques, ans = "", "" (* Math_mayhem.get_questions ()*) in
-  Graphics.draw_string ques
->>>>>>> origin/main
+  Hashtbl.set correct_answers ~key:client_ip ~data:ans
 ;;
 
-(* draws the string but what is the answer? how about we create a map with
-   client -> player -> score we need *)
+let display_math_mayhem_points
+  ~(current_points : (string, int) Base.Hashtbl.t)
+  (((client, _), x_coord) : (Socket.Address.Inet.t * Player.t) * int)
+  =
+  (* replace the previous score *)
+  Graphics.set_color Color.black;
+  Graphics.fill_rect
+    (x_coord + (player_block_size / 2))
+    (player_y_coord - 120)
+    50
+    50;
+  Graphics.set_color Color.dark_red;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--40-*-*-*-*-*-iso8859-1";
+  Graphics.moveto (x_coord + (player_block_size / 2)) (player_y_coord - 120);
+  Graphics.draw_string
+    (Int.to_string
+       (Hashtbl.find_exn current_points (Game.get_ip_address client)))
+;;
 
-let create_math_mayhem_graphics
+(* when transitioning from Trivia to Math Mayhem, a function should be called
+   to set up the intial graphics *)
+let intialize_math_mayhem_graphics
   (participants : (Socket.Address.Inet.t * Player.t) list)
   =
-  (* we only want to send the list of players to the clients, and we do not
-     want to include client *)
   let player_positions = display_players participants in
   (* this is the hashtable that stores the correct answer to arithmetic
      questions as values *)
@@ -158,13 +159,35 @@ let create_math_mayhem_graphics
       ~size:(List.length player_positions)
       (module String)
   in
-  (* the first questions are displayed *)
-  paste_math_mayhem_qs (List.hd_exn player_positions) correct_answers;
-  print_s [%message "" (correct_answers : (string, int) Base.Hashtbl.t)]
+  (* the scores are set to 0*)
+  List.iter player_positions ~f:(fun ((c, _), _) ->
+    Hashtbl.add_exn current_points ~key:(Game.get_ip_address c) ~data:0);
+  (* the first questions and scores are displayed *)
+  List.iter player_positions ~f:(display_math_mayhem_points ~current_points);
+  List.iter player_positions ~f:(paste_math_mayhem_qs ~correct_answers)
 ;;
 
-(* the first questions are displayed *)
-(* List.iter player_positions ~f:paste_math_mayhem_qs correct_answers *)
+(* to match up what the user inputted and to change the screen, call this
+   function - this is what players call in TMP_Server!!! *)
+let math_mayhem_player_response client query =
+  print_s
+    [%message
+      "Have a check to ensure ONLY players in the minigame are answering"];
+  print_s
+    [%message
+      "We need a way to access the current_pints and current_nswers... \
+       Maybe a global variable IS necessary for the time being"];
+  print_s
+    [%message
+      "honestly that can work, all you really need is to re-assign the \
+       global var in Graphics - better idea is to\n\
+      \  use a record in Math_Mayhem!"]
+;;
+
+(* now we need to GET player response...*)
+
+(* when we check for the correct answer, we are going to update the current
+   points, display the new scorea and display the new questions*)
 
 let create_decision_graphics () = ()
 let create_clicker_graphics () = ()
