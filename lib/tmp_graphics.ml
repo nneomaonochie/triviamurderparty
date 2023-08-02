@@ -26,14 +26,7 @@ let player_creation_screen () =
   Graphics.draw_string "Please enter your name into the console";
   Graphics.set_color Color.dark_blue;
   Graphics.draw_rect 375 400 600 200;
-  Graphics.set_color Color.dark_red;
-  Graphics.draw_arc
-    (Random.int 500)
-    (Random.int 500)
-    (Random.int 500)
-    (Random.int 500)
-    (Random.int 500)
-    (Random.int 500)
+  Graphics.set_color Color.dark_red
 ;;
 
 (* this places characters on a screen adjusting for the spacing depending on
