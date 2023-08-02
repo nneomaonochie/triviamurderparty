@@ -96,8 +96,7 @@ let paste_math_mayhem_qs
   =
   (* i need to fill in a rectangle to cover previous questions but i dont
      know the dimensiosn yet *)
-
-  (* Graphics.set_color Color.black; Graphics.fill_rect *)
+  (* Graphics.set_color Color.blue; Graphics.fill_rect *)
   Graphics.set_color Color.white;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
   Graphics.moveto x_coord (player_y_coord - 50);
