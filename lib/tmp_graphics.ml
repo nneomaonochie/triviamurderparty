@@ -14,6 +14,28 @@ let player_starting_x_coords = [ 537; 400; 287; 150 ]
 let player_y_coord = 650
 let display_beginning_instructions () = ()
 
+(* this asks user input for players' names so that we can initiatilize the
+   players and create a game *)
+let player_creation_screen () =
+  Graphics.open_graph (Printf.sprintf " %dx%d" 1200 800);
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1200 800;
+  Graphics.moveto 400 500;
+  Graphics.set_color Color.red;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
+  Graphics.draw_string "Please enter your name into the console";
+  Graphics.set_color Color.dark_blue;
+  Graphics.draw_rect 375 400 600 200;
+  Graphics.set_color Color.dark_red;
+  Graphics.draw_arc
+    (Random.int 500)
+    (Random.int 500)
+    (Random.int 500)
+    (Random.int 500)
+    (Random.int 500)
+    (Random.int 500)
+;;
+
 (* this places characters on a screen adjusting for the spacing depending on
    number of players *)
 let display_players (players : Player.t list) =
