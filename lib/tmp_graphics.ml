@@ -3,17 +3,6 @@
 open! Core
 open! Async
 
-module Color = struct
-  let black = Graphics.rgb 000 000 000
-  let green = Graphics.rgb 000 255 000
-  let red = Graphics.rgb 255 000 000
-  let blue = Graphics.rgb 000 000 255
-
-  let random =
-    Graphics.rgb (Random.int 256) (Random.int 256) (Random.int 256)
-  ;;
-end
-
 (* for both width and heights of the players *)
 let player_block_size = 125
 
@@ -25,14 +14,6 @@ let player_starting_x_coords = [ 537; 400; 287; 150 ]
 let player_y_coord = 650
 let display_beginning_instructions () = ()
 
-(* this asks user input for players' names so that we can initiatilize the
-   players and create a game *)
-let player_creation_screen () =
-  Graphics.open_graph (Printf.sprintf " %dx%d" 1200 800);
-  Graphics.set_color Color.black;
-  Graphics.fill_rect 0 0 1200 800
-;;
-
 (* this places characters on a screen adjusting for the spacing depending on
    number of players *)
 let display_players (players : Player.t list) =
@@ -41,16 +22,18 @@ let display_players (players : Player.t list) =
     then ()
     else (
       let current_player = List.hd_exn players_left in
-      let player_color = Color.random in
-      Graphics.set_color player_color;
+      (* let player_color = Color.random () in *)
+      Graphics.set_color Color.white;
       Graphics.fill_rect
         x_coord
         player_y_coord
         player_block_size
         player_block_size;
-      Graphics.moveto x_coord (player_y_coord + 50);
+      (* if player looks dead, you need to visually show that *)
+      Graphics.moveto x_coord 750;
+      Graphics.set_color Color.white;
       Graphics.set_font
-        "-*-fixed-medium-r-semicondensed--15-*-*-*-*-*-iso8859-1";
+        "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
       Graphics.draw_string current_player.name;
       (*this removes the player we just instantiated *)
       let players_left = List.tl_exn players_left in
@@ -65,6 +48,18 @@ let display_players (players : Player.t list) =
   paste_players
     (List.nth_exn player_starting_x_coords (num_players - 1))
     display_player_list
+;;
+
+(* this asks user input for players' names so that we can initiatilize the
+   players and create a game *)
+let player_creation_screen () =
+  Graphics.open_graph (Printf.sprintf " %dx%d" 1200 800);
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1200 800;
+  display_players
+    [ { Player.name = "Jessica"; score = 100; living = true }
+    ; { Player.name = "Hame"; score = 1; living = true }
+    ]
 ;;
 
 (* these are the graphics for specific game_kind*)
