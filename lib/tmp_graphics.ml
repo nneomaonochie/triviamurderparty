@@ -8,6 +8,10 @@ module Color = struct
   let green = Graphics.rgb 000 255 000
   let red = Graphics.rgb 255 000 000
   let blue = Graphics.rgb 000 000 255
+
+  let random =
+    Graphics.rgb (Random.int 256) (Random.int 256) (Random.int 256)
+  ;;
 end
 
 (* for both width and heights of the players *)
@@ -29,51 +33,51 @@ let player_creation_screen () =
   Graphics.fill_rect 0 0 1200 800
 ;;
 
-(* this will deal with the spacing *)
-let display_players players =
-  let rec paste_players x_coord players_left : unit =
-    if players_left = 0
+(* this places characters on a screen adjusting for the spacing depending on
+   number of players *)
+let display_players (players : Player.t list) =
+  let rec paste_players x_coord (players_left : Player.t list) : unit =
+    if List.length players_left = 0
     then ()
     else (
+      let current_player = List.hd_exn players_left in
+      let player_color = Color.random in
+      Graphics.set_color player_color;
       Graphics.fill_rect
         x_coord
         player_y_coord
         player_block_size
         player_block_size;
-      paste_players (x_coord + 250) (players_left - 1))
+      Graphics.moveto x_coord (player_y_coord + 50);
+      Graphics.set_font
+        "-*-fixed-medium-r-semicondensed--15-*-*-*-*-*-iso8859-1";
+      Graphics.draw_string current_player.name;
+      (*this removes the player we just instantiated *)
+      let players_left = List.tl_exn players_left in
+      paste_players (x_coord + 250) players_left)
   in
-  (* this is pseudocode - i could hardcode the starting points for each
-     numPlayer and add the rect every X spaces,
-
-     i could calculate based off the cebnter (odds is player in middle, evens
-     is space in middle, do what makes sense)*)
   if List.length players = 0
   then failwith "We need at least one player to display.";
-  Graphics.set_color Color.blue;
-  let num_players = List.length players in
+  (* i want a list with the same items as player so i can pop things off
+     without consequence *)
+  let display_player_list = players in
+  let num_players = List.length display_player_list in
   paste_players
     (List.nth_exn player_starting_x_coords (num_players - 1))
-    num_players
+    display_player_list
 ;;
-
-(* for (int x = top_left_x_coor; x < 1200 - top_left_x_coor; x += 250) {
-   Graphics.fill rect x 700 player_block_size player_block_size;}
-
-   (* spacing is based off of numPlayers *) (1200 / 2 ) - (125 / 2 ) -> this
-   one player will be in the DEAD center (bc its based off the top left
-   coordinate)
-
-   if odd numplayers, center player is smack dab in middle, if even, the
-   space is smack dab in middle BETWEEN players, the spacing is always 250
-   from the top left corner (in between its 150) *)
 
 (* these are the graphics for specific game_kind*)
 let create_trivia_graphics () = ()
+let create_leaderboard_graphics (game : Game.t) = ()
 
 let create_math_mayhem_graphics
   (participants : (Socket.Address.Inet.t * Player.t) list)
   =
-  display_players participants;
+  (* we only want to send the list of players to the clients, and we do not
+     want to include client *)
+  display_players
+    (List.unzip participants |> fun (_, player_list) -> player_list);
   ()
 ;;
 
