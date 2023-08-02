@@ -4,12 +4,12 @@
    [@@deriving sexp_of, compare]
 
    (* sends a Math_Mayhem minigame with a list of players that are
-   participating in the minigame *) let initialize (players :
-   (Socket.Address.Inet.t * Player.t) list) = { participants = players } ;;
+   participating in the minigame *) let initialize (players
+   :(Socket.Address.Inet.t * Player.t) list) = { participants = players } ;;
 
-   (* 1. i need timer to stop the game... use an ivar with and check after X
-   seconds -> when it's full, stop, change the game (maybe make a winner
-   variant, whatever *)
+   (* 1. i need timer to stop the game... *) (*use an ivar with and check
+   after X seconds -> when it's full, stop, change the game (maybe make a
+   winner variant, whatever ) *)
 
    let run_game t = (* math_mayhem.graphics t *)
    Tmp_graphics.create_math_mayhem_graphics t.participants; (* this will
@@ -23,9 +23,9 @@
    loop *)
 
    (* 3. display question to player - this will utilize Protocol.Response.t
-   *) Graphics => Graphics 4 quadrants for each players each time i return a
-   question stirng -> if they get get correct answer, new string show
-   everything a player need to look at
+   *) (* Graphics => Graphics 4 quadrants for each players each time i return
+   a question stirng -> if they get get correct answer, new string show
+   everything a player need to look at *)
 
    (* 4. get player responses - each correct answer is +25 to score *) (*
    wrong answers - in OG game they get stunned for X secs, may just implement
