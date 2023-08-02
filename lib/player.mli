@@ -6,7 +6,7 @@ type t =
   { mutable name : string
   ; mutable score : int
   ; mutable living : bool
-  ; color : Tmp_graphics.Color.t
+  ; color : int
   }
 [@@deriving compare, equal, sexp_of]
 
