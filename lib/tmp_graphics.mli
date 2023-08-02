@@ -1,3 +1,5 @@
+[@@@disable_unused_warnings]
+
 open! Core
 open! Async
 
@@ -12,4 +14,3 @@ val create_math_mayhem_graphics
 
 val create_decision_graphics : unit -> unit
 val create_clicker_graphics : unit -> unit
-val create_players : unit -> unit

@@ -9,11 +9,17 @@ module Color = struct
   let red = Graphics.rgb 255 000 000
   let blue = Graphics.rgb 000 000 255
 end
+
 (* for both width and heights of the players *)
 let player_block_size = 125
-(* based off the number of players that are starting - index = numPlayers - 1 *) 
-let player_starting_x_coords = [537; 400; 287; 150] (* some of these numbers repeat... maybe i can optimize *)
+
+(* based off the number of players that are starting - index = numPlayers -
+   1 *)
+let player_starting_x_coords = [ 537; 400; 287; 150 ]
+
+(* some of these numbers repeat... maybe i can optimize *)
 let player_y_coord = 650
+let display_beginning_instructions () = ()
 
 (* this asks user input for players' names so that we can initiatilize the
    players and create a game *)
@@ -23,29 +29,43 @@ let player_creation_screen () =
   Graphics.fill_rect 0 0 1200 800
 ;;
 
-let display_beginning_instructions () = ()
-
-
-
 (* this will deal with the spacing *)
-let display_players players = 
+let display_players players =
+  let rec paste_players x_coord players_left : unit =
+    if players_left = 0
+    then ()
+    else (
+      Graphics.fill_rect
+        x_coord
+        player_y_coord
+        player_block_size
+        player_block_size;
+      paste_players (x_coord + 250) (players_left - 1))
+  in
+  (* this is pseudocode - i could hardcode the starting points for each
+     numPlayer and add the rect every X spaces,
 
-  (* this is pseudocode - i could hardcode the starting points for each numPlayer and add the rect every X spaces,
-     
-  i could calculate based off the cebnter (odds is player in middle, evens is space in middle, do what makes sense)*)
-  for (int x = top_left_x_coor; x < 1200 - top_left_x_coor; x += 250) { Graphics.fill rect x 700 player_block_size player_block_size;}
-
-
-
-
-
-  (* spacing is based off of numPlayers *)
-  (1200 / 2 ) - (125 / 2 ) -> this one player will be in the DEAD center (bc its based off the top left coordinate)
-
-  if odd numplayers, center player is smack dab in middle, if even, the space is smack dab in middle
-  (* BETWEEN players, the spacing is always 250 from the top left corner (in between its 150)*)
-  
+     i could calculate based off the cebnter (odds is player in middle, evens
+     is space in middle, do what makes sense)*)
+  if List.length players = 0
+  then failwith "We need at least one player to display.";
+  Graphics.set_color Color.blue;
+  let num_players = List.length players in
+  paste_players
+    (List.nth_exn player_starting_x_coords (num_players - 1))
+    num_players
 ;;
+
+(* for (int x = top_left_x_coor; x < 1200 - top_left_x_coor; x += 250) {
+   Graphics.fill rect x 700 player_block_size player_block_size;}
+
+   (* spacing is based off of numPlayers *) (1200 / 2 ) - (125 / 2 ) -> this
+   one player will be in the DEAD center (bc its based off the top left
+   coordinate)
+
+   if odd numplayers, center player is smack dab in middle, if even, the
+   space is smack dab in middle BETWEEN players, the spacing is always 250
+   from the top left corner (in between its 150) *)
 
 (* these are the graphics for specific game_kind*)
 let create_trivia_graphics () = ()
@@ -53,7 +73,7 @@ let create_trivia_graphics () = ()
 let create_math_mayhem_graphics
   (participants : (Socket.Address.Inet.t * Player.t) list)
   =
-  display_players participants; 
+  display_players participants;
   ()
 ;;
 
