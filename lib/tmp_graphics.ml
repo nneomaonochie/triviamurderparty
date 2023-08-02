@@ -79,8 +79,16 @@ let player_creation_screen () =
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1200 800;
   display_players
-    [ { Player.name = "Jessica"; score = 100; living = true }
-    ; { Player.name = "Hame"; score = 1; living = true }
+    [ { Player.name = "Jessica"
+      ; score = 100
+      ; living = true
+      ; color = Color.random ()
+      }
+    ; { Player.name = "Hame"
+      ; score = 1
+      ; living = true
+      ; color = Color.random ()
+      }
     ]
 ;;
 
