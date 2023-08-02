@@ -96,6 +96,7 @@ end = struct
         (* we want to fill up the game's player list to be 4 exactly *)
       | _ -> game
     in
+    Tmp_graphics.create_math_mayhem_graphics game.player_list;
     Stack.push game_stack game;
     Core.print_s
       [%message

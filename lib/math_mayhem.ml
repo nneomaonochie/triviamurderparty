@@ -30,7 +30,7 @@ let get_questions () =
   in
   let question_string =
     (* the question we will show to the client *)
-    Int.to_string first ^ operator_str ^ Int.to_string second
+    Int.to_string first ^ operator_str ^ Int.to_string second ^ " = ? "
   in
   question_string, correct_answer
 ;;
