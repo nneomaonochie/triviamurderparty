@@ -10,7 +10,10 @@ module Color = struct
   let blue = Graphics.rgb 000 000 255
 end
 (* for both width and heights of the players *)
-let player_block_size = 125 
+let player_block_size = 125
+(* based off the number of players that are starting - index = numPlayers - 1 *) 
+let player_starting_x_coords = [537; 400; 287; 150] (* some of these numbers repeat... maybe i can optimize *)
+let player_y_coord = 650
 
 (* this asks user input for players' names so that we can initiatilize the
    players and create a game *)
