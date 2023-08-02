@@ -9,9 +9,9 @@ module Color = struct
   let red = Graphics.rgb 255 000 000
   let blue = Graphics.rgb 000 000 255
 end
-
 (* for both width and heights of the players *)
 let player_block_size = 125 
+
 (* this asks user input for players' names so that we can initiatilize the
    players and create a game *)
 let player_creation_screen () =
@@ -21,11 +21,9 @@ let player_creation_screen () =
 ;;
 
 (* display instructions for how TMP works after the game is created *)
-<<<<<<< HEAD
-(* let display_beginning_instructions (game : Game.t) = (* display
-   instruction for N seconds *) create_trivia_graphics game () ;; *)
-=======
 let display_beginning_instructions () = ()
+
+
 
 (* this will deal with the spacing *)
 let display_players players = 
@@ -33,7 +31,6 @@ let display_players players =
   
 ;;
 
->>>>>>> 6be2bb8d8160075b136a6403d6da49521773330b
 (* these are the graphics for specific game_kind*)
 let create_trivia_graphics () = ()
 
