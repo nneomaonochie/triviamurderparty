@@ -1,22 +1,21 @@
 open! Core
 open! Async
 
-type t = { participants : (Socket.Address.Inet.t * Player.t) list }
-[@@deriving sexp_of, compare]
+(* type t = { participants : (Socket.Address.Inet.t * Player.t) list }
+   [@@deriving sexp_of, compare]
 
-(* sends a Math_Mayhem minigame with a list of players that are participating
-   in the minigame *)
-let initialize (players : (Socket.Address.Inet.t * Player.t) list) =
-  { participants = players }
-;;
+   (* sends a Math_Mayhem minigame with a list of players that are
+   participating in the minigame *) let initialize (players :
+   (Socket.Address.Inet.t * Player.t) list) = { participants = players }
+   ;; *)
 
 (* 1. i need timer to stop the game... *)
 (*use an ivar with and check after X seconds -> when it's full, stop, change
   the game (maybe make a winner variant, whatever ) *)
 
-let run_game t =
-  (* math_mayhem.graphics t *)
-  Tmp_graphics.create_math_mayhem_graphics t.participants;
+(* the Math mayhem in graphics is the main one and it calls methods from
+   here *)
+let get_questions () =
   (* this will probably be in a loop *)
   let operator = if Random.int 2 % 2 = 0 then " + " else " - " in
   let first = Random.int 41 - 20 in

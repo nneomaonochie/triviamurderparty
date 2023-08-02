@@ -37,7 +37,9 @@ let player_creation_screen () =
 (* this places characters on a screen adjusting for the spacing depending on
    number of players *)
 (* returns a list of players and their corresponding x_coord*)
-let display_players (players : Player.t list) : (Player.t * int) list =
+let display_players (players : (Socket.Address.Inet.t * Player.t) list)
+  : (Player.t * int) list
+  =
   let rec paste_players
     x_coord
     ~(players_left : Player.t list)
@@ -68,9 +70,10 @@ let display_players (players : Player.t list) : (Player.t * int) list =
   in
   if List.length players = 0
   then failwith "We need at least one player to display.";
-  (* i want a list with the same items as player so i can pop things off
-     without consequence *)
-  let display_player_list = players in
+  (* I am making it exclusively a list of players *)
+  let display_player_list =
+    List.unzip players |> fun (_, player_list) -> player_list
+  in
   let num_players = List.length display_player_list in
   paste_players
     (List.nth_exn player_starting_x_coords (num_players - 1))
@@ -87,10 +90,7 @@ let create_math_mayhem_graphics
   =
   (* we only want to send the list of players to the clients, and we do not
      want to include client *)
-  let player_positions =
-    display_players
-      (List.unzip participants |> fun (_, player_list) -> player_list)
-  in
+  let player_positions = display_players participants in
   ()
 ;;
 
