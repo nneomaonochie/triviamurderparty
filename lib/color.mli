@@ -1,3 +1,5 @@
+open! Core
+
 val black : int
 val white : int
 val green : int
