@@ -10,6 +10,4 @@ type t =
 [@@deriving sexp_of]
 
 val create : unit -> t
-
-(* val initialize : (Socket.Address.Inet.t * Player.t) list -> t *)
 val get_questions : unit -> string * int

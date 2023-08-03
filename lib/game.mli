@@ -3,6 +3,7 @@ open! Async
 
 module Game_kind : sig
   type t =
+    | Leaderboard
     | Trivia of Question.t
     (* Player.t list is the list of player(s) who will be participating in
        that minigame *)

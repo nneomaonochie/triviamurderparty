@@ -3,6 +3,7 @@ open! Async
 
 module Game_kind = struct
   type t =
+    | Leaderboard
     | Trivia of Question.t
     | Math_mayhem of (Socket.Address.Inet.t * Player.t) list
     | Decisions of (Socket.Address.Inet.t * Player.t) list
@@ -45,13 +46,9 @@ let ask_question (game : t) =
 ;;
 
 let set_up_players client (query : string) t : t * bool =
-  (* t.player_list <- t.player_list @ [ client,
-     Player.name_create_single_player query ]; if List.length t.player_list =
-     2 then ( t.game_type <- Math_mayhem t.player_list; t.game_state <-
-     Ongoing); *)
-  if List.length t.player_list < 2
+  (* we need to ensure that we have 4 unique clients *)
+  if List.length t.player_list < 4
   then
-    (* we need to ensure that we have 4 unique clients *)
     if not
          (* they repeat IP adresses byt clients are differnet based off of
             TIME... *)
@@ -60,34 +57,11 @@ let set_up_players client (query : string) t : t * bool =
     then
       t.player_list
         <- t.player_list @ [ client, Player.name_create_single_player query ];
-  if List.length t.player_list = 2
+  if List.length t.player_list = 4
   then (
     t.game_state <- Ongoing;
+    (* t.game_type <- Math_mayhem t.player_list; *)
     ask_question t);
   print_s [%message "" (t : t)];
   t, match t.game_state with Ongoing -> true | _ -> false
 ;;
-
-(* try-catch for when not 4 is created *)
-
-(* expect tests for game creation let%expect_test "test game creation" = let
-   game = create (Player.create_multi_players [ "anoushka"; "nneoma"; "hao";
-   "ben" ]) in print_s [%message "" (game : t)]; [%expect {| (game
-   ((player_list (((name anoushka) (score 0) (living true)) ((name nneoma)
-   (score 0) (living true)) ((name hao) (score 0) (living true)) ((name ben)
-   (score 0) (living true)))) (game_type Trivia) (game_state Ongoing))) |}]
-   ;;
-
-   let%expect_test "changing player state" = let gg = create
-   (Player.create_multi_players [ "anoushka"; "nneoma"; "hao"; "ben" ]) in
-   let hao = List.nth_exn gg.player_list 2 in hao.living <- false;
-   gg.game_state <- Game_over; print_s [%message "" (gg : t)]; [%expect {|
-   (gg ((player_list (((name anoushka) (score 0) (living true)) ((name
-   nneoma) (score 0) (living true)) ((name hao) (score 0) (living false))
-   ((name ben) (score 0) (living true)))) (game_type Trivia) (game_state
-   Game_over))) |}] ;;
-
-   let%expect_test "checking it only allows 4 players" = let gme = create
-   (Player.create_multi_players []) in print_s [%message "" (gme : t)];
-   [%expect {| (gme ((player_list (()) (game_type Trivia) (game_state
-   Game_over))) |}] ;; *)
