@@ -111,10 +111,9 @@ end = struct
          | _ -> game)
       | _ -> game
     in
-    print_s [%message "" (count : int array)];
-    if count.(0) = 1
-    then Tmp_graphics.initialize_math_mayhem_graphics game.player_list;
-    Array.set count 0 (count.(0) + 1);
+    (* print_s [%message "" (count : int array)]; if count.(0) = 1 then
+       Tmp_graphics.initialize_math_mayhem_graphics game.player_list;
+       Array.set count 0 (count.(0) + 1); *)
     Stack.push game_stack game;
     Core.print_s
       [%message
@@ -160,13 +159,12 @@ end = struct
         if answer_is_correct
         then (
           let player = find_player players client in
-          player.score <- player.score + 1)
+          player.score <- player.score + 1000)
         else ()
       | _ -> ()
     in
+    print_s [%message "" (game : Game.t)];
     Stack.push game_stack game;
-    (* 1. which client put in what char 2. the only keys we allow are Q,W,E,R
-       3. if client is correct or not *)
     Core.print_s
       [%message
         "Received query"

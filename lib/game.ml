@@ -37,6 +37,13 @@ let get_ip_address client : string =
   client_str
 ;;
 
+let ask_question (game : t) =
+  match game.game_type with
+  | Trivia _ ->
+    game.game_type <- Trivia (Triviaquestions.pick_random_question ())
+  | _ -> ()
+;;
+
 let set_up_players client (query : string) t : t * bool =
   (* t.player_list <- t.player_list @ [ client,
      Player.name_create_single_player query ]; if List.length t.player_list =
@@ -53,16 +60,12 @@ let set_up_players client (query : string) t : t * bool =
     then
       t.player_list
         <- t.player_list @ [ client, Player.name_create_single_player query ];
-  if List.length t.player_list = 2 then t.game_state <- Ongoing;
-  (* Tmp_graphics.create_trivia_graphics t); *)
+  if List.length t.player_list = 2
+  then (
+    t.game_state <- Ongoing;
+    ask_question t);
+  print_s [%message "" (t : t)];
   t, match t.game_state with Ongoing -> true | _ -> false
-;;
-
-let ask_question (game : t) =
-  match game.game_type with
-  | Trivia _ ->
-    game.game_type <- Trivia (Triviaquestions.pick_random_question ())
-  | _ -> ()
 ;;
 
 (* try-catch for when not 4 is created *)

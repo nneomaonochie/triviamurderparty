@@ -11,7 +11,7 @@ let current_math_mayhem_hashtables = Math_mayhem.create ()
 
 (* based off the number of players that are starting - index = numPlayers -
    1 *)
-let player_starting_x_coords = [ 537; 400; 287; 150 ]
+let player_starting_x_coords = [ 687; 550; 437; 300 ]
 let player_y_coord = 620
 let display_beginning_instructions () = ()
 
@@ -22,12 +22,12 @@ let display_beginning_instructions () = ()
 let player_creation_screen () =
   Graphics.open_graph " 1500x800";
   Graphics.set_color Color.black;
-  Graphics.fill_rect 0 0 1200 800;
+  Graphics.fill_rect 0 0 1500 800;
   Graphics.set_color Color.dark_red;
   let _result =
     List.init 1000 ~f:(fun _ ->
       Graphics.draw_arc
-        (Random.int 1200)
+        (Random.int 1500)
         (Random.int 800)
         (Random.int 150)
         (Random.int 150)
