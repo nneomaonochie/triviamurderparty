@@ -101,7 +101,6 @@ let display_players (players : (Socket.Address.Inet.t * Player.t) list)
 
 let create_trivia_graphics (game : Game.t) =
   let d = display_players game.player_list in
-  ();
   let question =
     match game.game_type with
     | Trivia q -> q

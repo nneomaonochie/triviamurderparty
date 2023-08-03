@@ -10,9 +10,6 @@ module Game_kind = struct
   [@@deriving compare, sexp_of]
 end
 
-(* we need to try to store the client IP address with the player its attached
-   to *)
-
 type t =
   { mutable player_list : (Socket.Address.Inet.t * Player.t) list
   ; mutable game_type : Game_kind.t
@@ -40,21 +37,25 @@ let get_ip_address client : string =
   client_str
 ;;
 
-let set_up_players client (query : string) t : t =
-  t.player_list
-    <- t.player_list @ [ client, Player.name_create_single_player query ];
-  if List.length t.player_list = 2
-  then (
-    t.game_type <- Math_mayhem t.player_list;
-    t.game_state <- Ongoing);
-  (* if List.length t.player_list < 4 then (* we need to ensure that we have
-     4 unique clients *) if not (* they repeat IP adresses byt clients are
-     differnet based off of TIME... *) (List.exists t.player_list ~f:(fun (c,
-     _) -> String.equal (get_ip_address c) (get_ip_address client))) then
-     t.player_list <- t.player_list @ [ client,
+let set_up_players client (query : string) t : t * bool =
+  (* t.player_list <- t.player_list @ [ client,
      Player.name_create_single_player query ]; if List.length t.player_list =
-     4 then t.game_state <- Ongoing; *)
-  t
+     2 then ( t.game_type <- Math_mayhem t.player_list; t.game_state <-
+     Ongoing); *)
+  if List.length t.player_list < 2
+  then
+    (* we need to ensure that we have 4 unique clients *)
+    if not
+         (* they repeat IP adresses byt clients are differnet based off of
+            TIME... *)
+         (List.exists t.player_list ~f:(fun (c, _) ->
+            String.equal (get_ip_address c) (get_ip_address client)))
+    then
+      t.player_list
+        <- t.player_list @ [ client, Player.name_create_single_player query ];
+  if List.length t.player_list = 2 then t.game_state <- Ongoing;
+  (* Tmp_graphics.create_trivia_graphics t); *)
+  t, match t.game_state with Ongoing -> true | _ -> false
 ;;
 
 let ask_question (game : t) =

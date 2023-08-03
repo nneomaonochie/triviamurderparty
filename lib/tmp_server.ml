@@ -90,11 +90,16 @@ end = struct
     let game =
       match game.game_state with
       | Player_Initializion ->
-        Game.set_up_players
-          client
-          (Protocol.Query_string.to_string query)
-          game
-        (* we want to fill up the game's player list to be 4 exactly *)
+        let (g, finished_set_up) : Game.t * bool =
+          Game.set_up_players
+            client
+            (Protocol.Query_string.to_string query)
+            game
+        in
+        (* if we finished setting up players, display the graphics screen *)
+        if Bool.equal finished_set_up true
+        then Tmp_graphics.create_trivia_graphics g;
+        g
       | Ongoing ->
         (match game.game_type with
          | Math_mayhem _ ->
