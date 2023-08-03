@@ -6,6 +6,9 @@ open! Async
 (* for both width and heights of the players *)
 let player_block_size = 125
 
+(* needs to be reset each time Math_Mayhem minigame is run*)
+let current_math_mayhem_hashtables = Math_mayhem.create ()
+
 (* based off the number of players that are starting - index = numPlayers -
    1 *)
 let player_starting_x_coords = [ 537; 400; 287; 150 ]
@@ -181,35 +184,71 @@ let initialize_math_mayhem_graphics
       ~size:(List.length player_positions)
       (module String)
   in
-  (* the scores are set to 0*)
+  (* the scores are initially set to 0*)
   List.iter player_positions ~f:(fun ((c, _), _) ->
     Hashtbl.add_exn current_points ~key:(Game.get_ip_address c) ~data:0);
   (* the first questions and scores are displayed *)
   List.iter player_positions ~f:(display_math_mayhem_points ~current_points);
-  List.iter player_positions ~f:(paste_math_mayhem_qs ~correct_answers)
+  List.iter player_positions ~f:(paste_math_mayhem_qs ~correct_answers);
+  current_math_mayhem_hashtables.correct_answers <- correct_answers;
+  current_math_mayhem_hashtables.current_points <- current_points;
+  current_math_mayhem_hashtables.player_positions <- player_positions
 ;;
 
 (* to match up what the user inputted and to change the screen, call this
    function - this is what players call in TMP_Server!!! *)
 let math_mayhem_player_response client query =
-  print_s
-    [%message
-      "Have a check to ensure ONLY players in the minigame are answering"];
-  print_s
-    [%message
-      "We need a way to access the current_pints and current_nswers... \
-       Maybe a global variable IS necessary for the time being"];
-  print_s
-    [%message
-      "honestly that can work, all you really need is to re-assign the \
-       global var in Graphics - better idea is to\n\
-      \  use a record in Math_Mayhem!"]
+  (* this is assuming that i correctly altered the global math_mayhem record
+     var in graphics *)
+  let client_ip = Game.get_ip_address client in
+  (* check if client is among the participants in this minigame *)
+  if List.exists
+       current_math_mayhem_hashtables.player_positions
+       ~f:(fun ((c, _), _) -> String.equal (Game.get_ip_address c) client_ip)
+  then
+    if (* we need to check if a user got the question correct *)
+       String.equal
+         query
+         (Int.to_string
+            (Hashtbl.find_exn
+               current_math_mayhem_hashtables.correct_answers
+               client_ip))
+    then (
+      (* we increase their points and give them a new question and point
+         total *)
+      Async.print_s
+        [%message
+          "current_points:"
+            (current_math_mayhem_hashtables.current_points
+              : (string, int) Base.Hashtbl.t)];
+      let prev_score =
+        Hashtbl.find_exn
+          current_math_mayhem_hashtables.current_points
+          client_ip
+      in
+      Hashtbl.set
+        current_math_mayhem_hashtables.current_points
+        ~key:client_ip
+        ~data:(prev_score + 1);
+      let curr_client =
+        List.find_exn
+          current_math_mayhem_hashtables.player_positions
+          ~f:(fun ((c, _), _) ->
+          String.equal (Game.get_ip_address c) client_ip)
+      in
+      let (_, curr_player), _ = curr_client in
+      (* each correct answer increases the score by 25 *)
+      curr_player.score <- curr_player.score + 25;
+      display_math_mayhem_points
+        ~current_points:current_math_mayhem_hashtables.current_points
+        curr_client;
+      paste_math_mayhem_qs
+        ~correct_answers:current_math_mayhem_hashtables.correct_answers
+        curr_client)
 ;;
 
-(* now we need to GET player response...*)
-
-(* when we check for the correct answer, we are going to update the current
-   points, display the new scorea and display the new questions*)
+(* (* when timer ends - figure out the loser, call loser out, and cause him
+   to die *) calculate_math_mayhem_scores () *)
 
 let create_decision_graphics () = ()
 let create_clicker_graphics () = ()
