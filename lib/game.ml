@@ -42,20 +42,16 @@ let get_ip_address client : string =
 ;;
 
 let set_up_players client (query : string) t : t =
-  (* t.player_list <- t.player_list @ [ client,
-     Player.name_create_single_player query ]; t.game_state <- Ongoing; *)
-  if List.length t.player_list < 4
-  then
-    (* we need to ensure that we have 4 unique clients *)
-    if not
-         (* they repeat IP adresses byt clients are differnet based off of
-            TIME... *)
-         (List.exists t.player_list ~f:(fun (c, _) ->
-            String.equal (get_ip_address c) (get_ip_address client)))
-    then
-      t.player_list
-        <- t.player_list @ [ client, Player.name_create_single_player query ];
-  if List.length t.player_list = 4 then t.game_state <- Ongoing;
+  t.player_list
+    <- t.player_list @ [ client, Player.name_create_single_player query ];
+  t.game_state <- Ongoing;
+  (* if List.length t.player_list < 4 then (* we need to ensure that we have
+     4 unique clients *) if not (* they repeat IP adresses byt clients are
+     differnet based off of TIME... *) (List.exists t.player_list ~f:(fun (c,
+     _) -> String.equal (get_ip_address c) (get_ip_address client))) then
+     t.player_list <- t.player_list @ [ client,
+     Player.name_create_single_player query ]; if List.length t.player_list =
+     4 then t.game_state <- Ongoing; *)
   t
 ;;
 

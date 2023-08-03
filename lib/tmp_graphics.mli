@@ -7,7 +7,7 @@ val player_creation_screen : unit -> unit
 val display_beginning_instructions : unit -> unit
 val create_trivia_graphics : Game.t -> unit
 
-val create_math_mayhem_graphics
+val initialize_math_mayhem_graphics
   :  (Socket.Address.Inet.t * Player.t) list
   -> unit
 

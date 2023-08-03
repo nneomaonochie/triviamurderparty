@@ -1,10 +1,15 @@
 open! Core
 open! Async
 
-(* this is the file for the Math Mayhem mini game, which is a series of basic
-   (* arithmetic sequences - the player with the worst score dies *) type t =
-   { participants : (Socket.Address.Inet.t * Player.t) list } [@@deriving
-   sexp_of, compare] *)
+type t =
+  { mutable correct_answers : (string, int) Base.Hashtbl.t
+  ; mutable current_points : (string, int) Base.Hashtbl.t
+  ; mutable player_positions :
+      ((Socket.Address.Inet.t * Player.t) * int) list
+  }
+[@@deriving sexp_of]
+
+val create : unit -> t
 
 (* val initialize : (Socket.Address.Inet.t * Player.t) list -> t *)
 val get_questions : unit -> string * int

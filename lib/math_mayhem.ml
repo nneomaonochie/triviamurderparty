@@ -1,13 +1,20 @@
 open! Core
 open! Async
 
-(* type t = { participants : (Socket.Address.Inet.t * Player.t) list }
-   [@@deriving sexp_of, compare]
+type t =
+  { mutable correct_answers : (string, int) Base.Hashtbl.t
+  ; mutable current_points : (string, int) Base.Hashtbl.t
+  ; mutable player_positions :
+      ((Socket.Address.Inet.t * Player.t) * int) list
+  }
+[@@deriving sexp_of]
 
-   (* sends a Math_Mayhem minigame with a list of players that are
-   participating in the minigame *) let initialize (players :
-   (Socket.Address.Inet.t * Player.t) list) = { participants = players }
-   ;; *)
+let create () : t =
+  { correct_answers = Hashtbl.create (module String)
+  ; current_points = Hashtbl.create (module String)
+  ; player_positions = []
+  }
+;;
 
 (* 1. i need timer to stop the game... *)
 (*use an ivar with and check after X seconds -> when it's full, stop, change

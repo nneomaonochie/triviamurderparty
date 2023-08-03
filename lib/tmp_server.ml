@@ -105,7 +105,7 @@ end = struct
          | _ -> game)
       | _ -> game
     in
-    (* Tmp_graphics.create_math_mayhem_graphics game.player_list; *)
+    Tmp_graphics.initialize_math_mayhem_graphics game.player_list;
     Stack.push game_stack game;
     Core.print_s
       [%message
