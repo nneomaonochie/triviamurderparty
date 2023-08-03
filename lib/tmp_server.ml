@@ -107,10 +107,6 @@ end = struct
       | Ongoing ->
         (match game.game_type with
          | Math_mayhem _ ->
-           (* we are initializing math mayhem and starting the clock at the
-              end of TRIVIA *)
-
-           (* the players response to the question being shown *)
            Tmp_graphics.math_mayhem_player_response
              client
              (Protocol.Query_string.to_string query);
@@ -118,9 +114,6 @@ end = struct
          | _ -> game)
       | _ -> game
     in
-    (* print_s [%message "" (count : int array)]; if count.(0) = 0 then
-       Tmp_graphics.initialize_math_mayhem_graphics game.player_list;
-       Array.set count 0 (count.(0) + 1); *)
     Stack.push game_stack game;
     Core.print_s
       [%message

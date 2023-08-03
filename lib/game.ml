@@ -65,9 +65,3 @@ let set_up_players client (query : string) t : t * bool =
   print_s [%message "" (t : t)];
   t, match t.game_state with Ongoing -> true | _ -> false
 ;;
-
-(* we are changing the game type AFTER a number of seconds *)
-(* don't bind - we are not waiting for this *)
-(* let change_game_type (game : t) (desired_type : Game_kind.t) (sec : int) =
-   let span = Time_ns.Span.of_sec (Int.to_float sec) in Clock_ns.run_after
-   span (fun () -> game.game_type <- desired_type) ;; *)

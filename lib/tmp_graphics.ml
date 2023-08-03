@@ -241,14 +241,11 @@ let initialize_math_mayhem_graphics
   current_math_mayhem_hashtables.correct_answers <- correct_answers;
   current_math_mayhem_hashtables.current_points <- current_points;
   current_math_mayhem_hashtables.player_positions <- player_positions;
+  (* players have 30 seconds to accumulate as many points as possible *)
   let span = Time_ns.Span.of_sec 30.0 in
+  (* find a way to display the time you have left [might be OPTIONAL]*)
   Clock_ns.run_after span (fun () -> math_mayhem_calc_scores ()) ()
 ;;
-
-(* MAKE SURE THE CLOCK IS NOT BEING RUN TWICE *)
-(* let change_game_type (game : t) (desired_type : Game_kind.t) (sec : int) =
-   let span = Time_ns.Span.of_sec (Int.to_float sec) in Clock_ns.run_after
-   span (fun () -> game.game_type <- desired_type) ;; *)
 
 (* when clients send queries in this mode, we update the screen based off of
    their reponses *)
@@ -296,13 +293,6 @@ let math_mayhem_player_response client query =
         ~correct_answers:current_math_mayhem_hashtables.correct_answers
         curr_client)
 ;;
-
-(* game over stuff will come with the timer, dw about this for now*)
-(* Hashtbl.iter current_math_mayhem_hashtables.current_points ~f:(fun data ->
-   if data = 5 then math_mayhem_calc_scores ()) *)
-
-(* (* when timer ends - figure out the loser, call loser out, and cause him
-   to die *) calculate_math_mayhem_scores () *)
 
 let create_decision_graphics () = ()
 let create_clicker_graphics () = ()
