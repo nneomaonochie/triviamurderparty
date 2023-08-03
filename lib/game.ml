@@ -37,14 +37,16 @@ let get_ip_address client : string =
   let client_str =
     String.slice (Socket.Address.Inet.to_string client) 0 colon_index
   in
-  print_s [%message client_str];
   client_str
 ;;
 
 let set_up_players client (query : string) t : t =
   t.player_list
     <- t.player_list @ [ client, Player.name_create_single_player query ];
-  t.game_state <- Ongoing;
+  if List.length t.player_list = 2
+  then (
+    t.game_type <- Math_mayhem t.player_list;
+    t.game_state <- Ongoing);
   (* if List.length t.player_list < 4 then (* we need to ensure that we have
      4 unique clients *) if not (* they repeat IP adresses byt clients are
      differnet based off of TIME... *) (List.exists t.player_list ~f:(fun (c,

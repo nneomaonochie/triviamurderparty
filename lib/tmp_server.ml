@@ -83,6 +83,7 @@ module Server : sig
   val command : Command.t
 end = struct
   (* gets the query from the client *)
+  let count = Array.create ~len:1 0
 
   let handle_query_string client query =
     let game : Game.t = Stack.pop_exn game_stack in
@@ -105,14 +106,16 @@ end = struct
          | _ -> game)
       | _ -> game
     in
-    Tmp_graphics.initialize_math_mayhem_graphics game.player_list;
+    print_s [%message "" (count : int array)];
+    if count.(0) = 1
+    then Tmp_graphics.initialize_math_mayhem_graphics game.player_list;
+    Array.set count 0 (count.(0) + 1);
     Stack.push game_stack game;
     Core.print_s
       [%message
         "Received query"
           (client : Socket.Address.Inet.t)
           (query : Protocol.Query_string.t)];
-    Core.print_s [%message "" (Stack.top_exn game_stack : Game.t)];
     (* changing this into a deferred type *)
     return
       { Protocol.Response.response_message =

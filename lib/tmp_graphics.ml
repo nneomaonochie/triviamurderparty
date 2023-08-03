@@ -194,6 +194,11 @@ let math_mayhem_player_response client query =
     then (
       (* we increase their points and give them a new question and point
          total *)
+      Async.print_s
+        [%message
+          "current_points:"
+            (current_math_mayhem_hashtables.current_points
+              : (string, int) Base.Hashtbl.t)];
       let prev_score =
         Hashtbl.find_exn
           current_math_mayhem_hashtables.current_points
@@ -203,20 +208,25 @@ let math_mayhem_player_response client query =
         current_math_mayhem_hashtables.current_points
         ~key:client_ip
         ~data:(prev_score + 1);
-      let curr_player =
+      let curr_client =
         List.find_exn
           current_math_mayhem_hashtables.player_positions
           ~f:(fun ((c, _), _) ->
           String.equal (Game.get_ip_address c) client_ip)
       in
+      let (_, curr_player), _ = curr_client in
+      (* each correct answer increases the score by 25 *)
+      curr_player.score <- curr_player.score + 25;
       display_math_mayhem_points
         ~current_points:current_math_mayhem_hashtables.current_points
-        curr_player;
+        curr_client;
       paste_math_mayhem_qs
         ~correct_answers:current_math_mayhem_hashtables.correct_answers
-        curr_player)
-    else () (*consequence for missing a question *)
+        curr_client)
 ;;
+
+(* (* when timer ends - figure out the loser, call loser out, and cause him
+   to die *) calculate_math_mayhem_scores () *)
 
 let create_decision_graphics () = ()
 let create_clicker_graphics () = ()
