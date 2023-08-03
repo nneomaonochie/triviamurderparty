@@ -82,9 +82,8 @@ end
 module Server : sig
   val command : Command.t
 end = struct
+  (* let count = Array.create ~len:1 0 *)
   (* gets the query from the client *)
-  let count = Array.create ~len:1 0
-
   let handle_query_string client query =
     let game : Game.t = Stack.pop_exn game_stack in
     let game =
@@ -98,11 +97,19 @@ end = struct
         in
         (* if we finished setting up players, display the graphics screen *)
         if Bool.equal finished_set_up true
-        then Tmp_graphics.create_trivia_graphics g;
+        then (
+          match g.game_type with
+          | Trivia _ -> Tmp_graphics.create_trivia_graphics g
+          (* | Math_mayhem _ -> Tmp_graphics.initialize_math_mayhem_graphics
+             g.player_list *)
+          | _ -> ());
         g
       | Ongoing ->
         (match game.game_type with
          | Math_mayhem _ ->
+           (* we are initializing math mayhem and starting the clock at the
+              end of TRIVIA *)
+
            (* the players response to the question being shown *)
            Tmp_graphics.math_mayhem_player_response
              client
@@ -111,7 +118,7 @@ end = struct
          | _ -> game)
       | _ -> game
     in
-    (* print_s [%message "" (count : int array)]; if count.(0) = 1 then
+    (* print_s [%message "" (count : int array)]; if count.(0) = 0 then
        Tmp_graphics.initialize_math_mayhem_graphics game.player_list;
        Array.set count 0 (count.(0) + 1); *)
     Stack.push game_stack game;

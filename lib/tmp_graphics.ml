@@ -51,7 +51,32 @@ let game =
   }
 ;;
 
-(* let display_losers loser_list *)
+let display_losers loser_list =
+  let rec dpl x_coord loser_list =
+    if List.length loser_list = 0
+    then ()
+    else (
+      let (_, (curr_player : Player.t)), _ = List.hd_exn loser_list in
+      Graphics.set_color curr_player.color;
+      (* at this point the player should be dead *)
+      Graphics.fill_rect x_coord 450 player_block_size player_block_size;
+      Graphics.moveto x_coord 600;
+      Graphics.set_font
+        "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
+      Graphics.draw_string curr_player.name;
+      let loser_list = List.tl_exn loser_list in
+      dpl (x_coord + 250) loser_list)
+  in
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  dpl
+    (List.nth_exn player_starting_x_coords (List.length loser_list - 1))
+    loser_list;
+  Graphics.set_color Color.dark_red;
+  Graphics.moveto 650 500;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.draw_string "You died."
+;;
 
 (* recursively pastes other players from display_players*)
 let rec paste_players x_coord ~players_left ~player_positions
@@ -94,7 +119,7 @@ let display_players (players : (Socket.Address.Inet.t * Player.t) list)
   let display_player_list = players in
   let num_players = List.length display_player_list in
   Graphics.set_color Color.black;
-  Graphics.fill_rect 0 0 1200 800;
+  Graphics.fill_rect 0 0 1500 800;
   paste_players
     (List.nth_exn player_starting_x_coords (num_players - 1))
     ~players_left:display_player_list
@@ -163,6 +188,28 @@ let display_math_mayhem_points
        (Hashtbl.find_exn current_points (Game.get_ip_address client)))
 ;;
 
+(* cases: [maybe make it a list of losers] 1. multiple players have the
+   lowest score 2. ALL players hve the lowest score *)
+let math_mayhem_calc_scores () =
+  let get_int (i, s) = i in
+  let get_ip (_, cs) = cs in
+  let worst_perf = Array.create ~len:1 (Int.max_value, "") in
+  (* tries to find player with lowest scores*)
+  Hashtbl.iteri
+    current_math_mayhem_hashtables.current_points
+    ~f:(fun ~key ~data ->
+    if data < get_int worst_perf.(0) then Array.set worst_perf 0 (data, key));
+  let (c, losing_player), x_coord =
+    List.find_exn
+      current_math_mayhem_hashtables.player_positions
+      ~f:(fun ((c, _), _) ->
+      String.equal (Game.get_ip_address c) (get_ip worst_perf.(0)))
+  in
+  (* the loser player dies*)
+  losing_player.living <- false;
+  display_losers [ (c, losing_player), x_coord ]
+;;
+
 (* when transitioning from Trivia to Math Mayhem, a function should be called
    to set up the intial graphics *)
 let initialize_math_mayhem_graphics
@@ -193,33 +240,18 @@ let initialize_math_mayhem_graphics
   List.iter player_positions ~f:(paste_math_mayhem_qs ~correct_answers);
   current_math_mayhem_hashtables.correct_answers <- correct_answers;
   current_math_mayhem_hashtables.current_points <- current_points;
-  current_math_mayhem_hashtables.player_positions <- player_positions
+  current_math_mayhem_hashtables.player_positions <- player_positions;
+  let span = Time_ns.Span.of_sec 30.0 in
+  Clock_ns.run_after span (fun () -> math_mayhem_calc_scores ()) ()
 ;;
 
-(* cases: [maybe make it a list of losers] 1. multiple players have the
-   lowest score 2. ALL players hve the lowest score *)
-let math_mayhem_calc_scores () =
-  let get_int (i, s) = i in
-  let get_ip (_, cs) = cs in
-  let worst_perf = Array.create ~len:1 (Int.max_value, "") in
-  (* tries to find player with lowest scores*)
-  Hashtbl.iteri
-    current_math_mayhem_hashtables.current_points
-    ~f:(fun ~key ~data ->
-    if data < get_int worst_perf.(0) then Array.set worst_perf 0 (data, key));
-  let (c, losing_player), x_coord =
-    List.find_exn
-      current_math_mayhem_hashtables.player_positions
-      ~f:(fun ((c, _), _) ->
-      String.equal (Game.get_ip_address c) (get_ip worst_perf.(0)))
-  in
-  (* the loser player dies*)
-  losing_player.living <- false;
-  display_losers [ (c, losing_player), x_coord ]
-;;
+(* MAKE SURE THE CLOCK IS NOT BEING RUN TWICE *)
+(* let change_game_type (game : t) (desired_type : Game_kind.t) (sec : int) =
+   let span = Time_ns.Span.of_sec (Int.to_float sec) in Clock_ns.run_after
+   span (fun () -> game.game_type <- desired_type) ;; *)
 
-(* to match up what the user inputted and to change the screen, call this
-   function - this is what players call in TMP_Server!!! *)
+(* when clients send queries in this mode, we update the screen based off of
+   their reponses *)
 let math_mayhem_player_response client query =
   (* this is assuming that i correctly altered the global math_mayhem record
      var in graphics *)
@@ -264,6 +296,10 @@ let math_mayhem_player_response client query =
         ~correct_answers:current_math_mayhem_hashtables.correct_answers
         curr_client)
 ;;
+
+(* game over stuff will come with the timer, dw about this for now*)
+(* Hashtbl.iter current_math_mayhem_hashtables.current_points ~f:(fun data ->
+   if data = 5 then math_mayhem_calc_scores ()) *)
 
 (* (* when timer ends - figure out the loser, call loser out, and cause him
    to die *) calculate_math_mayhem_scores () *)

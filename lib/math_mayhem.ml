@@ -41,10 +41,5 @@ let get_questions () =
   question_string, correct_answer
 ;;
 
-(* 4. get player responses - each correct answer is +25 to score *)
-(* wrong answers - in OG game they get stunned for X secs, may just implement
-   a $$ deduction instead *)
-(* 5. keep track of score - lowest score dies *)
-
 (* 6. [do last] the case where only one player is sent - get other players to
    play or that they must reach 20 correct Q's *)
