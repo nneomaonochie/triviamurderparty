@@ -51,6 +51,8 @@ let game =
   }
 ;;
 
+(* let display_losers loser_list *)
+
 (* recursively pastes other players from display_players*)
 let rec paste_players x_coord ~players_left ~player_positions
   : ((Socket.Address.Inet.t * Player.t) * int) list
@@ -194,6 +196,28 @@ let initialize_math_mayhem_graphics
   current_math_mayhem_hashtables.player_positions <- player_positions
 ;;
 
+(* cases: [maybe make it a list of losers] 1. multiple players have the
+   lowest score 2. ALL players hve the lowest score *)
+let math_mayhem_calc_scores () =
+  let get_int (i, s) = i in
+  let get_ip (_, cs) = cs in
+  let worst_perf = Array.create ~len:1 (Int.max_value, "") in
+  (* tries to find player with lowest scores*)
+  Hashtbl.iteri
+    current_math_mayhem_hashtables.current_points
+    ~f:(fun ~key ~data ->
+    if data < get_int worst_perf.(0) then Array.set worst_perf 0 (data, key));
+  let (c, losing_player), x_coord =
+    List.find_exn
+      current_math_mayhem_hashtables.player_positions
+      ~f:(fun ((c, _), _) ->
+      String.equal (Game.get_ip_address c) (get_ip worst_perf.(0)))
+  in
+  (* the loser player dies*)
+  losing_player.living <- false;
+  display_losers [ (c, losing_player), x_coord ]
+;;
+
 (* to match up what the user inputted and to change the screen, call this
    function - this is what players call in TMP_Server!!! *)
 let math_mayhem_player_response client query =
@@ -215,11 +239,6 @@ let math_mayhem_player_response client query =
     then (
       (* we increase their points and give them a new question and point
          total *)
-      Async.print_s
-        [%message
-          "current_points:"
-            (current_math_mayhem_hashtables.current_points
-              : (string, int) Base.Hashtbl.t)];
       let prev_score =
         Hashtbl.find_exn
           current_math_mayhem_hashtables.current_points
