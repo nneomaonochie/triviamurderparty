@@ -12,10 +12,12 @@ let player_starting_x_coords = [ 537; 400; 287; 150 ]
 let player_y_coord = 620
 let display_beginning_instructions () = ()
 
+(* these are the graphics for specific game_kind*)
+
 (* this asks user input for players' names so that we can initiatilize the
    players and create a game *)
 let player_creation_screen () =
-  Graphics.open_graph " 1200x800";
+  Graphics.open_graph " 1500x800";
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1200 800;
   Graphics.set_color Color.dark_red;
@@ -37,6 +39,13 @@ let player_creation_screen () =
   Graphics.set_color Color.red;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
   Graphics.draw_string "Please enter your name into the console"
+;;
+
+let game =
+  { Game.player_list = []
+  ; game_type = Trivia (Triviaquestions.pick_random_question ())
+  ; game_state = Ongoing
+  }
 ;;
 
 (* recursively pastes other players from display_players*)
@@ -87,17 +96,30 @@ let display_players (players : (Socket.Address.Inet.t * Player.t) list)
     ~player_positions:[]
 ;;
 
-(* these are the graphics for specific game_kind*)
 let create_trivia_graphics (game : Game.t) =
   let d = display_players game.player_list in
   ();
-  let question_to_display =
+  let question =
     match game.game_type with
     | Trivia q -> q
-    | _ -> { question = ""; answer_choices = []; correct_answer = "" }
+    | _ ->
+      { Question.question = ""; answer_choices = []; correct_answer = "" }
   in
-  Graphics.moveto 500 500;
-  Graphics.draw_string question_to_display.question
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  Graphics.set_color Color.white;
+  Graphics.moveto 400 500;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--25-*-*-*-*-*-iso8859-1";
+  Graphics.draw_string question.question;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--24-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 300 400;
+  Graphics.draw_string (List.nth_exn question.answer_choices 0);
+  Graphics.moveto 350 350;
+  Graphics.draw_string (List.nth_exn question.answer_choices 1);
+  Graphics.moveto 900 350;
+  Graphics.draw_string (List.nth_exn question.answer_choices 2);
+  Graphics.moveto 950 300;
+  Graphics.draw_string (List.nth_exn question.answer_choices 3)
 ;;
 
 let create_leaderboard_graphics (game : Game.t) = ()
@@ -139,7 +161,7 @@ let display_math_mayhem_points
 
 (* when transitioning from Trivia to Math Mayhem, a function should be called
    to set up the intial graphics *)
-let intialize_math_mayhem_graphics
+let initialize_math_mayhem_graphics
   (participants : (Socket.Address.Inet.t * Player.t) list)
   =
   let player_positions = display_players participants in
