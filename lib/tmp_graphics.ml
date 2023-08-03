@@ -100,6 +100,8 @@ let display_players (players : (Socket.Address.Inet.t * Player.t) list)
 ;;
 
 let create_trivia_graphics (game : Game.t) =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
   let d = display_players game.player_list in
   let question =
     match game.game_type with
@@ -107,8 +109,6 @@ let create_trivia_graphics (game : Game.t) =
     | _ ->
       { Question.question = ""; answer_choices = []; correct_answer = "" }
   in
-  Graphics.set_color Color.black;
-  Graphics.fill_rect 0 0 1500 800;
   Graphics.set_color Color.white;
   Graphics.moveto 400 500;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--25-*-*-*-*-*-iso8859-1";
