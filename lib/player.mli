@@ -6,6 +6,8 @@ type t =
   { mutable name : string
   ; mutable score : int
   ; mutable living : bool
+  ; mutable answered_mr_question : bool
+  ; mutable answered_mr_question_wrong : bool
   ; color : int
   }
 [@@deriving compare, equal, sexp_of]

@@ -156,10 +156,19 @@ end = struct
           String.of_char (Protocol.Query_char.to_char query)
         in
         let answer_is_correct = String.equal player_ans correct_ans in
+        let player = find_player players client in
         if answer_is_correct
         then (
-          let player = find_player players client in
-          player.score <- player.score + 1000)
+          player.score <- player.score + 1000;
+          player.answered_mr_question <- true)
+        else player.answered_mr_question_wrong <- true;
+        if List.for_all players ~f:(fun (_, player) ->
+             player.answered_mr_question)
+        then
+          if List.exists players ~f:(fun (_, player) ->
+               player.answered_mr_question_wrong)
+          then ()
+          else ()
         else ()
       | _ -> ()
     in
