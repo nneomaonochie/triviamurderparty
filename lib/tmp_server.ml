@@ -169,7 +169,8 @@ end = struct
         let span = Time_ns.Span.of_sec 10.0 in
         Clock_ns.run_after
           span
-          (fun () -> Tmp_graphics.initialize_math_mayhem_graphics players)
+          (fun () ->
+            Tmp_graphics.initialize_math_mayhem_graphics players game)
           ())
       else (
         Game.ask_question game;

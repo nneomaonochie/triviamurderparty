@@ -197,7 +197,21 @@ let create_trivia_graphics (game : Game.t) =
   Graphics.draw_string (List.nth_exn question.answer_choices 3)
 ;;
 
-let create_leaderboard_graphics (game : Game.t) = ()
+let create_leaderboard_graphics (game : Game.t) =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  (* this sorts the players by their score, so the player with the highest
+     score is at index 0*)
+  let players_by_score =
+    game.player_list
+    |> List.map ~f:snd
+    |> List.map ~f:(fun player -> player.score, player)
+    |> List.sort ~compare:[%compare: int * Player.t]
+    |> List.map ~f:snd
+    |> List.rev
+  in
+  print_s [%message "" (players_by_score : Player.t list)]
+;;
 
 (* pastes the arithmetic stuff where they are supposed to be *)
 let paste_math_mayhem_qs
