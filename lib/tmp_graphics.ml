@@ -126,6 +126,35 @@ let display_players (players : (Socket.Address.Inet.t * Player.t) list)
     ~player_positions:[]
 ;;
 
+let get_correct_q_coords (game : Game.t) =
+  let correct_ans =
+    match game.game_type with Trivia q -> q.correct_answer | _ -> ""
+  in
+  match correct_ans with
+  | "Q" -> 300, 400
+  | "W" -> 350, 350
+  | "E" -> 900, 350
+  | "R" -> 950, 300
+  | _ -> 0, 0
+;;
+
+let show_correct_answer (game : Game.t) =
+  Graphics.fill_rect 0 0 1500 800;
+  let question =
+    match game.game_type with
+    | Trivia q -> q
+    | _ ->
+      { Question.question = ""; answer_choices = []; correct_answer = "" }
+  in
+  let correct_ans =
+    List.find_exn question.answer_choices ~f:(fun q ->
+      let first_char = String.get q 0 in
+      let first_char = String.of_char first_char in
+      if String.equal first_char question.correct_answer then true else false)
+  in
+  ()
+;;
+
 let create_trivia_graphics (game : Game.t) =
   let players = game.player_list in
   List.iter players ~f:(fun (_, player) ->
