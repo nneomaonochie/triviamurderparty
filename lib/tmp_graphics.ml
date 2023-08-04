@@ -228,7 +228,15 @@ let create_leaderboard_graphics (game : Game.t) =
     |> List.map ~f:snd
     |> List.rev
   in
-  display_pl_leaderboard 300 600 players_by_score
+  display_pl_leaderboard 300 600 players_by_score;
+  (* transition to *)
+  game.game_type
+    <- Trivia
+         { Question.question = ""; answer_choices = []; correct_answer = "" };
+  Game.ask_question game;
+  let span = Time_ns.Span.of_sec 5.0 in
+  (* find a way to display the time you have left [might be OPTIONAL]*)
+  Clock_ns.run_after span (fun () -> create_trivia_graphics game) ()
 ;;
 
 (* pastes the arithmetic stuff where they are supposed to be *)
