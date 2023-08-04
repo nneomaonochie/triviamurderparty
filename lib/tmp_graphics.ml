@@ -210,42 +210,55 @@ let math_mayhem_calc_scores () =
   display_losers [ (c, losing_player), x_coord ]
 ;;
 
+(* displays the title of *)
+let display_math_mayhem_title () =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  Graphics.set_color Color.white;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
+  Graphics.set_color Color.black;
+  Graphics.moveto 600 375;
+  (* Graphics.draw_string "Math Mayhem"; *)
+  (* can i have multiple clocks running... i think no...*)
+  Graphics.moveto 600 450;
+  Graphics.draw_string "The worst";
+  Graphics.moveto 600 300;
+  Graphics.draw_string "mathematician dies"
+;;
+
+(* let display_math_mayhem_instructions () = ;; *)
 (* when transitioning from Trivia to Math Mayhem, a function should be called
    to set up the intial graphics *)
 let initialize_math_mayhem_graphics
   (participants : (Socket.Address.Inet.t * Player.t) list)
   =
   let player_positions = display_players participants in
-  (* this is the hashtable that stores the correct answer to arithmetic
-     questions as values *)
-  let correct_answers : (string, int) Base.Hashtbl.t =
-    Hashtbl.create
-      ~growth_allowed:false
-      ~size:(List.length player_positions)
-      (module String)
-  in
-  (* this is the hashtable that tracks the amount of questions users have
-     gotten correct so far *)
-  let current_points : (string, int) Base.Hashtbl.t =
-    Hashtbl.create
-      ~growth_allowed:false
-      ~size:(List.length player_positions)
-      (module String)
-  in
-  (* the scores are initially set to 0*)
-  List.iter player_positions ~f:(fun ((c, _), _) ->
-    Hashtbl.add_exn current_points ~key:(Game.get_ip_address c) ~data:0);
-  (* the first questions and scores are displayed *)
-  List.iter player_positions ~f:(display_math_mayhem_points ~current_points);
-  List.iter player_positions ~f:(paste_math_mayhem_qs ~correct_answers);
-  current_math_mayhem_hashtables.correct_answers <- correct_answers;
-  current_math_mayhem_hashtables.current_points <- current_points;
-  current_math_mayhem_hashtables.player_positions <- player_positions;
-  (* players have 30 seconds to accumulate as many points as possible *)
-  let span = Time_ns.Span.of_sec 30.0 in
-  (* find a way to display the time you have left [might be OPTIONAL]*)
-  Clock_ns.run_after span (fun () -> math_mayhem_calc_scores ()) ()
+  display_math_mayhem_title ()
 ;;
+
+(* let span = Time_ns.Span.of_sec 10.0 in Clock_ns.run_after span (fun () ->
+   display_math_mayhem_instructions ()) () *)
+
+(* (* this is the hashtable that stores the correct answer to arithmetic
+   questions as values *) let correct_answers : (string, int) Base.Hashtbl.t
+   = Hashtbl.create ~growth_allowed:false ~size:(List.length
+   player_positions) (module String) in (* this is the hashtable that tracks
+   the amount of questions users have gotten correct so far *) let
+   current_points : (string, int) Base.Hashtbl.t = Hashtbl.create
+   ~growth_allowed:false ~size:(List.length player_positions) (module String)
+   in (* the scores are initially set to 0*) List.iter player_positions
+   ~f:(fun ((c, _), _) -> Hashtbl.add_exn current_points
+   ~key:(Game.get_ip_address c) ~data:0); (* the first questions and scores
+   are displayed *) List.iter player_positions ~f:(display_math_mayhem_points
+   ~current_points); List.iter player_positions ~f:(paste_math_mayhem_qs
+   ~correct_answers); current_math_mayhem_hashtables.correct_answers <-
+   correct_answers; current_math_mayhem_hashtables.current_points <-
+   current_points; current_math_mayhem_hashtables.player_positions <-
+   player_positions; (* players have 30 seconds to accumulate as many points
+   as possible *) let span = Time_ns.Span.of_sec 30.0 in (* find a way to
+   display the time you have left [might be OPTIONAL]*) Clock_ns.run_after
+   span (fun () -> math_mayhem_calc_scores ()) () *)
 
 (* when clients send queries in this mode, we update the screen based off of
    their reponses *)

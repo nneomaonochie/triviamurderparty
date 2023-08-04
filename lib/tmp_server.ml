@@ -100,8 +100,8 @@ end = struct
         then (
           match g.game_type with
           | Trivia _ -> Tmp_graphics.create_trivia_graphics g
-          (* | Math_mayhem _ -> Tmp_graphics.initialize_math_mayhem_graphics
-             g.player_list *)
+          | Math_mayhem _ ->
+            Tmp_graphics.initialize_math_mayhem_graphics g.player_list
           | _ -> ());
         g
       | Ongoing ->
