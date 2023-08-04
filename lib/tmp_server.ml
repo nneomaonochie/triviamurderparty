@@ -104,11 +104,19 @@ end = struct
         g
       | Ongoing ->
         (match game.game_type with
-         | Math_mayhem _ ->
+         | Math_mayhem ->
            Tmp_graphics.math_mayhem_player_response
              client
              (Protocol.Query_string.to_string query);
+           game (* password creation mode*)
+         | Password_pain false ->
+           pp_password_creation
+             client
+             (Protocol.Query_string.to_string query)
+             game;
            game
+         (* password guessing mode *)
+         | Password_pain true -> game
          | _ -> game)
       | _ -> game
     in
@@ -163,15 +171,19 @@ end = struct
           let players =
             List.fold players ~init:[] ~f:(fun accum (client, player) ->
               if player.answered_mr_question_wrong
+                 && Bool.equal player.living true
               then accum @ [ client, player ]
               else accum)
           in
-          game.game_type <- Math_mayhem players;
+          (* this is for math mayhem specifically *)
+          game.game_type <- Math_mayhem;
           Tmp_graphics.start_math_mayhem_intro ();
-          let span = Time_ns.Span.of_sec 10.0 in
+          (* Tmp_graphics.start_pp_intro () *)
+          let span = Time_ns.Span.of_sec 7.0 in
           Clock_ns.run_after
             span
-            (fun () -> Tmp_graphics.initialize_math_mayhem_graphics players)
+            (fun () ->
+              Tmp_graphics.initialize_math_mayhem_graphics players game)
             ())
         else (
           Game.ask_question game;

@@ -16,12 +16,6 @@ let create () : t =
   }
 ;;
 
-(* 1. i need timer to stop the game... *)
-(*use an ivar with and check after X seconds -> when it's full, stop, change
-  the game (maybe make a winner variant, whatever ) *)
-
-(* the Math mayhem in graphics is the main one and it calls methods from
-   here *)
 let get_questions () =
   let operator_str = if Random.int 2 % 2 = 0 then " + " else " - " in
   (* random number from -20 to 20 *)

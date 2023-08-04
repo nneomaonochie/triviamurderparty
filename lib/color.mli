@@ -10,4 +10,5 @@ val dark_red : int
 val skeleton_white : int
 val skeleton_gray : int
 val dead_gray : int
+val pink : int
 val random : unit -> int

@@ -5,9 +5,9 @@ module Game_kind = struct
   type t =
     | Leaderboard
     | Trivia of Question.t
-    | Math_mayhem of (Socket.Address.Inet.t * Player.t) list
-    | Decisions of (Socket.Address.Inet.t * Player.t) list
-    | Button_mash of (Socket.Address.Inet.t * Player.t) list
+    | Math_mayhem
+    | Decisions
+    | Password_pain of bool
   [@@deriving compare, sexp_of]
 end
 

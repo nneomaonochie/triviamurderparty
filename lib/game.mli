@@ -5,13 +5,11 @@ module Game_kind : sig
   type t =
     | Leaderboard
     | Trivia of Question.t
-    (* Player.t list is the list of player(s) who will be participating in
-       that minigame *)
-    (* this list WILL be revised when the minigames have been actually
-       created *)
-    | Math_mayhem of (Socket.Address.Inet.t * Player.t) list
-    | Decisions of (Socket.Address.Inet.t * Player.t) list
-    | Button_mash of (Socket.Address.Inet.t * Player.t) list
+    | Math_mayhem
+    | Decisions
+    (* if false, it's in password creation mode; if true its in password
+       guessing mode*)
+    | Password_pain of bool
   [@@deriving compare, sexp_of]
 end
 

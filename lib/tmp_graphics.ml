@@ -8,6 +8,7 @@ let player_block_size = 125
 
 (* needs to be reset each time Math_Mayhem minigame is run*)
 let current_math_mayhem_hashtables = Math_mayhem.create ()
+let current_pp_state = Password_pain.create ()
 
 (* based off the number of players that are starting - index = numPlayers -
    1 *)
@@ -243,7 +244,6 @@ let create_leaderboard_graphics (game : Game.t) =
          { Question.question = ""; answer_choices = []; correct_answer = "" };
   Game.ask_question game;
   let span = Time_ns.Span.of_sec 5.0 in
-  (* find a way to display the time you have left [might be OPTIONAL]*)
   Clock_ns.run_after span (fun () -> create_trivia_graphics game) ()
 ;;
 
@@ -332,7 +332,7 @@ let display_math_mayhem_instructions () =
 
 let start_math_mayhem_intro () =
   display_math_mayhem_title ();
-  let span = Time_ns.Span.of_sec 5.0 in
+  let span = Time_ns.Span.of_sec 3.0 in
   Clock_ns.run_after span (fun () -> display_math_mayhem_instructions ()) ()
 ;;
 
@@ -422,4 +422,79 @@ let math_mayhem_player_response client query =
 ;;
 
 let create_decision_graphics () = ()
-let create_clicker_graphics () = ()
+
+(* this is the title screen for Password Pain *)
+let display_pp_title () =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  Graphics.set_color Color.pink;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
+  Graphics.set_color Color.black;
+  Graphics.moveto 600 375;
+  Graphics.draw_string "Password Pain"
+;;
+
+(* these are the directions for the participants of the password pain
+   minigame*)
+let display_pp_participant_instructions participants =
+  let playing_players = display_players participants in
+  Graphics.set_color Color.pink;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_color Color.black;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 635 400;
+  Graphics.draw_string "Input a 4";
+  Graphics.moveto 535 350;
+  Graphics.draw_string "letter password";
+  current_pp_state.active_participants <- participants;
+  (* fixed the format for the record field *)
+  current_pp_state.player_passwords_positions
+    <- List.map playing_players ~f:(fun ((c, p), i) -> c, p, "", i)
+;;
+
+let start_pp_intro participants =
+  display_pp_title ();
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after
+    span
+    (fun () -> display_pp_participant_instructions participants)
+    ()
+;;
+
+(* note to self, make a function for decide minigame in the tmp_server
+   later *)
+let initialize_password_pain_graphics
+  ~(participants : (Socket.Address.Inet.t * Player.t) list)
+  ~(safe_players : (Socket.Address.Inet.t * Player.t) list)
+  =
+  current_pp_state.safe_players <- safe_players
+;;
+
+(* i prevously set player positions and active participants in start intro,
+   so do this here *)
+
+(* clients input the password the safe players must guess *)
+let pp_password_creation client query (game : Game.t) =
+  let client_ip = Game.get_ip_address client in
+  (* ensures that only players who got question wrong create passwords *)
+  if List.exists current_pp_state.active_participants ~f:(fun (c, _) ->
+       String.equal client_ip (Game.get_ip_address c))
+  then
+    if String.length query <> 4
+    then ()
+    else (
+      Password_pain.update_password current_pp_state ~client_ip ~query;
+      (* that every password is a non string *)
+      if List.for_all current_pp_state.player_passwords_positions ~f: then game.game_state <- Password_pain true
+      
+      
+      
+      
+      
+      
+      
+      
+      )
+;;
+(*the every player mode *)
