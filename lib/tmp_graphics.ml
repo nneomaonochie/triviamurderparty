@@ -214,7 +214,7 @@ let create_leaderboard_graphics (game : Game.t) =
       Graphics.moveto (x_coord + 35) (y_coord - 65);
       Graphics.draw_string (Int.to_string curr_player.score);
       let players = List.tl_exn players in
-      display_pl_leaderboard (x_coord + 250) (y_coord - 150) players)
+      display_pl_leaderboard (x_coord + 250) (y_coord - 100) players)
   in
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1500 800;
