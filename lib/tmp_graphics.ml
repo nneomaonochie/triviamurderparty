@@ -236,7 +236,7 @@ let display_math_mayhem_points
 
 (* cases: [maybe make it a list of losers] 1. multiple players have the
    lowest score 2. ALL players hve the lowest score *)
-let math_mayhem_calc_scores () =
+let math_mayhem_calc_scores game =
   let get_int (i, s) = i in
   let get_ip (_, cs) = cs in
   let worst_perf = Array.create ~len:1 (Int.max_value, "") in
@@ -253,7 +253,10 @@ let math_mayhem_calc_scores () =
   in
   (* the loser player dies*)
   Player.player_loses losing_player;
-  display_losers [ (c, losing_player), x_coord ]
+  display_losers [ (c, losing_player), x_coord ];
+  let span = Time_ns.Span.of_sec 5.0 in
+  (* find a way to display the time you have left [might be OPTIONAL]*)
+  Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ()
 ;;
 
 (* displays the title of *)
@@ -267,8 +270,6 @@ let display_math_mayhem_title () =
   Graphics.moveto 600 375;
   Graphics.draw_string "Math Mayhem"
 ;;
-
-(* can i have multiple clocks running... i think no...*)
 
 let display_math_mayhem_instructions () =
   Graphics.set_color Color.white;
@@ -291,6 +292,7 @@ let start_math_mayhem_intro () =
    to set up the intial graphics *)
 let initialize_math_mayhem_graphics
   (participants : (Socket.Address.Inet.t * Player.t) list)
+  (game : Game.t)
   =
   let player_positions = display_players participants in
   (* this is the hashtable that stores the correct answer to arithmetic
@@ -321,7 +323,7 @@ let initialize_math_mayhem_graphics
   (* players have 30 seconds to accumulate as many points as possible *)
   let span = Time_ns.Span.of_sec 40.0 in
   (* find a way to display the time you have left [might be OPTIONAL]*)
-  Clock_ns.run_after span (fun () -> math_mayhem_calc_scores ()) ()
+  Clock_ns.run_after span (fun () -> math_mayhem_calc_scores game) ()
 ;;
 
 (* when clients send queries in this mode, we update the screen based off of
