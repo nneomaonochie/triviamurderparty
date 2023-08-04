@@ -78,6 +78,18 @@ let display_losers loser_list =
   Graphics.draw_string "You died."
 ;;
 
+(* this is the skull that should be shown on top of the player*)
+let draw_skull x_coord =
+  (* the x_coord is the x_coord of the PLAYER - make sure to shift the skull
+     x_coord - (x_coord + 25)*)
+  (* skull is compraised of ellipse head, rect jaw, circle eyes *)
+
+  (* this is the color of the white skeleton *)
+  Graphics.set_color Color.skeleton_white;
+  (* this is the color for the eyes and inner jaw of the skeleton*)
+  Graphics.set_color Color.skeleton_gray
+;;
+
 (* recursively pastes other players from display_players*)
 let rec paste_players x_coord ~players_left ~player_positions
   : ((Socket.Address.Inet.t * Player.t) * int) list
@@ -95,6 +107,7 @@ let rec paste_players x_coord ~players_left ~player_positions
       player_block_size
       player_block_size;
     (* if player looks dead, put an x *)
+    if Bool.equal current_player.living false then draw_skull x_coord;
     Graphics.moveto x_coord 750;
     Graphics.set_font
       "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
@@ -250,7 +263,6 @@ let start_math_mayhem_intro () =
 let initialize_math_mayhem_graphics
   (participants : (Socket.Address.Inet.t * Player.t) list)
   =
-  (* start_math_mayhem_intro (); *)
   let player_positions = display_players participants in
   (* this is the hashtable that stores the correct answer to arithmetic
      questions as values *)
