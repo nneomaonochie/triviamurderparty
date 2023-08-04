@@ -127,6 +127,10 @@ let display_players (players : (Socket.Address.Inet.t * Player.t) list)
 ;;
 
 let create_trivia_graphics (game : Game.t) =
+  let players = game.player_list in
+  List.iter players ~f:(fun (_, player) ->
+    player.answered_mr_question_wrong <- false;
+    player.answered_mr_question <- false);
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1500 800;
   let d = display_players game.player_list in

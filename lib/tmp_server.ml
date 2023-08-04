@@ -157,18 +157,26 @@ end = struct
         in
         let answer_is_correct = String.equal player_ans correct_ans in
         let player = find_player players client in
+        player.answered_mr_question <- true;
         if answer_is_correct
-        then (
-          player.score <- player.score + 1000;
-          player.answered_mr_question <- true)
+        then player.score <- player.score + 1000
         else player.answered_mr_question_wrong <- true;
         if List.for_all players ~f:(fun (_, player) ->
              player.answered_mr_question)
         then
           if List.exists players ~f:(fun (_, player) ->
                player.answered_mr_question_wrong)
-          then ()
-          else ()
+          then (
+            let players =
+              List.fold players ~init:[] ~f:(fun accum (client, player) ->
+                if player.answered_mr_question_wrong
+                then accum @ [ client, player ]
+                else accum)
+            in
+            Tmp_graphics.initialize_math_mayhem_graphics players)
+          else (
+            Game.ask_question game;
+            Tmp_graphics.create_trivia_graphics game)
         else ()
       | _ -> ()
     in
