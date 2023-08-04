@@ -47,7 +47,7 @@ let ask_question (game : t) =
 
 let set_up_players client (query : string) t : t * bool =
   (* we need to ensure that we have 4 unique clients *)
-  if List.length t.player_list < 2
+  if List.length t.player_list < 1
   then
     if not
          (* they repeat IP adresses byt clients are differnet based off of
@@ -57,7 +57,7 @@ let set_up_players client (query : string) t : t * bool =
     then
       t.player_list
         <- t.player_list @ [ client, Player.name_create_single_player query ];
-  if List.length t.player_list = 2
+  if List.length t.player_list = 1
   then (
     t.game_state <- Ongoing;
     ask_question t);

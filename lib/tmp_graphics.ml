@@ -79,7 +79,7 @@ let display_losers loser_list =
 ;;
 
 (* this is the skull that should be shown on top of the player*)
-let draw_skull x_coord =
+let draw_skull (x_coord : int) =
   (* the x_coord is the x_coord of the PLAYER - make sure to shift the skull
      x_coord - (x_coord + 25)*)
   (* skull is compraised of ellipse head, rect jaw, circle eyes *)
@@ -198,6 +198,24 @@ let create_trivia_graphics (game : Game.t) =
 ;;
 
 let create_leaderboard_graphics (game : Game.t) =
+  let rec display_pl_leaderboard x_coord y_coord players =
+    if List.length players = 0
+    then ()
+    else (
+      let curr_player : Player.t = List.hd_exn players in
+      Graphics.set_color curr_player.color;
+      if Bool.equal curr_player.living false then draw_skull x_coord;
+      Graphics.fill_rect x_coord y_coord player_block_size player_block_size;
+      Graphics.moveto x_coord (y_coord + 150);
+      Graphics.set_font
+        "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
+      Graphics.draw_string curr_player.name;
+      Graphics.set_color Color.white;
+      Graphics.moveto (x_coord + 35) (y_coord - 65);
+      Graphics.draw_string (Int.to_string curr_player.score);
+      let players = List.tl_exn players in
+      display_pl_leaderboard (x_coord + 250) (y_coord - 150) players)
+  in
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1500 800;
   (* this sorts the players by their score, so the player with the highest
@@ -210,7 +228,7 @@ let create_leaderboard_graphics (game : Game.t) =
     |> List.map ~f:snd
     |> List.rev
   in
-  print_s [%message "" (players_by_score : Player.t list)]
+  display_pl_leaderboard 300 600 players_by_score
 ;;
 
 (* pastes the arithmetic stuff where they are supposed to be *)
