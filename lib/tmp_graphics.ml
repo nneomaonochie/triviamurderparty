@@ -223,7 +223,7 @@ let math_mayhem_calc_scores () =
       String.equal (Game.get_ip_address c) (get_ip worst_perf.(0)))
   in
   (* the loser player dies*)
-  losing_player.living <- false;
+  Player.player_loses losing_player;
   display_losers [ (c, losing_player), x_coord ]
 ;;
 

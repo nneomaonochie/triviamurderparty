@@ -6,7 +6,7 @@ type t =
   ; mutable living : bool
   ; mutable answered_mr_question : bool
   ; mutable answered_mr_question_wrong : bool
-  ; color : int
+  ; mutable color : int
   }
 [@@deriving compare, equal, sexp_of]
 
@@ -45,6 +45,11 @@ let update_name t str =
   if String.equal t.name ""
   then t.name <- str
   else failwith "This player already has a name!"
+;;
+
+let player_loses t =
+  t.living <- false;
+  t.color <- Color.dead_gray
 ;;
 
 (* expect tests *)
