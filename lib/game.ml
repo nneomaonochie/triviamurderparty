@@ -60,7 +60,7 @@ let set_up_players client (query : string) t : t * bool =
   if List.length t.player_list = 1
   then (
     t.game_state <- Ongoing;
-    t.game_type <- Math_mayhem t.player_list;
+    (* t.game_type <- Math_mayhem t.player_list; *)
     ask_question t);
   print_s [%message "" (t : t)];
   t, match t.game_state with Ongoing -> true | _ -> false

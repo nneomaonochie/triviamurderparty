@@ -250,7 +250,7 @@ let start_math_mayhem_intro () =
 let initialize_math_mayhem_graphics
   (participants : (Socket.Address.Inet.t * Player.t) list)
   =
-  start_math_mayhem_intro ();
+  (* start_math_mayhem_intro (); *)
   let player_positions = display_players participants in
   (* this is the hashtable that stores the correct answer to arithmetic
      questions as values *)
@@ -278,7 +278,7 @@ let initialize_math_mayhem_graphics
   current_math_mayhem_hashtables.current_points <- current_points;
   current_math_mayhem_hashtables.player_positions <- player_positions;
   (* players have 30 seconds to accumulate as many points as possible *)
-  let span = Time_ns.Span.of_sec 30.0 in
+  let span = Time_ns.Span.of_sec 40.0 in
   (* find a way to display the time you have left [might be OPTIONAL]*)
   Clock_ns.run_after span (fun () -> math_mayhem_calc_scores ()) ()
 ;;
