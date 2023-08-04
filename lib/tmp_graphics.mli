@@ -15,3 +15,4 @@ val start_math_mayhem_intro : unit -> unit
 val math_mayhem_player_response : Socket.Address.Inet.t -> string -> unit
 val create_decision_graphics : unit -> unit
 val create_clicker_graphics : unit -> unit
+val show_correct_answer : Game.t -> unit

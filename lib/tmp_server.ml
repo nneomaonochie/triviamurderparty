@@ -154,26 +154,31 @@ end = struct
     else player.answered_mr_question_wrong <- true;
     if List.for_all players ~f:(fun (_, player) ->
          player.answered_mr_question)
-    then
-      if List.exists players ~f:(fun (_, player) ->
-           player.answered_mr_question_wrong)
-      then (
-        let players =
-          List.fold players ~init:[] ~f:(fun accum (client, player) ->
-            if player.answered_mr_question_wrong
-            then accum @ [ client, player ]
-            else accum)
-        in
-        game.game_type <- Math_mayhem players;
-        Tmp_graphics.start_math_mayhem_intro ();
-        let span = Time_ns.Span.of_sec 10.0 in
-        Clock_ns.run_after
-          span
-          (fun () -> Tmp_graphics.initialize_math_mayhem_graphics players)
-          ())
-      else (
-        Game.ask_question game;
-        Tmp_graphics.create_trivia_graphics game)
+    then (
+      Tmp_graphics.show_correct_answer game;
+      let func () =
+        if List.exists players ~f:(fun (_, player) ->
+             player.answered_mr_question_wrong)
+        then (
+          let players =
+            List.fold players ~init:[] ~f:(fun accum (client, player) ->
+              if player.answered_mr_question_wrong
+              then accum @ [ client, player ]
+              else accum)
+          in
+          game.game_type <- Math_mayhem players;
+          Tmp_graphics.start_math_mayhem_intro ();
+          let span = Time_ns.Span.of_sec 10.0 in
+          Clock_ns.run_after
+            span
+            (fun () -> Tmp_graphics.initialize_math_mayhem_graphics players)
+            ())
+        else (
+          Game.ask_question game;
+          Tmp_graphics.create_trivia_graphics game)
+      in
+      let span = Time_ns.Span.of_sec 3.0 in
+      Clock_ns.run_after span (fun () -> func ()) ())
     else ()
   ;;
 

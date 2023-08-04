@@ -152,6 +152,7 @@ let get_correct_q_coords (game : Game.t) =
 ;;
 
 let show_correct_answer (game : Game.t) =
+  Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1500 800;
   let question =
     match game.game_type with
@@ -165,7 +166,14 @@ let show_correct_answer (game : Game.t) =
       let first_char = String.of_char first_char in
       if String.equal first_char question.correct_answer then true else false)
   in
-  ()
+  Graphics.moveto 650 400;
+  Graphics.set_color Color.white;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
+  Graphics.draw_string correct_ans;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--40-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 700 700;
+  Graphics.set_color Color.green;
+  Graphics.draw_string "Correct Answer"
 ;;
 
 let create_trivia_graphics (game : Game.t) =
