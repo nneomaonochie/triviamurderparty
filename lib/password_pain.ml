@@ -27,7 +27,9 @@ type t =
   ; mutable safe_players : (Socket.Address.Inet.t * Player.t) list
       (* this is a list of players and the passwords they choice *)
   ; mutable player_passwords_positions :
-      (Socket.Address.Inet.t * Player.t * string * int) list
+      (Socket.Address.Inet.t * Player.t * string * string * int) list
+      (* the FIRST string is the real password, and the SECOND string is what
+         we display *)
   }
 [@@deriving sexp_of]
 
@@ -43,10 +45,12 @@ let update_password t ~client_ip ~query =
   let player_positions = t.player_passwords_positions in
   (* inserts the new password into the record *)
   let player_positions =
-    List.map player_positions ~f:(fun (c, p, pw, i) ->
+    List.map player_positions ~f:(fun (c, p, real_pw, display_pw, i) ->
       if String.equal client_ip (Game.get_ip_address c)
-      then c, p, query, i
-      else c, p, pw, i)
+      then c, p, query, "****", i
+      else c, p, real_pw, display_pw, i)
   in
   t.player_passwords_positions <- player_positions
 ;;
+
+let check_guess t (guess : string) = ""

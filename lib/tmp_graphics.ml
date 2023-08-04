@@ -81,11 +81,6 @@ let display_losers loser_list =
 
 (* this is the skull that should be shown on top of the player*)
 let draw_skull (x_coord : int) (y_coord : int) =
-  (* the x_coord is the x_coord of the PLAYER - make sure to shift the skull
-     x_coord - (x_coord + 25)*)
-  (* skull is compraised of ellipse head, rect jaw, circle eyes *)
-
-  (* this is the color of the white skeleton *)
   Graphics.set_color Color.skeleton_gray;
   Graphics.fill_circle (x_coord + 50) (y_coord + 75) 50;
   Graphics.fill_rect x_coord (y_coord - 25) 50 50;
@@ -459,7 +454,7 @@ let display_pp_participant_instructions participants =
   current_pp_state.active_participants <- participants;
   (* fixed the format for the record field *)
   current_pp_state.player_passwords_positions
-    <- List.map playing_players ~f:(fun ((c, p), i) -> c, p, "", i)
+    <- List.map playing_players ~f:(fun ((c, p), i) -> c, p, "", "", i)
 ;;
 
 let start_pp_intro participants =
@@ -469,6 +464,49 @@ let start_pp_intro participants =
     span
     (fun () -> display_pp_participant_instructions participants)
     ()
+;;
+
+let display_player_passwords () =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_color Color.dark_red;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
+  (* players are already on teh screen *)
+  List.iter
+    current_pp_state.player_passwords_positions
+    ~f:(fun (c, p, real_pw, display_pw, i) ->
+    Graphics.moveto i (player_y_coord - 100);
+    Graphics.draw_string display_pw)
+;;
+
+let final_pp_instruction () =
+  Graphics.set_color Color.pink;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_color Color.black;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 635 400;
+  Graphics.draw_string "If your code ";
+  Graphics.moveto 535 350;
+  Graphics.draw_string "is guessed,";
+  Graphics.moveto 535 350;
+  Graphics.draw_string "you die";
+  let span = Time_ns.Span.of_sec 4.0 in
+  Clock_ns.run_after span (fun () -> display_player_passwords ()) ()
+;;
+
+let display_pp_safe_player_instructions () =
+  Graphics.set_color Color.pink;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_color Color.black;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 635 400;
+  Graphics.draw_string "Safe players";
+  Graphics.moveto 535 350;
+  Graphics.draw_string "Guess the";
+  Graphics.moveto 535 350;
+  Graphics.draw_string "password";
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after span (fun () -> final_pp_instruction ()) ()
 ;;
 
 (* note to self, make a function for decide minigame in the tmp_server
@@ -494,16 +532,24 @@ let pp_password_creation client query (game : Game.t) =
     then ()
     else (
       Password_pain.update_password current_pp_state ~client_ip ~query;
-      (* that every password is a non string *)
-      if List.for_all current_pp_state.player_passwords_positions ~f: then game.game_state <- Password_pain true
-      
-      
-      
-      
-      
-      
-      
-      
-      )
+      (* that every password is a non string - all participating players put
+         in their password *)
+      if List.for_all
+           current_pp_state.player_passwords_positions
+           ~f:(fun (c, p, real_pw, display_pw, i) ->
+           not (String.is_empty real_pw))
+      then (
+        game.game_type <- Password_pain true;
+        display_pp_safe_player_instructions ()))
 ;;
+
+(* when the safe players guess the answer, this is what handles it *)
+let pp_guesses client query game =
+  let client_ip = Game.get_ip_address client in
+  (* ensures that only players who got question wrong create passwords *)
+  if List.exists current_pp_state.safe_players ~f:(fun (c, _) ->
+       String.equal client_ip (Game.get_ip_address c))
+  then Password_pain.check_guess current_pp_state query
+;;
+
 (*the every player mode *)

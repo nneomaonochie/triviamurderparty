@@ -110,13 +110,18 @@ end = struct
              (Protocol.Query_string.to_string query);
            game (* password creation mode*)
          | Password_pain false ->
-           pp_password_creation
+           Tmp_graphics.pp_password_creation
              client
              (Protocol.Query_string.to_string query)
              game;
            game
          (* password guessing mode *)
-         | Password_pain true -> game
+         | Password_pain true ->
+           Tmp_graphics.pp_guesses
+             client
+             (Protocol.Query_string.to_string query)
+             game;
+           game
          | _ -> game)
       | _ -> game
     in

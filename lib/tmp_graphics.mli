@@ -24,3 +24,4 @@ val initialize_password_pain_graphics
 
 val show_correct_answer : Game.t -> unit
 val pp_password_creation : Socket.Address.Inet.t -> string -> Game.t -> unit
+val pp_guesses : Socket.Address.Inet.t -> string -> Game.t -> unit
