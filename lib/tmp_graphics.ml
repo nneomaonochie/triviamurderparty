@@ -79,7 +79,7 @@ let display_losers loser_list =
 ;;
 
 (* this is the skull that should be shown on top of the player*)
-let draw_skull x_coord =
+let draw_skull (x_coord : int) =
   (* the x_coord is the x_coord of the PLAYER - make sure to shift the skull
      x_coord - (x_coord + 25)*)
   (* skull is compraised of ellipse head, rect jaw, circle eyes *)
@@ -205,7 +205,47 @@ let create_trivia_graphics (game : Game.t) =
   Graphics.draw_string (List.nth_exn question.answer_choices 3)
 ;;
 
-let create_leaderboard_graphics (game : Game.t) = ()
+let create_leaderboard_graphics (game : Game.t) =
+  let rec display_pl_leaderboard x_coord y_coord players =
+    if List.length players = 0
+    then ()
+    else (
+      let curr_player : Player.t = List.hd_exn players in
+      Graphics.set_color curr_player.color;
+      if Bool.equal curr_player.living false then draw_skull x_coord;
+      Graphics.fill_rect x_coord y_coord player_block_size player_block_size;
+      Graphics.moveto x_coord (y_coord + 150);
+      Graphics.set_font
+        "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
+      Graphics.draw_string curr_player.name;
+      Graphics.set_color Color.white;
+      Graphics.moveto (x_coord + 35) (y_coord - 65);
+      Graphics.draw_string (Int.to_string curr_player.score);
+      let players = List.tl_exn players in
+      display_pl_leaderboard (x_coord + 250) (y_coord - 100) players)
+  in
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  (* this sorts the players by their score, so the player with the highest
+     score is at index 0*)
+  let players_by_score =
+    game.player_list
+    |> List.map ~f:snd
+    |> List.map ~f:(fun player -> player.score, player)
+    |> List.sort ~compare:[%compare: int * Player.t]
+    |> List.map ~f:snd
+    |> List.rev
+  in
+  display_pl_leaderboard 300 600 players_by_score;
+  (* transition to *)
+  game.game_type
+    <- Trivia
+         { Question.question = ""; answer_choices = []; correct_answer = "" };
+  Game.ask_question game;
+  let span = Time_ns.Span.of_sec 5.0 in
+  (* find a way to display the time you have left [might be OPTIONAL]*)
+  Clock_ns.run_after span (fun () -> create_trivia_graphics game) ()
+;;
 
 (* pastes the arithmetic stuff where they are supposed to be *)
 let paste_math_mayhem_qs
@@ -244,7 +284,7 @@ let display_math_mayhem_points
 
 (* cases: [maybe make it a list of losers] 1. multiple players have the
    lowest score 2. ALL players hve the lowest score *)
-let math_mayhem_calc_scores () =
+let math_mayhem_calc_scores game =
   let get_int (i, s) = i in
   let get_ip (_, cs) = cs in
   let worst_perf = Array.create ~len:1 (Int.max_value, "") in
@@ -261,7 +301,10 @@ let math_mayhem_calc_scores () =
   in
   (* the loser player dies*)
   Player.player_loses losing_player;
-  display_losers [ (c, losing_player), x_coord ]
+  display_losers [ (c, losing_player), x_coord ];
+  let span = Time_ns.Span.of_sec 5.0 in
+  (* find a way to display the time you have left [might be OPTIONAL]*)
+  Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ()
 ;;
 
 (* displays the title of *)
@@ -275,8 +318,6 @@ let display_math_mayhem_title () =
   Graphics.moveto 600 375;
   Graphics.draw_string "Math Mayhem"
 ;;
-
-(* can i have multiple clocks running... i think no...*)
 
 let display_math_mayhem_instructions () =
   Graphics.set_color Color.white;
@@ -299,6 +340,7 @@ let start_math_mayhem_intro () =
    to set up the intial graphics *)
 let initialize_math_mayhem_graphics
   (participants : (Socket.Address.Inet.t * Player.t) list)
+  (game : Game.t)
   =
   let player_positions = display_players participants in
   (* this is the hashtable that stores the correct answer to arithmetic
@@ -329,7 +371,7 @@ let initialize_math_mayhem_graphics
   (* players have 30 seconds to accumulate as many points as possible *)
   let span = Time_ns.Span.of_sec 40.0 in
   (* find a way to display the time you have left [might be OPTIONAL]*)
-  Clock_ns.run_after span (fun () -> math_mayhem_calc_scores ()) ()
+  Clock_ns.run_after span (fun () -> math_mayhem_calc_scores game) ()
 ;;
 
 (* when clients send queries in this mode, we update the screen based off of
