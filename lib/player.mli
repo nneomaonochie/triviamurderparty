@@ -8,7 +8,7 @@ type t =
   ; mutable living : bool
   ; mutable answered_mr_question : bool
   ; mutable answered_mr_question_wrong : bool
-  ; color : int
+  ; mutable color : int
   }
 [@@deriving compare, equal, sexp_of]
 
@@ -24,3 +24,4 @@ val create_multi_players : unit -> t list
 (* changes a player's name so long as the previous name was an empty
    string *)
 val update_name : t -> string -> unit
+val player_loses : t -> unit

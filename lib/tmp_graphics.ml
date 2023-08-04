@@ -78,6 +78,18 @@ let display_losers loser_list =
   Graphics.draw_string "You died."
 ;;
 
+(* this is the skull that should be shown on top of the player*)
+let draw_skull x_coord =
+  (* the x_coord is the x_coord of the PLAYER - make sure to shift the skull
+     x_coord - (x_coord + 25)*)
+  (* skull is compraised of ellipse head, rect jaw, circle eyes *)
+
+  (* this is the color of the white skeleton *)
+  Graphics.set_color Color.skeleton_white;
+  (* this is the color for the eyes and inner jaw of the skeleton*)
+  Graphics.set_color Color.skeleton_gray
+;;
+
 (* recursively pastes other players from display_players*)
 let rec paste_players x_coord ~players_left ~player_positions
   : ((Socket.Address.Inet.t * Player.t) * int) list
@@ -95,6 +107,7 @@ let rec paste_players x_coord ~players_left ~player_positions
       player_block_size
       player_block_size;
     (* if player looks dead, put an x *)
+    if Bool.equal current_player.living false then draw_skull x_coord;
     Graphics.moveto x_coord 750;
     Graphics.set_font
       "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
@@ -239,8 +252,39 @@ let math_mayhem_calc_scores () =
       String.equal (Game.get_ip_address c) (get_ip worst_perf.(0)))
   in
   (* the loser player dies*)
-  losing_player.living <- false;
+  Player.player_loses losing_player;
   display_losers [ (c, losing_player), x_coord ]
+;;
+
+(* displays the title of *)
+let display_math_mayhem_title () =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  Graphics.set_color Color.white;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
+  Graphics.set_color Color.black;
+  Graphics.moveto 600 375;
+  Graphics.draw_string "Math Mayhem"
+;;
+
+(* can i have multiple clocks running... i think no...*)
+
+let display_math_mayhem_instructions () =
+  Graphics.set_color Color.white;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_color Color.black;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 635 400;
+  Graphics.draw_string "The worst";
+  Graphics.moveto 535 350;
+  Graphics.draw_string "mathematician dies"
+;;
+
+let start_math_mayhem_intro () =
+  display_math_mayhem_title ();
+  let span = Time_ns.Span.of_sec 5.0 in
+  Clock_ns.run_after span (fun () -> display_math_mayhem_instructions ()) ()
 ;;
 
 (* when transitioning from Trivia to Math Mayhem, a function should be called
@@ -275,7 +319,7 @@ let initialize_math_mayhem_graphics
   current_math_mayhem_hashtables.current_points <- current_points;
   current_math_mayhem_hashtables.player_positions <- player_positions;
   (* players have 30 seconds to accumulate as many points as possible *)
-  let span = Time_ns.Span.of_sec 30.0 in
+  let span = Time_ns.Span.of_sec 40.0 in
   (* find a way to display the time you have left [might be OPTIONAL]*)
   Clock_ns.run_after span (fun () -> math_mayhem_calc_scores ()) ()
 ;;

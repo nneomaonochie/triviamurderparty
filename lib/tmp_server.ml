@@ -173,7 +173,14 @@ end = struct
                 then accum @ [ client, player ]
                 else accum)
             in
-            Tmp_graphics.initialize_math_mayhem_graphics players)
+            Tmp_graphics.start_math_mayhem_intro ();
+            let span = Time_ns.Span.of_sec 10.0 in
+            Clock_ns.run_after
+              span
+              (fun () ->
+                Tmp_graphics.initialize_math_mayhem_graphics players)
+              ()
+            (* Tmp_graphics.initialize_math_mayhem_graphics players) *))
           else (
             Game.ask_question game;
             Tmp_graphics.create_trivia_graphics game)
