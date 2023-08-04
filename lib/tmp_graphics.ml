@@ -79,15 +79,20 @@ let display_losers loser_list =
 ;;
 
 (* this is the skull that should be shown on top of the player*)
-let draw_skull (x_coord : int) =
+let draw_skull (x_coord : int) (y_coord : int) =
   (* the x_coord is the x_coord of the PLAYER - make sure to shift the skull
      x_coord - (x_coord + 25)*)
   (* skull is compraised of ellipse head, rect jaw, circle eyes *)
 
   (* this is the color of the white skeleton *)
-  Graphics.set_color Color.skeleton_white;
-  (* this is the color for the eyes and inner jaw of the skeleton*)
-  Graphics.set_color Color.skeleton_gray
+  Graphics.set_color Color.skeleton_gray;
+  Graphics.fill_circle (x_coord + 50) (y_coord + 75) 50;
+  Graphics.fill_rect x_coord (y_coord - 25) 50 50;
+  Graphics.set_color Color.black;
+  Graphics.fill_rect (x_coord + 38) y_coord 5 25;
+  Graphics.fill_rect (x_coord + 58) y_coord 5 25;
+  Graphics.fill_circle (x_coord + 70) (y_coord + 75) 13;
+  Graphics.fill_circle (x_coord + 30) (y_coord + 75) 13
 ;;
 
 (* recursively pastes other players from display_players*)
@@ -107,7 +112,9 @@ let rec paste_players x_coord ~players_left ~player_positions
       player_block_size
       player_block_size;
     (* if player looks dead, put an x *)
-    if Bool.equal current_player.living false then draw_skull x_coord;
+    if Bool.equal current_player.living false
+    then draw_skull x_coord player_y_coord;
+    Graphics.set_color current_player.color;
     Graphics.moveto x_coord 750;
     Graphics.set_font
       "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
@@ -212,7 +219,9 @@ let create_leaderboard_graphics (game : Game.t) =
     else (
       let curr_player : Player.t = List.hd_exn players in
       Graphics.set_color curr_player.color;
-      if Bool.equal curr_player.living false then draw_skull x_coord;
+      if Bool.equal curr_player.living false
+      then draw_skull x_coord player_y_coord;
+      Graphics.set_color curr_player.color;
       Graphics.fill_rect x_coord y_coord player_block_size player_block_size;
       Graphics.moveto x_coord (y_coord + 150);
       Graphics.set_font
