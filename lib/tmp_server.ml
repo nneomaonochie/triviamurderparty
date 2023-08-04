@@ -100,8 +100,6 @@ end = struct
         then (
           match g.game_type with
           | Trivia _ -> Tmp_graphics.create_trivia_graphics g
-          (* | Math_mayhem _ -> Tmp_graphics.initialize_math_mayhem_graphics
-             g.player_list *)
           | _ -> ());
         g
       | Ongoing ->
@@ -143,48 +141,50 @@ end = struct
     player
   ;;
 
+  (* this starts the trivia portion of the game *)
+  let run_trivia_game (game : Game.t) (q : Question.t) client query =
+    let correct_ans = q.correct_answer in
+    let players = game.player_list in
+    let player_ans = String.of_char (Protocol.Query_char.to_char query) in
+    let answer_is_correct = String.equal player_ans correct_ans in
+    let player = find_player players client in
+    player.answered_mr_question <- true;
+    if answer_is_correct
+    then player.score <- player.score + 1000
+    else player.answered_mr_question_wrong <- true;
+    if List.for_all players ~f:(fun (_, player) ->
+         player.answered_mr_question)
+    then
+      if List.exists players ~f:(fun (_, player) ->
+           player.answered_mr_question_wrong)
+      then (
+        let players =
+          List.fold players ~init:[] ~f:(fun accum (client, player) ->
+            if player.answered_mr_question_wrong
+            then accum @ [ client, player ]
+            else accum)
+        in
+        game.game_type <- Math_mayhem players;
+        Tmp_graphics.start_math_mayhem_intro ();
+        let span = Time_ns.Span.of_sec 10.0 in
+        Clock_ns.run_after
+          span
+          (fun () -> Tmp_graphics.initialize_math_mayhem_graphics players)
+          ())
+      else (
+        Game.ask_question game;
+        Tmp_graphics.create_trivia_graphics game)
+    else ()
+  ;;
+
+  (* this handles the chars a user inputs *)
   let handle_query_char client query : Protocol.Response.t Deferred.t =
     let game = Stack.pop_exn game_stack in
     let question = game.game_type in
     let ip_addr = Game.get_ip_address client in
     let () =
       match question with
-      | Trivia q ->
-        let correct_ans = q.correct_answer in
-        let players = game.player_list in
-        let player_ans =
-          String.of_char (Protocol.Query_char.to_char query)
-        in
-        let answer_is_correct = String.equal player_ans correct_ans in
-        let player = find_player players client in
-        player.answered_mr_question <- true;
-        if answer_is_correct
-        then player.score <- player.score + 1000
-        else player.answered_mr_question_wrong <- true;
-        if List.for_all players ~f:(fun (_, player) ->
-             player.answered_mr_question)
-        then
-          if List.exists players ~f:(fun (_, player) ->
-               player.answered_mr_question_wrong)
-          then (
-            let players =
-              List.fold players ~init:[] ~f:(fun accum (client, player) ->
-                if player.answered_mr_question_wrong
-                then accum @ [ client, player ]
-                else accum)
-            in
-            Tmp_graphics.start_math_mayhem_intro ();
-            let span = Time_ns.Span.of_sec 10.0 in
-            Clock_ns.run_after
-              span
-              (fun () ->
-                Tmp_graphics.initialize_math_mayhem_graphics players)
-              ()
-            (* Tmp_graphics.initialize_math_mayhem_graphics players) *))
-          else (
-            Game.ask_question game;
-            Tmp_graphics.create_trivia_graphics game)
-        else ()
+      | Trivia q -> run_trivia_game game q client query
       | _ -> ()
     in
     print_s [%message "" (game : Game.t)];
