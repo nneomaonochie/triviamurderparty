@@ -489,7 +489,7 @@ let final_pp_instruction () =
   Graphics.draw_string "If your code ";
   Graphics.moveto 525 350;
   Graphics.draw_string "is guessed, you die";
-  let span = Time_ns.Span.of_sec 6.0 in
+  let span = Time_ns.Span.of_sec 5.0 in
   Clock_ns.run_after span (fun () -> display_player_passwords ()) ()
 ;;
 
