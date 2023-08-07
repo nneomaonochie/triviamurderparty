@@ -549,7 +549,9 @@ let pp_guesses client query game =
   (* ensures that only players who got question wrong create passwords *)
   if List.exists current_pp_state.safe_players ~f:(fun (c, _) ->
        String.equal client_ip (Game.get_ip_address c))
-  then Password_pain.check_guess current_pp_state query
+  then (
+    let a = Password_pain.check_guess current_pp_state query in
+    ())
 ;;
 
 (*the every player mode *)

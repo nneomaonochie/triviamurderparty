@@ -53,4 +53,8 @@ let update_password t ~client_ip ~query =
   t.player_passwords_positions <- player_positions
 ;;
 
-let check_guess t (guess : string) = ""
+let check_guess t (guess : string) =
+  ignore t;
+  ignore guess;
+  ""
+;;
