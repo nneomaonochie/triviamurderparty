@@ -291,24 +291,40 @@ let display_math_mayhem_points
 let math_mayhem_calc_scores game =
   let get_int (i, s) = i in
   let get_ip (_, cs) = cs in
-  let worst_perf = Array.create ~len:1 (Int.max_value, "") in
-  (* tries to find player with lowest scores*)
-  Hashtbl.iteri
-    current_math_mayhem_hashtables.current_points
-    ~f:(fun ~key ~data ->
-    if data < get_int worst_perf.(0) then Array.set worst_perf 0 (data, key));
-  let (c, losing_player), x_coord =
-    List.find_exn
-      current_math_mayhem_hashtables.player_positions
-      ~f:(fun ((c, _), _) ->
-      String.equal (Game.get_ip_address c) (get_ip worst_perf.(0)))
-  in
-  (* the loser player dies*)
-  Player.player_loses losing_player;
-  display_losers [ (c, losing_player), x_coord ];
-  let span = Time_ns.Span.of_sec 5.0 in
-  (* find a way to display the time you have left [might be OPTIONAL]*)
-  Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ()
+  (* if only one player is playing, then they need to get at least 15 to
+     survive *)
+  if Hashtbl.length current_math_mayhem_hashtables.current_points = 1
+  then
+    Hashtbl.iteri
+      current_math_mayhem_hashtables.current_points
+      ~f:(fun ~key ~data ->
+      if data < 15
+      then
+        display_losers
+          [ List.find_exn
+              current_math_mayhem_hashtables.player_positions
+              ~f:(fun ((c, _), _) ->
+              String.equal (Game.get_ip_address c) key)
+          ])
+  else (
+    let worst_perf = Array.create ~len:1 (Int.max_value, "") in
+    (* tries to find player with lowest scores*)
+    Hashtbl.iteri
+      current_math_mayhem_hashtables.current_points
+      ~f:(fun ~key ~data ->
+      if data < get_int worst_perf.(0) then Array.set worst_perf 0 (data, key));
+    let (c, losing_player), x_coord =
+      List.find_exn
+        current_math_mayhem_hashtables.player_positions
+        ~f:(fun ((c, _), _) ->
+        String.equal (Game.get_ip_address c) (get_ip worst_perf.(0)))
+    in
+    (* the loser player dies*)
+    Player.player_loses losing_player;
+    display_losers [ (c, losing_player), x_coord ];
+    let span = Time_ns.Span.of_sec 5.0 in
+    (* find a way to display the time you have left [might be OPTIONAL]*)
+    Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ())
 ;;
 
 (* displays the title of *)
@@ -363,7 +379,7 @@ let initialize_math_mayhem_graphics
       ~size:(List.length player_positions)
       (module String)
   in
-  (* the scores are initially set to 0*)
+  (* the scores are initially set to 0 *)
   List.iter player_positions ~f:(fun ((c, _), _) ->
     Hashtbl.add_exn current_points ~key:(Game.get_ip_address c) ~data:0);
   (* the first questions and scores are displayed *)
@@ -479,7 +495,18 @@ let display_player_passwords () =
     Graphics.draw_string display_pw)
 ;;
 
-let final_pp_instruction () =
+(* this ends the minigame for password pain *)
+let pp_end_minigame game =
+  display_losers
+    (List.filter
+       current_pp_state.active_participants
+       ~f:(fun (_, pl, _, _, _) -> not pl.living)
+     |> List.map ~f:(fun (c, pl, _, _, x_coord) -> (c, pl), x_coord));
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ()
+;;
+
+let final_pp_instruction game =
   Graphics.set_color Color.pink;
   Graphics.fill_rect 500 250 500 300;
   Graphics.set_color Color.black;
@@ -493,18 +520,10 @@ let final_pp_instruction () =
   (* after we display the initial passwords, we will set a timer before the
      game runs out*)
   let span = Time_ns.Span.of_sec 60.0 in
-  Clock_ns.run_after
-    span
-    (fun () ->
-      display_losers
-        (List.filter
-           current_pp_state.active_participants
-           ~f:(fun (_, pl, _, _, _) -> not pl.living)
-         |> List.map ~f:(fun (c, pl, _, _, x_coord) -> (c, pl), x_coord)))
-    ()
+  Clock_ns.run_after span (fun () -> pp_end_minigame game) ()
 ;;
 
-let display_pp_safe_player_instructions () =
+let display_pp_safe_player_instructions game =
   Graphics.set_color Color.pink;
   Graphics.fill_rect 500 250 500 300;
   Graphics.set_color Color.black;
@@ -514,7 +533,7 @@ let display_pp_safe_player_instructions () =
   Graphics.moveto 535 350;
   Graphics.draw_string "Guess the password";
   let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after span (fun () -> final_pp_instruction ()) ()
+  Clock_ns.run_after span (fun () -> final_pp_instruction game) ()
 ;;
 
 (* participant clients input the password that the safe players must guess *)
@@ -538,7 +557,7 @@ let pp_password_creation client query (game : Game.t) =
            not (String.is_empty real_pw))
       then (
         game.game_type <- Password_pain true;
-        display_pp_safe_player_instructions ()))
+        display_pp_safe_player_instructions game))
 ;;
 
 (* when the safe players guess the answer, this is what handles it *)
@@ -550,7 +569,7 @@ let pp_guesses client query (game : Game.t) =
      && List.exists current_pp_state.safe_players ~f:(fun (c, _) ->
           String.equal client_ip (Game.get_ip_address c))
   then (
-    Password_pain.check_guess current_pp_state query;
+    Password_pain.check_guess current_pp_state query game;
     display_player_passwords ())
 ;;
 

@@ -72,7 +72,7 @@ let rec compare_answers ~real_pw ~guess ~index ~result =
 ;;
 
 (* takes in a guess as a string and finds similarites with passwords *)
-let check_guess t (guess : string) =
+let check_guess t (guess : string) (game : Game.t) =
   let updated_pp_positions =
     List.map t.active_participants ~f:(fun (c, pl, real_pw, display_pw, i) ->
       let real_p = real_pw in
@@ -88,8 +88,13 @@ let check_guess t (guess : string) =
           else init ^ Char.to_string char)
       in
       (* if no *'s present then it has been completely guessed *)
-      if not (String.contains new_display_pw '*') then pl.living <- false;
-      print_s [%message new_display_pw];
+      if not (String.contains new_display_pw '*')
+      then
+        List.iter game.player_list ~f:(fun (_, p) ->
+          if Player.equal p pl
+          then (
+            p.living <- false;
+            pl.living <- false));
       (* the new password is now the display pw *)
       c, pl, real_pw, new_display_pw, i)
   in
@@ -106,3 +111,5 @@ let check_guess t (guess : string) =
 (* make an every player mode*)
 
 (* make sure players cant submit non-words ec: nneo*)
+
+(* there is a chance that the game passed hasnt updated yet... *)
