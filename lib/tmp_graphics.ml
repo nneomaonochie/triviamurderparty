@@ -492,7 +492,7 @@ let final_pp_instruction () =
   Clock_ns.run_after span (fun () -> display_player_passwords ()) ();
   (* after we display the initial passwords, we will set a timer before the
      game runs out*)
-  let span = Time_ns.Span.of_sec 30.0 in
+  let span = Time_ns.Span.of_sec 60.0 in
   Clock_ns.run_after
     span
     (fun () ->
