@@ -53,8 +53,37 @@ let update_password t ~client_ip ~query =
   t.player_passwords_positions <- player_positions
 ;;
 
+(* recursively checks which chars in a string are equivalent *)
+let rec compare_answers ~real_pw ~guess ~index ~result =
+  if index = 4
+  then result
+  else (
+    let result =
+      if Char.equal (String.get real_pw index) (String.get guess index)
+      then result ^ Char.to_string (String.get real_pw index)
+      else result ^ "*"
+    in
+    let stop_index = String.length real_pw in
+    let new_real_pw =
+      if String.length real_pw = 1
+      then ""
+      else String.slice real_pw 1 stop_index
+    in
+    let new_guess =
+      if String.length guess = 1 then "" else String.slice guess 1 stop_index
+    in
+    compare_answers
+      ~real_pw:new_real_pw
+      ~guess:new_guess
+      ~index:(index + 1)
+      ~result)
+;;
+
+(* takes in a guess as a string and finds similarites with passwords *)
 let check_guess t (guess : string) =
-  ignore t;
-  ignore guess;
+  List.iter t.player_passwords_positions ~f:(fun (_, _, real_pw, _, _) ->
+    let result = compare_answers ~real_pw ~guess ~index:0 ~result:"" in
+    (* eventually change to change to display_pq*)
+    print_s [%message result]);
   ""
 ;;
