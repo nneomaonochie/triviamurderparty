@@ -82,7 +82,10 @@ let rec compare_answers ~real_pw ~guess ~index ~result =
 (* takes in a guess as a string and finds similarites with passwords *)
 let check_guess t (guess : string) =
   List.iter t.player_passwords_positions ~f:(fun (_, _, real_pw, _, _) ->
-    let result = compare_answers ~real_pw ~guess ~index:0 ~result:"" in
+    let real_p = real_pw in
+    let result =
+      compare_answers ~real_pw:real_p ~guess ~index:0 ~result:""
+    in
     (* eventually change to change to display_pq*)
     print_s [%message result]);
   ""
