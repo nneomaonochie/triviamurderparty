@@ -60,7 +60,7 @@ let rec compare_answers ~real_pw ~guess ~index ~result =
   else (
     let result =
       if Char.equal (String.get real_pw 0) (String.get guess 0)
-      then result ^ Char.to_string (String.get real_pw index)
+      then result ^ Char.to_string (String.get real_pw 0)
       else result ^ "*"
     in
     let stop_index = String.length real_pw in
