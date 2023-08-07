@@ -451,9 +451,8 @@ let display_pp_participant_instructions participants =
   Graphics.draw_string "Input a 4";
   Graphics.moveto 535 350;
   Graphics.draw_string "letter password";
-  current_pp_state.active_participants <- participants;
   (* fixed the format for the record field *)
-  current_pp_state.player_passwords_positions
+  current_pp_state.active_participants
     <- List.map playing_players ~f:(fun ((c, p), i) -> c, p, "", "", i)
 ;;
 
@@ -474,7 +473,7 @@ let display_player_passwords () =
   Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
   (* players are already on teh screen *)
   List.iter
-    current_pp_state.player_passwords_positions
+    current_pp_state.active_participants
     ~f:(fun (c, p, real_pw, display_pw, i) ->
     Graphics.moveto i (player_y_coord - 100);
     Graphics.draw_string display_pw)
@@ -490,7 +489,19 @@ let final_pp_instruction () =
   Graphics.moveto 525 350;
   Graphics.draw_string "is guessed, you die";
   let span = Time_ns.Span.of_sec 4.0 in
-  Clock_ns.run_after span (fun () -> display_player_passwords ()) ()
+  Clock_ns.run_after span (fun () -> display_player_passwords ()) ();
+  (* after we display the initial passwords, we will set a timer before the
+     game runs out*)
+  let span = Time_ns.Span.of_sec 30.0 in
+  Clock_ns.run_after
+    span
+    (fun () ->
+      display_losers
+        (List.filter
+           current_pp_state.active_participants
+           ~f:(fun (_, pl, _, _, _) -> not pl.living)
+         |> List.map ~f:(fun (c, pl, _, _, x_coord) -> (c, pl), x_coord)))
+    ()
 ;;
 
 let display_pp_safe_player_instructions () =
@@ -506,21 +517,23 @@ let display_pp_safe_player_instructions () =
   Clock_ns.run_after span (fun () -> final_pp_instruction ()) ()
 ;;
 
-(* clients input the password the safe players must guess *)
+(* participant clients input the password that the safe players must guess *)
 let pp_password_creation client query (game : Game.t) =
   let client_ip = Game.get_ip_address client in
   (* ensures that only players who got question wrong create passwords *)
-  if List.exists current_pp_state.active_participants ~f:(fun (c, _) ->
+  if List.exists
+       current_pp_state.active_participants
+       ~f:(fun (c, _, _, _, _) ->
        String.equal client_ip (Game.get_ip_address c))
   then
     if String.length query <> 4
     then print_s [%message "Your password must be 4 letters."]
     else (
-      Password_pain.update_password current_pp_state ~client_ip ~query;
+      Password_pain.update_password current_pp_state ~query;
       (* that every password is a non string - all participating players put
          in their password *)
       if List.for_all
-           current_pp_state.player_passwords_positions
+           current_pp_state.active_participants
            ~f:(fun (c, p, real_pw, display_pw, i) ->
            not (String.is_empty real_pw))
       then (
@@ -533,22 +546,12 @@ let pp_guesses client query (game : Game.t) =
   let client_ip = Game.get_ip_address client in
   (* we only accept guesses that are from safe players and are 4 letters
      long *)
-  print_s
-    [%message
-      (game.game_type : Game.Game_kind.t)
-        (current_pp_state.safe_players
-          : (Socket.Address.Inet.t * Player.t) list)];
   if String.length query = 4
      && List.exists current_pp_state.safe_players ~f:(fun (c, _) ->
           String.equal client_ip (Game.get_ip_address c))
   then (
-    let a = Password_pain.check_guess current_pp_state query in
-    print_s
-      [%message
-        a
-          (game.game_type : Game.Game_kind.t)
-          (current_pp_state.safe_players
-            : (Socket.Address.Inet.t * Player.t) list)])
+    Password_pain.check_guess current_pp_state query;
+    display_player_passwords ())
 ;;
 
 (*the every player mode *)

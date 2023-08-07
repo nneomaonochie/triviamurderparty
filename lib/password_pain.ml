@@ -23,34 +23,26 @@ open! Async
 (* make an every_plyaer_playing mode - whoever is guessed the MOST dies *)
 
 type t =
-  { mutable active_participants : (Socket.Address.Inet.t * Player.t) list
-  ; mutable safe_players : (Socket.Address.Inet.t * Player.t) list
-      (* this is a list of players and the passwords they choice *)
-  ; mutable player_passwords_positions :
+  { mutable active_participants :
       (Socket.Address.Inet.t * Player.t * string * string * int) list
       (* the FIRST string is the real password, and the SECOND string is what
          we display *)
+  ; mutable safe_players : (Socket.Address.Inet.t * Player.t) list
   }
 [@@deriving sexp_of]
 
-let create () =
-  { active_participants = []
-  ; safe_players = []
-  ; player_passwords_positions = []
-  }
-;;
+let create () = { active_participants = []; safe_players = [] }
 
-let update_password t ~client_ip ~query =
+(* initializes a user's password *)
+let update_password t ~query =
   (* make sure they cant RE-update it *)
-  let player_positions = t.player_passwords_positions in
-  (* inserts the new password into the record *)
-  let player_positions =
-    List.map player_positions ~f:(fun (c, p, real_pw, display_pw, i) ->
-      if String.equal client_ip (Game.get_ip_address c)
-      then c, p, query, "****", i
-      else c, p, real_pw, display_pw, i)
-  in
-  t.player_passwords_positions <- player_positions
+  t.active_participants
+    <- List.map
+         t.active_participants
+         ~f:(fun (c, p, real_pw, display_pw, i) ->
+         if String.is_empty real_pw
+         then c, p, query, "****", i
+         else c, p, real_pw, display_pw, i)
 ;;
 
 (* recursively checks which chars in a string are equivalent *)
@@ -81,12 +73,28 @@ let rec compare_answers ~real_pw ~guess ~index ~result =
 
 (* takes in a guess as a string and finds similarites with passwords *)
 let check_guess t (guess : string) =
-  List.iter t.player_passwords_positions ~f:(fun (_, _, real_pw, _, _) ->
-    let real_p = real_pw in
-    let result =
-      compare_answers ~real_pw:real_p ~guess ~index:0 ~result:""
-    in
-    (* eventually change to change to display_pq*)
-    print_s [%message result]);
-  ""
+  let updated_pp_positions =
+    List.map t.active_participants ~f:(fun (c, pl, real_pw, display_pw, i) ->
+      let real_p = real_pw in
+      (* result is user's correct letter placements, which we will compare
+         with the display password *)
+      let result =
+        compare_answers ~real_pw:real_p ~guess ~index:0 ~result:""
+      in
+      let new_display_pw =
+        String.foldi display_pw ~init:"" ~f:(fun ind init char ->
+          if Char.equal char '*'
+          then init ^ Char.to_string (String.get result ind)
+          else init ^ Char.to_string char)
+      in
+      (* if no *'s present then it has been completely guessed *)
+      if not (String.contains new_display_pw '*') then pl.living <- false;
+      print_s [%message new_display_pw];
+      (* the new password is now the display pw *)
+      c, pl, real_pw, new_display_pw, i)
+  in
+  t.active_participants <- updated_pp_positions
 ;;
+
+(* for the timer, maybe do it where the different ratio of safe to unsafe
+   yields a different amount of time *)
