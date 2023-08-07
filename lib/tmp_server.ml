@@ -154,6 +154,30 @@ end = struct
     player
   ;;
 
+  let run_math_mayhem ~players t =
+    Tmp_graphics.start_math_mayhem_intro ();
+    let span = Time_ns.Span.of_sec 7.0 in
+    Clock_ns.run_after
+      span
+      (fun () -> Tmp_graphics.initialize_math_mayhem_graphics players t)
+      ()
+  ;;
+
+  let run_password_pain ~participants ~safe_players =
+    Tmp_graphics.start_pp_intro ~participants ~safe_players
+  ;;
+
+  let pick_minigame ~participants ~safe_players (game : Game.t) =
+    let minigames : Game.Game_kind.t list =
+      [ Math_mayhem; Password_pain false ]
+    in
+    game.game_type <- List.random_element_exn minigames;
+    match game.game_type with
+    | Math_mayhem -> run_math_mayhem ~players:participants game
+    | Password_pain false -> run_password_pain ~participants ~safe_players
+    | _ -> ()
+  ;;
+
   (* this starts the trivia portion of the game *)
   let run_trivia_game (game : Game.t) (q : Question.t) client query =
     let correct_ans = q.correct_answer in
@@ -184,8 +208,7 @@ end = struct
             List.filter game.player_list ~f:(fun (_, p) ->
               Bool.equal p.answered_mr_question_wrong false)
           in
-          Game.pick_minigame ~participants:players ~safe_players game
-          (* this is for password pain *))
+          pick_minigame ~participants:players ~safe_players game)
         else (
           Game.ask_question game;
           Tmp_graphics.create_trivia_graphics game)

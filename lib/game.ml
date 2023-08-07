@@ -64,24 +64,3 @@ let set_up_players client (query : string) t : t * bool =
   print_s [%message "" (t : t)];
   t, match t.game_state with Ongoing -> true | _ -> false
 ;;
-
-let run_math_mayhem players t =
-  Tmp_graphics.start_math_mayhem_intro ();
-  let span = Time_ns.Span.of_sec 7.0 in
-  Clock_ns.run_after
-    span
-    (fun () -> Tmp_graphics.initialize_math_mayhem_graphics players t)
-    ()
-;;
-
-let run_password_pain ~participants ~safe_players =
-  Tmp_graphics.start_pp_intro ~participants ~safe_players
-;;
-
-let pick_minigame ~participants ~safe_players (t : Game.t) =
-  let minigames : Game_kind.t list = [ Math_mayhem; Password_pain false ] in
-  t.game_type <- List.random_element_exn minigames;
-  match t.game_type with
-  | Math_mayhem -> run_math_mayhem participants t
-  | Password_pain false -> run_password_pain ~participants ~safe_players t
-;;

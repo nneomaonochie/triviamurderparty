@@ -27,9 +27,3 @@ val get_ip_address : Socket.Address.Inet.t -> string
 val set_up_players : Socket.Address.Inet.t -> string -> t -> t * bool
 val ask_question : t -> unit
 val create : unit -> t
-
-val pick_minigame
-  :  participants:(Socket.Address.Inet.t * Player.t) list
-  -> safe_players:(Socket.Address.Inet.t * Player.t) list
-  -> t
-  -> unit
