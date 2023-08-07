@@ -70,13 +70,16 @@ let display_losers loser_list =
   in
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1500 800;
-  dpl
-    (List.nth_exn player_starting_x_coords (List.length loser_list - 1))
-    loser_list;
-  Graphics.set_color Color.dark_red;
-  Graphics.moveto 650 500;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
-  Graphics.draw_string "You died."
+  if List.length loser_list > 0
+  then (
+    dpl
+      (List.nth_exn player_starting_x_coords (List.length loser_list - 1))
+      loser_list;
+    Graphics.set_color Color.dark_red;
+    Graphics.moveto 650 500;
+    Graphics.set_font
+      "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+    Graphics.draw_string "You died.")
 ;;
 
 (* this is the skull that should be shown on top of the player*)
