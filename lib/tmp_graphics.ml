@@ -488,10 +488,6 @@ let final_pp_instruction () =
   Graphics.draw_string "If your code ";
   Graphics.moveto 525 350;
   Graphics.draw_string "is guessed, you die";
-<<<<<<< HEAD
-  let span = Time_ns.Span.of_sec 6.0 in
-  Clock_ns.run_after span (fun () -> display_player_passwords ()) ()
-=======
   let span = Time_ns.Span.of_sec 4.0 in
   Clock_ns.run_after span (fun () -> display_player_passwords ()) ();
   (* after we display the initial passwords, we will set a timer before the
@@ -506,7 +502,6 @@ let final_pp_instruction () =
            ~f:(fun (_, pl, _, _, _) -> not pl.living)
          |> List.map ~f:(fun (c, pl, _, _, x_coord) -> (c, pl), x_coord)))
     ()
->>>>>>> 6e272989a2e715093d269885d446e11452e80032
 ;;
 
 let display_pp_safe_player_instructions () =
