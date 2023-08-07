@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if $# -ne 1
+then
+	echo "Wrong number of argunents"
+	exit 0
+fi
+
+dune exec bin/main.exe -- tmp-server client send-char -server ec2-52-45-110-109.compute-1.amazonaws.com:8181 -char $1
+
