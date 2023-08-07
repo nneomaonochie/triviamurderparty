@@ -82,13 +82,13 @@ let display_losers loser_list =
 (* this is the skull that should be shown on top of the player*)
 let draw_skull (x_coord : int) (y_coord : int) =
   Graphics.set_color Color.skeleton_gray;
-  Graphics.fill_circle (x_coord + 50) (y_coord + 75) 50;
-  Graphics.fill_rect (x_coord + 25) (y_coord - 25) 50 50;
+  Graphics.fill_circle (x_coord + 60) (y_coord + 75) 50;
+  Graphics.fill_rect (x_coord + 35) y_coord 50 50;
   Graphics.set_color Color.black;
-  Graphics.fill_rect (x_coord + 38) y_coord 5 25;
-  Graphics.fill_rect (x_coord + 58) y_coord 5 25;
-  Graphics.fill_circle (x_coord + 70) (y_coord + 75) 13;
-  Graphics.fill_circle (x_coord + 30) (y_coord + 75) 13
+  Graphics.fill_rect (x_coord + 48) y_coord 5 25;
+  Graphics.fill_rect (x_coord + 68) y_coord 5 25;
+  Graphics.fill_circle (x_coord + 80) (y_coord + 75) 13;
+  Graphics.fill_circle (x_coord + 40) (y_coord + 75) 13
 ;;
 
 (* recursively pastes other players from display_players*)
@@ -215,8 +215,6 @@ let create_leaderboard_graphics (game : Game.t) =
     else (
       let curr_player : Player.t = List.hd_exn players in
       Graphics.set_color curr_player.color;
-      if Bool.equal curr_player.living false
-      then draw_skull x_coord player_y_coord;
       Graphics.set_color curr_player.color;
       Graphics.fill_rect x_coord y_coord player_block_size player_block_size;
       Graphics.moveto x_coord (y_coord + 150);
@@ -226,6 +224,8 @@ let create_leaderboard_graphics (game : Game.t) =
       Graphics.set_color Color.white;
       Graphics.moveto (x_coord + 35) (y_coord - 65);
       Graphics.draw_string (Int.to_string curr_player.score);
+      if Bool.equal curr_player.living false
+      then draw_skull x_coord (player_y_coord - 20);
       let players = List.tl_exn players in
       display_pl_leaderboard (x_coord + 250) (y_coord - 100) players)
   in
@@ -488,6 +488,10 @@ let final_pp_instruction () =
   Graphics.draw_string "If your code ";
   Graphics.moveto 525 350;
   Graphics.draw_string "is guessed, you die";
+<<<<<<< HEAD
+  let span = Time_ns.Span.of_sec 6.0 in
+  Clock_ns.run_after span (fun () -> display_player_passwords ()) ()
+=======
   let span = Time_ns.Span.of_sec 4.0 in
   Clock_ns.run_after span (fun () -> display_player_passwords ()) ();
   (* after we display the initial passwords, we will set a timer before the
@@ -502,6 +506,7 @@ let final_pp_instruction () =
            ~f:(fun (_, pl, _, _, _) -> not pl.living)
          |> List.map ~f:(fun (c, pl, _, _, x_coord) -> (c, pl), x_coord)))
     ()
+>>>>>>> 6e272989a2e715093d269885d446e11452e80032
 ;;
 
 let display_pp_safe_player_instructions () =
