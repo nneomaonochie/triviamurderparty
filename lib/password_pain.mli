@@ -10,4 +10,4 @@ type t =
 
 val create : unit -> t
 val update_password : t -> query:string -> unit
-val check_guess : t -> string -> unit
+val check_guess : t -> string -> Game.t -> unit

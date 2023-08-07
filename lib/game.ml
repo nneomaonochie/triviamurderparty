@@ -6,7 +6,7 @@ module Game_kind = struct
     | Leaderboard
     | Trivia of Question.t
     | Math_mayhem
-    | Decisions
+    | Chalices of bool
     | Password_pain of bool
   [@@deriving compare, sexp_of]
 end

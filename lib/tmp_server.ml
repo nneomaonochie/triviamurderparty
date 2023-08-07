@@ -154,12 +154,12 @@ end = struct
     player
   ;;
 
-  let run_math_mayhem ~players t =
+  let run_math_mayhem ~players game =
     Tmp_graphics.start_math_mayhem_intro ();
     let span = Time_ns.Span.of_sec 7.0 in
     Clock_ns.run_after
       span
-      (fun () -> Tmp_graphics.initialize_math_mayhem_graphics players t)
+      (fun () -> Tmp_graphics.initialize_math_mayhem_graphics players game)
       ()
   ;;
 
