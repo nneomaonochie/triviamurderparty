@@ -16,8 +16,6 @@ let player_starting_x_coords = [ 687; 550; 437; 300 ]
 let player_y_coord = 620
 let display_beginning_instructions () = ()
 
-(* these are the graphics for specific game_kind*)
-
 (* this asks user input for players' names so that we can initiatilize the
    players and create a game *)
 let player_creation_screen () =
@@ -204,6 +202,24 @@ let create_trivia_graphics (game : Game.t) =
   Graphics.draw_string (List.nth_exn question.answer_choices 3)
 ;;
 
+let display_ending_graphics (game : Game.t) =
+  let func () =
+    let coords = display_players game.player_list in
+    let alive_players =
+      List.filter coords ~f:(fun ((c, p), x_coord) ->
+        if p.living then true else false)
+    in
+    List.iter alive_players ~f:(fun ((c, p), x_coord) ->
+      p.score <- p.score + 3000);
+    List.iter alive_players ~f:(fun ((c, p), x_coord) ->
+      Graphics.moveto x_coord 500;
+      Graphics.set_color Color.green;
+      Graphics.draw_string "+3000")
+  in
+  let span = Time_ns.Span.of_sec 4.0 in
+  Clock_ns.run_after span (fun () -> func ()) ()
+;;
+
 let create_leaderboard_graphics (game : Game.t) =
   let rec display_pl_leaderboard x_coord y_coord players =
     if List.length players = 0
@@ -221,7 +237,7 @@ let create_leaderboard_graphics (game : Game.t) =
       Graphics.moveto (x_coord + 35) (y_coord - 65);
       Graphics.draw_string (Int.to_string curr_player.score);
       if Bool.equal curr_player.living false
-      then draw_skull x_coord (player_y_coord - 20);
+      then draw_skull x_coord (y_coord - 20);
       let players = List.tl_exn players in
       display_pl_leaderboard (x_coord + 250) (y_coord - 100) players)
   in
@@ -244,7 +260,16 @@ let create_leaderboard_graphics (game : Game.t) =
          { Question.question = ""; answer_choices = []; correct_answer = "" };
   Game.ask_question game;
   let span = Time_ns.Span.of_sec 5.0 in
-  Clock_ns.run_after span (fun () -> create_trivia_graphics game) ()
+  Clock_ns.run_after
+    span
+    (fun () ->
+      if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
+         || game.questions_asked >= 10
+      then (
+        game.game_state <- Game_over;
+        display_ending_graphics game)
+      else create_trivia_graphics game)
+    ()
 ;;
 
 (* pastes the arithmetic stuff where they are supposed to be *)
@@ -469,7 +494,14 @@ let display_pp_participant_instructions participants =
 ;;
 
 let start_pp_intro ~participants ~safe_players =
-  current_pp_state.safe_players <- safe_players;
+  current_pp_state.active_participants <- [];
+  current_pp_state.safe_players <- [];
+  if List.is_empty safe_players
+  then
+    (* no safe players means that every player got the question wrong - so
+       everyone can guess each others passwords EXCEPT their own *)
+    current_pp_state.safe_players <- participants
+  else current_pp_state.safe_players <- safe_players;
   display_pp_title ();
   let span = Time_ns.Span.of_sec 3.0 in
   Clock_ns.run_after
@@ -480,10 +512,9 @@ let start_pp_intro ~participants ~safe_players =
 
 let display_player_passwords () =
   Graphics.set_color Color.black;
-  Graphics.fill_rect 500 250 500 300;
+  Graphics.fill_rect 500 250 600 400;
   Graphics.set_color Color.dark_red;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
-  (* players are already on teh screen *)
   List.iter
     current_pp_state.active_participants
     ~f:(fun (c, p, real_pw, display_pw, i) ->
@@ -544,14 +575,23 @@ let pp_password_creation client query (game : Game.t) =
     if String.length query <> 4
     then print_s [%message "Your password must be 4 letters."]
     else (
-      Password_pain.update_password current_pp_state ~query;
-      (* that every password is a non string - all participating players put
-         in their password *)
+      Password_pain.update_password client_ip current_pp_state ~query;
+      (* that every password is a non empty string - all participating
+         players put in their password *)
       if List.for_all
            current_pp_state.active_participants
-           ~f:(fun (c, p, real_pw, display_pw, i) ->
+           ~f:(fun (_, _, real_pw, display_pw, _) ->
+           print_s [%message real_pw display_pw];
            not (String.is_empty real_pw))
       then (
+        print_s
+          [%message
+            ""
+              (current_pp_state.safe_players
+                : (Socket.Address.Inet.t * Player.t) list)
+              (current_pp_state.active_participants
+                : (Socket.Address.Inet.t * Player.t * string * string * int)
+                  list)];
         game.game_type <- Password_pain true;
         display_pp_safe_player_instructions game))
 ;;
@@ -565,26 +605,6 @@ let pp_guesses client query (game : Game.t) =
      && List.exists current_pp_state.safe_players ~f:(fun (c, _) ->
           String.equal client_ip (Game.get_ip_address c))
   then (
-    Password_pain.check_guess current_pp_state query game;
+    Password_pain.check_guess client_ip current_pp_state query game;
     display_player_passwords ())
-;;
-
-(*the every player mode *)
-
-let display_ending_graphics (game : Game.t) =
-  let func () =
-    let coords = display_players game.player_list in
-    let alive_players =
-      List.filter coords ~f:(fun ((c, p), x_coord) ->
-        if p.living then true else false)
-    in
-    List.iter alive_players ~f:(fun ((c, p), x_coord) ->
-      p.score <- p.score + 3000);
-    List.iter alive_players ~f:(fun ((c, p), x_coord) ->
-      Graphics.moveto x_coord 500;
-      Graphics.set_color Color.green;
-      Graphics.draw_string "+3000")
-  in
-  let span = Time_ns.Span.of_sec 4.0 in
-  Clock_ns.run_after span (fun () -> func ()) ()
 ;;

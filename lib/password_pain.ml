@@ -1,27 +1,6 @@
 open! Core
 open! Async
 
-(* 
-
-   Players that lost will have to create a 4 letter pass word [should we
-   ensure its a real word or go by honor system ]
-
-   Players that are safe need to guess - when they get certain letters they
-   will be revealed
-
-   Any password that is completely guessed will have the player that
-   submitted it DIE
-
-   LOGIC: game participants safe_players display_name (Password Pain)
-   display_instructions (players participating, submit a 4 letter word) empty
-   array with size of participants -> when its full, transition to
-   next_instructions next_instructions (SAFE players [if all 4 dead, then
-   every_player_mode] guess the password ) queries come in - if from
-   SAFE_PLAYER list, then see which letters -> every letter revealed if the
-   individual letter is right (like hangman) *)
-
-(* make an every_plyaer_playing mode - whoever is guessed the MOST dies *)
-
 type t =
   { mutable active_participants :
       (Socket.Address.Inet.t * Player.t * string * string * int) list
@@ -34,13 +13,14 @@ type t =
 let create () = { active_participants = []; safe_players = [] }
 
 (* initializes a user's password *)
-let update_password t ~query =
+let update_password client_ip t ~query =
   (* make sure they cant RE-update it *)
   t.active_participants
     <- List.map
          t.active_participants
          ~f:(fun (c, p, real_pw, display_pw, i) ->
-         if String.is_empty real_pw
+         if String.equal client_ip (Game.get_ip_address c)
+            && String.is_empty real_pw
          then c, p, query, "****", i
          else c, p, real_pw, display_pw, i)
 ;;
@@ -72,14 +52,18 @@ let rec compare_answers ~real_pw ~guess ~index ~result =
 ;;
 
 (* takes in a guess as a string and finds similarites with passwords *)
-let check_guess t (guess : string) (game : Game.t) =
+let check_guess client_ip t (guess : string) (game : Game.t) =
+  (* the client string is for Every Player Mode - we dont want to guess our
+     own password *)
   let updated_pp_positions =
     List.map t.active_participants ~f:(fun (c, pl, real_pw, display_pw, i) ->
       let real_p = real_pw in
       (* result is user's correct letter placements, which we will compare
          with the display password *)
       let result =
-        compare_answers ~real_pw:real_p ~guess ~index:0 ~result:""
+        if String.equal (Game.get_ip_address c) client_ip
+        then "****"
+        else compare_answers ~real_pw:real_p ~guess ~index:0 ~result:""
       in
       let new_display_pw =
         String.foldi display_pw ~init:"" ~f:(fun ind init char ->
@@ -101,14 +85,9 @@ let check_guess t (guess : string) (game : Game.t) =
   t.active_participants <- updated_pp_positions
 ;;
 
-(* for the timer, maybe do it where the different ratio of safe to unsafe
-   yields a different amount of time *)
-
 (* if everyone gets password guess, just go straight to display losers *)
 
 (* the reprinting of the password graphics is scuffy *)
-
-(* make an every player mode*)
 
 (* make sure players cant submit non-words ec: nneo*)
 
