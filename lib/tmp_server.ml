@@ -184,22 +184,8 @@ end = struct
             List.filter game.player_list ~f:(fun (_, p) ->
               Bool.equal p.answered_mr_question_wrong false)
           in
-          (* this is for password pain *)
-          (* game.game_type <- Password_pain false; print_s [%message
-             (game.game_type : Game.Game_kind.t) (safe_players :
-             (Socket.Address.Inet.t * Player.t) list)];
-             Tmp_graphics.start_pp_intro ~participants:players
-             ~safe_players *)
-          (* this is for math mayhem specifically *)
-          game.game_type <- Math_mayhem;
-          Tmp_graphics.start_math_mayhem_intro ();
-          (* Tmp_graphics.start_pp_intro () *)
-          let span = Time_ns.Span.of_sec 7.0 in
-          Clock_ns.run_after
-            span
-            (fun () ->
-              Tmp_graphics.initialize_math_mayhem_graphics players game)
-            ())
+          Game.pick_minigame ~participants:players ~safe_players game
+          (* this is for password pain *))
         else (
           Game.ask_question game;
           Tmp_graphics.create_trivia_graphics game)
