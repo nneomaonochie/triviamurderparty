@@ -182,6 +182,7 @@ end = struct
 
   (* this starts the trivia portion of the game *)
   let run_trivia_game (game : Game.t) (q : Question.t) client query =
+    game.questions_asked <- game.questions_asked + 1;
     let correct_ans = q.correct_answer in
     let players = game.player_list in
     let player_ans = String.of_char (Protocol.Query_char.to_char query) in
@@ -231,9 +232,7 @@ end = struct
       if game.questions_asked < 10
       then (
         match question with
-        | Trivia q ->
-          run_trivia_game game q client query;
-          game.questions_asked <- game.questions_asked + 1
+        | Trivia q -> run_trivia_game game q client query
         | _ -> ())
       else Tmp_graphics.display_ending_graphics game
     in
