@@ -83,7 +83,7 @@ let display_losers loser_list =
 let draw_skull (x_coord : int) (y_coord : int) =
   Graphics.set_color Color.skeleton_gray;
   Graphics.fill_circle (x_coord + 50) (y_coord + 75) 50;
-  Graphics.fill_rect x_coord (y_coord - 25) 50 50;
+  Graphics.fill_rect (x_coord + 25) (y_coord - 25) 50 50;
   Graphics.set_color Color.black;
   Graphics.fill_rect (x_coord + 38) y_coord 5 25;
   Graphics.fill_rect (x_coord + 58) y_coord 5 25;
