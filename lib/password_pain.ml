@@ -7,10 +7,16 @@ type t =
       (* the FIRST string is the real password, and the SECOND string is what
          we display *)
   ; mutable safe_players : (Socket.Address.Inet.t * Player.t) list
+  ; mutable all_passwords_guessed : bool
   }
 [@@deriving sexp_of]
 
-let create () = { active_participants = []; safe_players = [] }
+let create () =
+  { active_participants = []
+  ; safe_players = []
+  ; all_passwords_guessed = false
+  }
+;;
 
 (* initializes a user's password *)
 let update_password client_ip t ~query =
@@ -82,7 +88,11 @@ let check_guess client_ip t (guess : string) (game : Game.t) =
       (* the new password is now the display pw *)
       c, pl, real_pw, new_display_pw, i)
   in
-  t.active_participants <- updated_pp_positions
+  t.active_participants <- updated_pp_positions;
+  (* if every password is revealed, prematurely end the game *)
+  if List.for_all t.active_participants ~f:(fun (_, _, _, display_pw, _) ->
+       not (String.contains display_pw '*'))
+  then t.all_passwords_guessed <- true
 ;;
 
 (* if everyone gets password guess, just go straight to display losers *)
