@@ -15,6 +15,7 @@ type t =
   { mutable player_list : (Socket.Address.Inet.t * Player.t) list
   ; mutable game_type : Game_kind.t
   ; mutable game_state : Game_state.t
+  ; mutable questions_asked : int
   }
 [@@deriving sexp_of, compare]
 
@@ -23,6 +24,7 @@ let create () : t =
   ; game_type =
       Trivia { question = ""; answer_choices = []; correct_answer = "" }
   ; game_state = Player_Initializion
+  ; questions_asked = 0
   }
 ;;
 

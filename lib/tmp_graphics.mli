@@ -24,3 +24,4 @@ val start_pp_intro
 val show_correct_answer : Game.t -> unit
 val pp_password_creation : Socket.Address.Inet.t -> string -> Game.t -> unit
 val pp_guesses : Socket.Address.Inet.t -> string -> Game.t -> unit
+val display_ending_graphics : Game.t -> unit

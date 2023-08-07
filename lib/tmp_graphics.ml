@@ -45,13 +45,6 @@ let player_creation_screen () =
   Graphics.draw_string "Please enter your name into the console"
 ;;
 
-let game =
-  { Game.player_list = []
-  ; game_type = Trivia (Triviaquestions.pick_random_question ())
-  ; game_state = Ongoing
-  }
-;;
-
 let display_losers loser_list =
   let rec dpl x_coord loser_list =
     if List.length loser_list = 0
@@ -555,3 +548,21 @@ let pp_guesses client query (game : Game.t) =
 ;;
 
 (*the every player mode *)
+
+let display_ending_graphics (game : Game.t) =
+  let func () =
+    let coords = display_players game.player_list in
+    let alive_players =
+      List.filter coords ~f:(fun ((c, p), x_coord) ->
+        if p.living then true else false)
+    in
+    List.iter alive_players ~f:(fun ((c, p), x_coord) ->
+      p.score <- p.score + 3000);
+    List.iter alive_players ~f:(fun ((c, p), x_coord) ->
+      Graphics.moveto x_coord 500;
+      Graphics.set_color Color.green;
+      Graphics.draw_string "+3000")
+  in
+  let span = Time_ns.Span.of_sec 4.0 in
+  Clock_ns.run_after span (fun () -> func ()) ()
+;;

@@ -20,6 +20,7 @@ type t =
       (Socket.Address.Inet.t * Player.t) list (* a Client * Player touple *)
   ; mutable game_type : Game_kind.t
   ; mutable game_state : Game_state.t
+  ; mutable questions_asked : int
   }
 [@@deriving sexp_of, compare]
 
