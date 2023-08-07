@@ -6,10 +6,10 @@ module Game_kind : sig
     | Leaderboard
     | Trivia of Question.t
     | Math_mayhem
-    | Decisions
-    (* if false, it's in password creation mode; if true its in password
-       guessing mode*)
+    | Chalices of bool
     | Password_pain of bool
+      (* if false, it's in password creation mode; if true its in password
+         guessing mode*)
   [@@deriving compare, sexp_of]
 end
 
