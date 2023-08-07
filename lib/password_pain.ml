@@ -98,3 +98,11 @@ let check_guess t (guess : string) =
 
 (* for the timer, maybe do it where the different ratio of safe to unsafe
    yields a different amount of time *)
+
+(* if everyone gets password guess, just go straight to display losers *)
+
+(* the reprinting of the password graphics is scuffy *)
+
+(* make an every player mode*)
+
+(* make sure players cant submit non-words ec: nneo*)
