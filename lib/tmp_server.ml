@@ -172,6 +172,8 @@ end = struct
       [ Math_mayhem; Password_pain false ]
     in
     game.game_type <- List.random_element_exn minigames;
+    (* for testing purposes*)
+    (* game.game_type <- Password_pain false; *)
     match game.game_type with
     | Math_mayhem -> run_math_mayhem ~players:participants game
     | Password_pain false -> run_password_pain ~participants ~safe_players
@@ -225,9 +227,14 @@ end = struct
     let question = game.game_type in
     let ip_addr = Game.get_ip_address client in
     let () =
-      match question with
-      | Trivia q -> run_trivia_game game q client query
-      | _ -> ()
+      (* remove the questions asked from tmp_server - its handled in
+         tmp_graphics.leaderboard*)
+      if game.questions_asked < 10
+      then (
+        match question with
+        | Trivia q -> run_trivia_game game q client query
+        | _ -> ())
+      else Tmp_graphics.display_ending_graphics game
     in
     print_s [%message "" (game : Game.t)];
     Stack.push game_stack game;

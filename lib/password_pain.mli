@@ -9,5 +9,5 @@ type t =
 [@@deriving sexp_of]
 
 val create : unit -> t
-val update_password : t -> query:string -> unit
-val check_guess : t -> string -> Game.t -> unit
+val update_password : string -> t -> query:string -> unit
+val check_guess : string -> t -> string -> Game.t -> unit
