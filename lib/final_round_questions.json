@@ -1,0 +1,375 @@
+[
+  {
+    "category": "Tarot Cards",
+    "W": [
+      "The River Styx",
+      "The Shadowy One"
+    ],
+    "R": [
+      "The High Priestess"
+    ]
+  },
+  {
+    "category": "Worn Around the Neck",
+    "W": [
+      "fez"
+    ],
+    "R": [
+      "lei",
+      "foulard"
+    ]
+  },
+  {
+    "category": "Hogwarts Professors",
+    "W": [
+      "Daryl Van Horne",
+      "Agatha Harkness"
+    ],
+    "R": [
+      "Pomona Sprout"
+    ]
+  },
+  {
+    "category": "London Tube Lines",
+    "W": [],
+    "R": [
+      "Jubilee Line",
+      "Metropolitan Line",
+      "Queens Line"
+    ]
+  },
+  {
+    "category": "Black Mirror Episodes",
+    "W": [
+      "\"Replay\""
+    ],
+    "R": [
+      "\"The National Anthem\"",
+      "\"Hang the DJ\""
+    ]
+  },
+  {
+    "category": "James Patterson Novels",
+    "W": [
+      "Fuzzy Wuzzy",
+      "Old Mother Hubbard"
+    ],
+    "R": [
+      "Hope to Die"
+    ]
+  },
+  {
+    "category": "Canadian National Holidays",
+    "W": [
+      "Proclamation",
+      "Picnic Day"
+    ],
+    "R": [
+      "Boxing Day"
+    ]
+  },
+  {
+    "category": "Stage Names",
+    "W": [
+      "Elton John"
+    ],
+    "R": [
+      "Katy Perry",
+      "Drake"
+    ]
+  },
+  {
+    "category": "Vitamins",
+    "W": [
+      "vitamin L",
+      "vitamin X"
+    ],
+    "R": [
+      "vitamin B3"
+    ]
+  },
+  {
+    "category": "Cats in the Musical Cats",
+    "W": [
+      "Vagabond Prince"
+    ],
+    "R": [
+      "Rum Rum Tugger",
+      "Old Deuteronomy"
+    ]
+  },
+  {
+    "category": "Has an Exoskeleton",
+    "W": [
+      "crocodile",
+      "cobra"
+    ],
+    "R": [
+      "lobster"
+    ]
+  },
+  {
+    "category": "Boy Scout Merit Badges",
+    "W": [
+      "Pokémon Go"
+    ],
+    "R": [
+      "Camping",
+      "Disabilities Awareness"
+    ]
+  },
+  {
+    "category": "Lunchables",
+    "W": [],
+    "R": [
+      "Mexican Style Chicken Tacos",
+      "Chicken Pizza",
+      "Extra Cheesy Pizza"
+    ]
+  },
+  {
+    "category": "Gluten-Free",
+    "W": [],
+    "R": [
+      "Sour cream",
+      "Skittles",
+      "Cottage cheese"
+    ]
+  },
+  {
+    "category": "Lyrics in Billy Joel's We Didn't Start the Fire",
+    "W": [
+      "Tanzania, Michigan, Mr. Roger's cardigan",
+      "Cincinnati, John Wayne, lobotomy of the brain"
+    ],
+    "R": [
+      "Buddy Holly, \"Ben Hur\", space monkey Mofia"
+    ]
+  },
+  {
+    "category": "Scary Stories to Tell in the Dark",
+    "W": [
+      "\"That’s No Moon\""
+    ],
+    "R": [
+      "\"The Hook\"",
+      "\"May I Carry Your Basket?\""
+    ]
+  },
+  {
+    "category": "Boat-Related Occupations",
+    "W": [],
+    "R": [
+      "skipper",
+      "coxswain",
+      "pinsetter"
+    ]
+  },
+  {
+    "category": "Olsen Twins Movies",
+    "W": [
+      "Twinning",
+      "Mary-Kate and Ashly Rock Switzerland"
+    ],
+    "R": [
+      "To Grandmother’s House We Go"
+    ]
+  },
+  {
+    "category": "Pulitzer Prize Categories",
+    "W": [
+      "News Entertainment Program"
+    ],
+    "R": [
+      "History",
+      "Investigative Reporting"
+    ]
+  },
+  {
+    "category": "Overwatch Characters",
+    "W": [
+      "Gorilla Man"
+    ],
+    "R": [
+      "D.Va",
+      "Symmetra"
+    ]
+  },
+  {
+    "category": "Car Engine Parts",
+    "W": [
+      "hubcap"
+    ],
+    "R": [
+      "flywheel",
+      "crankshaft"
+    ]
+  },
+  {
+    "category": "Characters \"Snapped\" Away in Avengers: Infinity War",
+    "W": [
+      "Hawkeye"
+    ],
+    "R": [
+      "Black Panther",
+      "Winter Soldier"
+    ]
+  },
+  {
+    "category": "People Who Have Walked on the Moon",
+    "W": [
+      "Buzz McCallister"
+    ],
+    "R": [
+      "Eugene Cernan",
+      "Charles Duke"
+    ]
+  },
+  {
+    "category": "The Greek Muses",
+    "W": [
+      "Thespia of Theater"
+    ],
+    "R": [
+      "Thalia of Comedy",
+      "Erato of Lyric Poetry"
+    ]
+  },
+  {
+    "category": "Egyptian Gods & Goddesses",
+    "W": [
+      "Hestia",
+      "Juno"
+    ],
+    "R": [
+      "Ra"
+    ]
+  },
+  {
+    "category": "Major Greenhouse Gases",
+    "W": [
+      "Diatomic Nitrogen",
+      "Acetylene"
+    ],
+    "R": [
+      "Tetrafluoromethane"
+    ]
+  },
+  {
+    "category": "Stranger Things Characters",
+    "W": [
+      "Elliot Taylor"
+    ],
+    "R": [
+      "Max Mayfield",
+      "The Demogorgon"
+    ]
+  },
+  {
+    "category": "Yogurt Brands",
+    "W": [],
+    "R": [
+      "Icelandic Provisions",
+      "Dannon",
+      "Fage"
+    ]
+  },
+  {
+    "category": "Ranks of Organisms in Taxonomy",
+    "W": [
+      "County",
+      "Group",
+      "Brand"
+    ],
+    "R": []
+  },
+  {
+    "category": "Detective on a Law & Order Show",
+    "W": [
+      "Det. Jessica Fletcher"
+    ],
+    "R": [
+      "Det. Fin Tutuola",
+      "Det. Lennie Briscoe"
+    ]
+  },
+  {
+    "category": "Locations in Game of Thrones",
+    "W": [
+      "Brandos"
+    ],
+    "R": [
+      "Winterfell",
+      "The Wall"
+    ]
+  },
+  {
+    "category": "Metamorphic Rocks",
+    "W": [
+      "clay",
+      "obsidian"
+    ],
+    "R": [
+      "slate"
+    ]
+  },
+  {
+    "category": "Parts of an Animal Cell",
+    "W": [
+      "Amniotic sac",
+      "inhibitors"
+    ],
+    "R": [
+      "Cell membrane"
+    ]
+  },
+  {
+    "category": "Root Vegetables & Tubers",
+    "W": [
+      "turmeric",
+      "ginseng",
+      "radishes"
+    ],
+    "R": []
+  },
+  {
+    "category": "Never Married",
+    "W": [
+      "Henry the VIII"
+    ],
+    "R": [
+      "Jane Austen",
+      "Sir Isaac Newton"
+    ]
+  },
+  {
+    "category": "Dairy Products",
+    "W": [
+      "tofu"
+    ],
+    "R": [
+      "ghee",
+      "kefir"
+    ]
+  },
+  {
+    "category": "Taller Than The Eiffel Tower",
+    "W": [
+      "The Great Pyramid of Giza",
+      "The Wash"
+    ],
+    "R": [
+      "The Kingdom Clock Tower"
+    ]
+  },
+  {
+    "category": "Star Trek Captains",
+    "W": [
+      "Malcolm “Mal” Reynolds"
+    ],
+    "R": [
+      "Philippa Georgiou",
+      "Kathryn Janeway"
+    ]
+  }
+]
