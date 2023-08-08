@@ -99,9 +99,6 @@ let player_creation_screen () =
         (Random.int 30))
   in
   ();
-<<<<<<< HEAD
-  Graphics.set_color Color.dark_red;
-=======
   (* testing animation *)
   (* let stop_test = ref false in let coordinates = Array.create ~len:2 0 in
      every 0.5 ~f:(fun () -> animation_test coordinates.(0) coordinates.(1);
@@ -109,7 +106,7 @@ let player_creation_screen () =
      (coordinates.(1) + 10); if coordinates.(1) > 800 then stop_test := true)
      ~stop:stop_test; *)
   (* testing animation again*)
->>>>>>> e19b6d6a6eaf425ac7304ef0ffff942b54a96227
+  Graphics.set_color Color.dark_red;
   Graphics.draw_rect 375 400 600 200;
   Graphics.fill_rect 375 400 600 200;
   Graphics.moveto 400 500;
@@ -606,6 +603,8 @@ let start_pp_intro ~participants ~safe_players =
     (fun () -> display_pp_participant_instructions participants)
     ()
 ;;
+
+let start_chalices_intro ~participants ~safe_players = ()
 
 let display_player_passwords () =
   Graphics.set_color Color.black;
