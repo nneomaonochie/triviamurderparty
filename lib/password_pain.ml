@@ -94,11 +94,3 @@ let check_guess client_ip t (guess : string) (game : Game.t) =
        not (String.contains display_pw '*'))
   then t.all_passwords_guessed <- true
 ;;
-
-(* if everyone gets password guess, just go straight to display losers *)
-
-(* the reprinting of the password graphics is scuffy *)
-
-(* make sure players cant submit non-words ec: nneo*)
-
-(* there is a chance that the game passed hasnt updated yet... *)

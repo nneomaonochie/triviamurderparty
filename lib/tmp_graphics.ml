@@ -14,7 +14,28 @@ let current_pp_state = Password_pain.create ()
    1 *)
 let player_starting_x_coords = [ 687; 550; 437; 300 ]
 let player_y_coord = 620
-let display_beginning_instructions () = ()
+
+let every seconds ~f ~stop =
+  let open Async in
+  (* recursive loop *)
+  let rec loop () =
+    if !stop
+    then return ()
+    else
+      Clock.after (Time_float.Span.of_sec seconds)
+      >>= fun () ->
+      f ();
+      loop ()
+  in
+  don't_wait_for (loop ())
+;;
+
+let animation_test x y =
+  Graphics.set_color Color.red;
+  Graphics.fill_circle x y 50;
+  Graphics.set_color Color.black;
+  Graphics.fill_circle (x - 10) (y - 10) 50
+;;
 
 (* this asks user input for players' names so that we can initiatilize the
    players and create a game *)
@@ -78,7 +99,17 @@ let player_creation_screen () =
         (Random.int 30))
   in
   ();
+<<<<<<< HEAD
   Graphics.set_color Color.dark_red;
+=======
+  (* testing animation *)
+  (* let stop_test = ref false in let coordinates = Array.create ~len:2 0 in
+     every 0.5 ~f:(fun () -> animation_test coordinates.(0) coordinates.(1);
+     Array.set coordinates 0 (coordinates.(0) + 10); Array.set coordinates 1
+     (coordinates.(1) + 10); if coordinates.(1) > 800 then stop_test := true)
+     ~stop:stop_test; *)
+  (* testing animation again*)
+>>>>>>> e19b6d6a6eaf425ac7304ef0ffff942b54a96227
   Graphics.draw_rect 375 400 600 200;
   Graphics.fill_rect 375 400 600 200;
   Graphics.moveto 400 500;

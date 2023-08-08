@@ -66,3 +66,5 @@ let set_up_players client (query : string) t : t * bool =
   print_s [%message "" (t : t)];
   t, match t.game_state with Ongoing -> true | _ -> false
 ;;
+
+(* let get_final_questions = ;; *)
