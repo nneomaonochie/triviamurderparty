@@ -11,6 +11,7 @@ let skeleton_white = Graphics.rgb 245 245 245
 let skeleton_gray = Graphics.rgb 119 119 119
 let dead_gray = Graphics.rgb 146 146 146
 let pink = Graphics.rgb 252 225 255
+let pastel_purple = Graphics.rgb 172 154 204
 
 let random () =
   Graphics.rgb (Random.int 256) (Random.int 256) (Random.int 256)
