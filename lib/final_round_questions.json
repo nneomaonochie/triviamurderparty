@@ -371,473 +371,709 @@
       "Philippa Georgiou",
       "Kathryn Janeway"
     ]
-  }
-
-  • Countries Bordering the Indian Ocean
-o Tanzania
-o Australia
-o Madagascar
-
-• Books Written in the First Person
-o The Scarlet Letter
-o To Kill a Mockingbird
-o
-
-• Animals Statistically Likely to Outlive a Moose
-o giraffe
-o dove
-o baboon
-
-• Animals With More Than Two Eyes
-o praying mantis
-o scallops
-o box jellyfish
-
-• Kama Sutra Chapters
-o On Personal Adornment
-o On Kissing
-o On Structurally Sound Surfaces
-
-• Disney Animated Movies
-o Tangled
-o Moana
-o The Swan Princess
-
-• Cat Breeds
-o Russian Blue
-o Maine ♥♥♥♥
-o Scottish Fold
-
-• Muscles in the Human Body
-o reticulum
-o rectus abdominis
-o delphinus
-
-• Sesame Street Residents
-o Aloysius Snuffleupagus
-o Penny Proud
-o Oscar the Grouch
-
-• Quadrilaterals
-o kite
-o tetrahedron
-o pentagon
-
-• Nobel Prize Winning Scientists
-o Charles Darwin
-o Alexander Fleming
-o Niels Bohr
-Final Round Questions II
-• Monsters Who Fought Godzilla
-o King Ghidorah
-o Gigan
-o Megadeth
-
-• Synchronized Swimming Positions
-o The twisted lunge
-o The bucking bronco
-o The Capricorn
-
-• Caffeinated Beverages
-o Pibb Xtra
-o Sunkist
-o
-
-• Dating Apps
-o Heads Up!
-o Hinge
-o Tinder
-
-• Tony Award Winners for “Best Musical”
-o The Book of Mormon
-o Monty Python’s Spamalot
-o Mary Poppins
-
-• Programming Languages
-o BB-8
-o MIB
-o Skrull
-
-• Disney Villains
-o Makunga
-o Madame Medusa
-o Ursula
-
-• Words in the Preamble of the U.S. Constitution
-o hungry
-o impeachment
-o friendship
-
-• 8 Most Common English Letters
-o M
-o S
-o E
-
-• Animals With Stripes
-o numbat
-o tabby cat
-o bongo
-
-• Clouds
-o cirrostratus
-o altostratus
-o stratostratus
-
-• Countries on the Equator
-o Uganda
-o Saudi Arabia
-o
-
-• Multiples of 8
-o 112
-o 96
-o 88
-
-• Roof Shapes
-o Dormer
-o Meadow
-o Maidenhead
-
-• Crayola Crayon Colors
-o Liver
-o Purple Heart
-o Fresh Cut Grass
-
-• States in India
-o Tripura
-o Goa
-o Timor
-
-• Mediterranean Islands
-o Rhodes
-o Sicily
-o Cotillard
-
-• Punctuation Marks
-o inverted comma
-o gerund
-o semi-period
-
-• Cruciferous Vegetables
-o turnip
-o squash
-o Brussels sprouts
-
-• Human Body Systems
-o Abiotic system
-o Immune system
-o Carburetor system
-
-• Human Hormones
-o Estrogen
-o Ibprofen
-o
-
-• Horse Breeds
-o New York Boxer
-o Thoroughbred
-o London Jumper
-
-• Geologic Time Periods
-o Cambrian
-o Paleogene
-o Jurassic
-
-• Prepositions
-o during
-o its
-o that
-
-• Former British Colonies
-o India
-o Ethiopia
-o Iran
-
-• Things From the Song “My Favorite Things”
-o Cool autumn breezes
-o Small button noses
-o Sleigh bells
-
-• Marie Kondo’s Rules of Tidying
-o “Tidy every space twice”
-o “Finish discarding first”
-o “Tidy by category, not by location”
-
-• Numbers That Divide Into 54
-o 12
-o 10
-o 1
-
-• Newspaper Comic Strips
-o Fox Trot
-o Hagar the Horrible
-o Dennis the Menace
-
-• Monsters Mentioned in the Song “The Monster Mash”
-o Witches
-o Dracula
-o
-
-• Palindromes
-o My gym
-o rotator
-o racecar
-
-• Movies With A Werewolf
-o K9
-o The Howling
-o Twilight
-
-• Food Named After People
-o Nachos
-o Sherry
-o Clementines
-
-• Founding Members of NATO
-o Mexico
-o Iceland
-o Russia
-
-• Kübler-Ross Five Stages of Grief
-o gambling
-o gloominess
-o addiction
-
-• Human Blood Types
+  },
+  {
+    "category": "Countries Bordering the Indian Ocean",
+    "W": [],
+    "R": [
+      "Tanzania",
+      "Australia",
+      "Madagascar"
+    ]
+  },
+  {
+    "category": "Books Written in the First Person",
+    "W": [
+      "The Scarlet Letter",
+      "War and Peace"
+    ],
+    "R": [
+      "To Kill a Mockingbird"
+    ]
+  },
+  {
+    "category": "Animals Statistically Likely to Outlive a Moose",
+    "W": [
+      "dove"
+    ],
+    "R": [
+      "giraffe",
+      "baboon"
+    ]
+  },
+  {
+    "category": "Animals With More Than Two Eyes",
+    "W": [],
+    "R": [
+      "praying mantis",
+      "scallops",
+      "box jellyfish"
+    ]
+  },
+  {
+    "category": "Disney Animated Movies",
+    "W": [
+      "The Swan Princess"
+    ],
+    "R": [
+      "Tangled",
+      "Moana"
+    ]
+  },
+  {
+    "category": "Cat Breeds",
+    "W": [
+      "Shih Tzu"
+    ],
+    "R": [
+      "Russian Blue",
+      "Scottish Fold"
+    ]
+  },
+  {
+    "category": "Muscles in the Human Body",
+    "W": [
+      "reticulum",
+      "delphinus"
+    ],
+    "R": [
+      "rectus abdominis"
+    ]
+  },
+  {
+    "category": "Sesame Street Residents",
+    "W": [
+      "Penny Proud"
+    ],
+    "R": [
+      "Aloysius Snuffleupagus",
+      "Oscar the Grouch"
+    ]
+  },
+  {
+    "category": "Quadrilaterals",
+    "W": [
+      "tetrahedron",
+      "pentagon"
+    ],
+    "R": [
+      "kite"
+    ]
+  },
+  {
+    "category": "Nobel Prize Winning Scientists",
+    "W": [
+      "Charles Darwin"
+    ],
+    "R": [
+      "Alexander Fleming",
+      "Niels Bohr"
+    ]
+  },
+  {
+    "category": "Monsters Who Fought Godzilla",
+    "W": [
+      "Megadeth"
+    ],
+    "R": [
+      "King Ghidorah",
+      "Gigan"
+    ]
+  },
+  {
+    "category": "Synchronized Swimming Positions",
+    "W": [
+      "The twisted lunge",
+      "The bucking bronco",
+      "The Capricorn"
+    ],
+    "R": []
+  },
+  {
+    "category": "Caffeinated Beverages",
+    "W": [],
+    "R": [
+      "Pibb Xtra",
+      "Sunkist",
+      "Zest Energy Tea"
+    ]
+  },
+  {
+    "category": "Dating Apps",
+    "W": [
+      "Heads Up!"
+    ],
+    "R": [
+      "Hinge",
+      "Tinder"
+    ]
+  },
+  {
+    "category": "Tony Award Winners for \"Best Musical\"",
+    "W": [
+      "Mary Poppins"
+    ],
+    "R": [
+      "The Book of Mormon",
+      "Monty Python’s Spamalot"
+    ]
+  },
+  {
+    "category": "Programming Languages",
+    "W": [
+      "BB-8",
+      "MIB",
+      "Skrull"
+    ],
+    "R": []
+  },
+  {
+    "category": "Disney Villains",
+    "W": [
+      "Makunga"
+    ],
+    "R": [
+      "Madame Medusa",
+      "Ursula"
+    ]
+  },
+  {
+    "category": "Words in the Preamble of the U.S. Constitution",
+    "W": [
+      "hungry",
+      "impeachment",
+      "friendship"
+    ],
+    "R": []
+  },
+  {
+    "category": "8 Most Common English Letters",
+    "W": [
+      "M"
+    ],
+    "R": [
+      "S",
+      "E"
+    ]
+  },
+  {
+    "category": "Clouds",
+    "W": [
+      "stratostratus"
+    ],
+    "R": [
+      "cirrostratus",
+      "altostratus"
+    ]
+  },
+  {
+    "category": "Countries on the Equator",
+    "W": [
+      "Chile",
+      "Saudi Arabia"
+    ],
+    "R": [
+      "Uganda"
+    ]
+  },
+  {
+    "category": "Multiples of 8",
+    "W": [],
+    "R": [
+      "112",
+      "96",
+      "88"
+    ]
+  },
+  {
+    "category": "Roof Shapes",
+    "W": [
+      "Meadow",
+      "Maidenhead"
+    ],
+    "R": [
+      "Dormer"
+    ]
+  },
+  {
+    "category": "Crayola Crayon Colors",
+    "W": [
+      "Liver",
+      "Fresh Cut Grass"
+    ],
+    "R": [
+      "Purple Heart"
+    ]
+  },
+  {
+    "category": "States in India",
+    "W": [
+      "Timor"
+    ],
+    "R": [
+      "Tripura",
+      "Goa"
+    ]
+  },
+  {
+    "category": "Mediterranean Islands",
+    "W": [
+      "Cotillard"
+    ],
+    "R": [
+      "Rhodes",
+      "Sicily"
+    ]
+  },
+  {
+    "category": "Punctuation Marks",
+    "W": [
+      "gerund",
+      "semi-period"
+    ],
+    "R": [
+      "inverted comma"
+    ]
+  },
+  {
+    "category": "Cruciferous Vegetables",
+    "W": [
+      "squash"
+    ],
+    "R": [
+      "turnip",
+      "Brussels sprouts"
+    ]
+  },
+  {
+    "category": "Human Body Systems",
+    "W": [
+      "Abiotic system",
+      "Carburetor system"
+    ],
+    "R": [
+      "Immune system"
+    ]
+  },
+  {
+    "category": "Human Hormones",
+    "W": [
+      "Ibprofen",
+      "Endocrine"
+    ],
+    "R": [
+      "Estrogen"
+    ]
+  },
+  {
+    "category": "Horse Breeds",
+    "W": [
+      "New York Boxer",
+      "London Jumper"
+    ],
+    "R": [
+      "Thoroughbred"
+    ]
+  },
+  {
+    "category": "Geologic Time Periods",
+    "W": [],
+    "R": [
+      "Cambrian",
+      "Paleogene",
+      "Jurassic"
+    ]
+  },
+  {
+    "category": "Former British Colonies",
+    "W": [
+      "Ethiopia",
+      "Iran"
+    ],
+    "R": [
+      "India"
+    ]
+  },
+  {
+    "category": "Things From the Song \"My Favorite Things\"",
+    "W": [
+      "Cool autumn breezes",
+      "Small button noses"
+    ],
+    "R": [
+      "Sleigh bells"
+    ]
+  },
+  {
+    "category": "Marie Kondo’s Rules of Tidying",
+    "W": [
+      "\"Tidy every space twice\""
+    ],
+    "R": [
+      "\"Finish discarding first\"",
+      "\"Tidy by category, not by location\""
+    ]
+  },
+  {
+    "category": "Numbers That Divide Into 54",
+    "W": [
+      "12",
+      "10"
+    ],
+    "R": [
+      "1"
+    ]
+  },
+  {
+    "category": "Newspaper Comic Strips",
+    "W": [],
+    "R": [
+      "Fox Trot",
+      "Hagar the Horrible",
+      "Dennis the Menace"
+    ]
+  },
+  {
+    "category": "Monsters Mentioned in the Song \"The Monster Mash\"",
+    "W": [
+      "Witches"
+    ],
+    "R": [
+      "Ghouls",
+      "Dracula"
+    ]
+  },
+  {
+    "category": "Palindromes",
+    "W": [],
+    "R": [
+      "My gym",
+      "rotator",
+      "racecar"
+    ]
+  },
+  {
+    "category": "Movies With A Werewolf",
+    "W": [
+      "K9",
+      "Twilight"
+    ],
+    "R": [
+      "The Howling"
+    ]
+  },
+  {
+    "category": "Food Named After People",
+    "W": [
+      "Sherry"
+    ],
+    "R": [
+      "Nachos",
+      "Clementines"
+    ]
+  },
+  {
+    "category": "Founding Members of NATO",
+    "W": [
+      "Mexico",
+      "Russia"
+    ],
+    "R": [
+      "Iceland"
+    ]
+  },
+  {
+    "category": "Kübler-Ross Five Stages of Grief",
+    "W": [
+      "gambling",
+      "gloominess",
+      "addiction"
+    ],
+    "R": []
+  },
+  {
+    "category":  Human Blood Types
 o O+
 o P-
 o A-
 
-• Died by Beheading
+{
+      "category":  Died by Beheading
 o Maximilien Robespierre
 o Medusa
 o Marie Antoinette
 
-• Andy Warhol Art Pieces
+{
+        "category":  Andy Warhol Art Pieces
 o Silver Brando
 o Mickey Mouse
 o Mick Jagger
 
-• Arthropods
+{
+          "category":  Arthropods
 o beetle
 o oyster
 o crab
 
-• German Composers
+{
+            "category":  German Composers
 o Pyotr Ilyich Tchaikovsky
 o George Frideric Handel
 o Hans Zimmer
 
-• Coca-Cola Brands
+{
+              "category":  Coca-Cola Brands
 o Dunkin’ Donuts Original Iced Coffee
 o Smartwater
 o
 
-• Training Exercises in Rocky Movies
+{
+                "category":  Training Exercises in Rocky Movies
 o Chasing a Chicken
 o Tearing up Carpet
 o Carrying Log on Shoulders
 
-• Dog Food Brands
+{
+                  "category":  Dog Food Brands
 o American Journey
 o Kibbles ‘n Bits
 o Iams
 
-• Has More Than 6 Legs
+{
+                    "category":  Has More Than 6 Legs
 o tick
 o shrimp
 o cockroach
 
-• Baking Tools
+{
+                      "category":  Baking Tools
 o distractor
 o Florence flask
 o suction tip
 
-• Old Testament Books
+{
+                        "category":  Old Testament Books
 o Lamentations
 o Jude
 o 1 Chronicles
 
-• Mark Twain Characters
+{
+                          "category":  Mark Twain Characters
 o Matilda Wormwood
 o Binx Bolling
 o Miss Trunchball
 
-• Knights of the Round Table
+{
+                            "category":  Knights of the Round Table
 o Sir Malfoy
 o Sir Pettigrew
 o Sir Umbridge
 
-• Chronicles of Narnia Books
+{
+                              "category":  Chronicles of Narnia Books
 o New Moon
 o Breaking Dawno
 
-• One-Term U.S. Presidents
+{
+                                "category":  One-Term U.S. Presidents
 o John Adams
 o Jimmy Carter
 o John Quincy Adams
 Final Round Questions III
-• Matrix Characters
+{
+                                  "category":  Matrix Characters
 o Sphinx
 o The Plague
 o Apoc
 
-• States of New England
+{
+                                    "category":  States of New England
 o Boston
 o Maine
 o Maryland
 
-• Always Happen on a Sunday
+{
+                                      "category":  Always Happen on a Sunday
 o Federal Election Day (Germany)
 o Saint Patrick’s Day
 o Federal Election Day (Russia)
 
-• Born in South Africa
+{
+                                        "category":  Born in South Africa
 o Sodapoppin
 o Halle Berry
 o Shakira
 
-• Agatha Christie Mysteries
+{
+                                          "category":  Agatha Christie Mysteries
 o The Signs of the Zodiac
 o Shutter Island
 o Murder on Oceanic Airline
 
-• Types of Lettuce
+{
+                                            "category":  Types of Lettuce
 o coffee
 o greene
 o Boston
 
-• Death Metal Subgenres
+{
+                                              "category":  Death Metal Subgenres
 o diseasecore
 o melodic death metal
 o goregrind
 
-• Monogamous Animals
+{
+                                                "category":  Monogamous Animals
 o emperor penguins
 o dolphins
 o rabbits
 
-• Love Stories Where They Don’t End Up Together
+{
+                                                  "category":  Love Stories Where They Don’t End Up Together
 o Harold and Maude
 o (500) Days of Summer
 o Knocked Up
 
-• Roman Emperors
+{
+                                                    "category":  Roman Emperors
 o Marcus Aurelius
 o Claudius
 o Caligula
 
-• Films Scored by John Willams
+{
+                                                      "category":  Films Scored by John Willams
 o Raiders of the Lost Ark
 o Jurassic World
 o The Exorcist
 
-• Contains Peanuts
+{
+                                                        "category":  Contains Peanuts
 o Snickers
 o 100 Grand Bar
 o
 
-• Akira Kurosawa Films
+{
+                                                          "category":  Akira Kurosawa Films
 o My Neighbor Totoro
 o Ikiru
 o Throne of Blood
 
-• IKEA Products
+{
+                                                            "category":  IKEA Products
 o Salskicer spoon
 o Kit Har meatballs
 o Nasho drapes
 
-• Moons of Jupiter
+{
+                                                              "category":  Moons of Jupiter
 o Grace
 o Gharange
 o Elara
 
-• WNBA Teams
+{
+                                                                "category":  WNBA Teams
 o Washington D.C. Supremes
 o New York Liberty
 o Toronto Geese
 
-• Butterfly Life Cycle Stages
+{
+                                                                  "category":  Butterfly Life Cycle Stages
 o pupa
 o spore
 o chrysalis
 
-• Walking Dead Characters
+{
+                                                                    "category":  Walking Dead Characters
 o Stan Rizzo
 o Glenn Rhee
 o Michonne
 
-• Adult Swim Cartoons
+{
+                                                                      "category":  Adult Swim Cartoons
 o Disenchantment
 o Frisky Dingo
 o BoJack Horseman
 
-• Dungeons & Dragons Abilities
+{
+                                                                        "category":  Dungeons & Dragons Abilities
 o charisma
 o intelligence
 o optimism
 
-• Common Varieties of Fig
+{
+                                                                          "category":  Common Varieties of Fig
 o Brown Turkey
 o Norseman
 o Kadota
 
-• Queen Songs
+{
+                                                                            "category":  Queen Songs
 o “We Will Rock You”
 o “Under Pressure”
 o “Radio Ga Ga”
 
-• Movies About Time Travel
+{
+                                                                              "category":  Movies About Time Travel
 o From Dusk Till Dawn
 o Back to the Future
 o
 
-• Roald Dahl Books
+{
+                                                                                "category":  Roald Dahl Books
 o Charlie and Grandpa Leave Home
 o Where the Sidewalk Ends
 o The Invention of Hugo Cabret
 
-• Anna Rice Novels
+{
+                                                                                  "category":  Anna Rice Novels
 o Blood Meridian
 o Interview with the Vampire
 o Blood Canticle
 
-• Actors in Sharknado 1-5
+{
+                                                                                    "category":  Actors in Sharknado 1-5
 o Mr. T
 o William Shatner
 o Jerry Springer
 
-• Snoopy’s Siblings
+{
+                                                                                      "category":  Snoopy’s Siblings
 o Marbles
 o Andy
 o Belle
 
-• Aesop’s Fables
+{
+                                                                                        "category":  Aesop’s Fables
 o The Prince and the Pauper
 o The Fisherman and the Little Fish
 o The Squid and the Whale
 
-• Leap Years
+{
+                                                                                          "category":  Leap Years
 o 1989
 o 2018
 o 2010
 
-• Poems That Rhyme
+{
+                                                                                            "category":  Poems That Rhyme
 o “The Road Not Taken” by Robert Frost
 o “Jabberwocky” by Lewis Carroll
 o “Doctor Faustus” by Christopher Marlowe
 
-• Beatles’ Songs
+{
+                                                                                              "category":  Beatles’ Songs
 o “Let it Be”
 o “Hello Goodbye”
 o “Love Shock”
-• Annette Funicello Movies
+{
+                                                                                                "category":  Annette Funicello Movies
 o Bikini Dogs
 o Psycho Bikini Party
 o Two Piece Bucket Party
 
-• States with Panhandles
+{
+                                                                                                  "category":  States with Panhandles
 o Texas
 o Oregon
 o Idaho
-]
+                                                                                                ]
