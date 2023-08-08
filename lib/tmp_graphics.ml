@@ -200,37 +200,10 @@ let show_correct_answer (game : Game.t) =
   Graphics.draw_string "Correct Answer"
 ;;
 
-let create_trivia_graphics (game : Game.t) =
-  let players = game.player_list in
-  List.iter players ~f:(fun (_, player) ->
-    player.answered_mr_question_wrong <- false;
-    player.answered_mr_question <- false);
-  Graphics.set_color Color.black;
-  Graphics.fill_rect 0 0 1500 800;
-  let d = display_players game.player_list in
-  let question =
-    match game.game_type with
-    | Trivia q -> q
-    | _ ->
-      { Question.question = ""; answer_choices = []; correct_answer = "" }
-  in
-  Graphics.set_color Color.white;
-  Graphics.moveto 400 500;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--25-*-*-*-*-*-iso8859-1";
-  Graphics.draw_string question.question;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--24-*-*-*-*-*-iso8859-1";
-  Graphics.moveto 300 400;
-  Graphics.draw_string (List.nth_exn question.answer_choices 0);
-  Graphics.moveto 350 350;
-  Graphics.draw_string (List.nth_exn question.answer_choices 1);
-  Graphics.moveto 900 350;
-  Graphics.draw_string (List.nth_exn question.answer_choices 2);
-  Graphics.moveto 950 300;
-  Graphics.draw_string (List.nth_exn question.answer_choices 3)
-;;
-
 let display_ending_graphics (game : Game.t) =
-  let func () =
+  let display_alive_bonus () =
+    Graphics.set_color Color.black;
+    Graphics.fill_rect 0 0 1500 800;
     let coords = display_players game.player_list in
     let alive_players =
       List.filter coords ~f:(fun ((c, p), x_coord) ->
@@ -239,12 +212,65 @@ let display_ending_graphics (game : Game.t) =
     List.iter alive_players ~f:(fun ((c, p), x_coord) ->
       p.score <- p.score + 3000);
     List.iter alive_players ~f:(fun ((c, p), x_coord) ->
-      Graphics.moveto x_coord 500;
+      Graphics.moveto (x_coord + 20) 550;
       Graphics.set_color Color.green;
       Graphics.draw_string "+3000")
   in
-  let span = Time_ns.Span.of_sec 4.0 in
-  Clock_ns.run_after span (fun () -> func ()) ()
+  let display_winner () =
+    Graphics.set_color Color.black;
+    Graphics.fill_rect 0 0 1500 800;
+    let winner = List.hd_exn game.player_list in
+    let _, p = winner in
+    let d = display_players [ winner ] in
+    Graphics.set_color Color.green;
+    Graphics.moveto 680 400;
+    Graphics.draw_string "The Winner";
+    ()
+  in
+  let span_of_alive_bonus = Time_ns.Span.of_sec 6.0 in
+  Clock_ns.run_after
+    span_of_alive_bonus
+    (fun () -> display_alive_bonus ())
+    ();
+  let span_of_winner = Time_ns.Span.of_sec 6.0 in
+  Clock_ns.run_after span_of_winner (fun () -> display_winner ()) ()
+;;
+
+let create_trivia_graphics (game : Game.t) =
+  if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
+     || game.questions_asked > 1
+  then (
+    game.game_state <- Game_over;
+    display_ending_graphics game)
+  else (
+    let players = game.player_list in
+    List.iter players ~f:(fun (_, player) ->
+      player.answered_mr_question_wrong <- false;
+      player.answered_mr_question <- false);
+    Graphics.set_color Color.black;
+    Graphics.fill_rect 0 0 1500 800;
+    let d = display_players game.player_list in
+    let question =
+      match game.game_type with
+      | Trivia q -> q
+      | _ ->
+        { Question.question = ""; answer_choices = []; correct_answer = "" }
+    in
+    Graphics.set_color Color.white;
+    Graphics.moveto 400 500;
+    Graphics.set_font
+      "-*-fixed-medium-r-semicondensed--25-*-*-*-*-*-iso8859-1";
+    Graphics.draw_string question.question;
+    Graphics.set_font
+      "-*-fixed-medium-r-semicondensed--24-*-*-*-*-*-iso8859-1";
+    Graphics.moveto 300 400;
+    Graphics.draw_string (List.nth_exn question.answer_choices 0);
+    Graphics.moveto 350 350;
+    Graphics.draw_string (List.nth_exn question.answer_choices 1);
+    Graphics.moveto 900 350;
+    Graphics.draw_string (List.nth_exn question.answer_choices 2);
+    Graphics.moveto 950 300;
+    Graphics.draw_string (List.nth_exn question.answer_choices 3))
 ;;
 
 let create_leaderboard_graphics (game : Game.t) =
@@ -287,16 +313,7 @@ let create_leaderboard_graphics (game : Game.t) =
          { Question.question = ""; answer_choices = []; correct_answer = "" };
   Game.ask_question game;
   let span = Time_ns.Span.of_sec 5.0 in
-  Clock_ns.run_after
-    span
-    (fun () ->
-      if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
-         || game.questions_asked >= 10
-      then (
-        game.game_state <- Game_over;
-        display_ending_graphics game)
-      else create_trivia_graphics game)
-    ()
+  Clock_ns.run_after span (fun () -> create_trivia_graphics game) ()
 ;;
 
 (* pastes the arithmetic stuff where they are supposed to be *)
@@ -342,7 +359,7 @@ let math_mayhem_calc_scores game =
   (* if only one player is playing, then they need to get at least 15 to
      survive *)
   if Hashtbl.length current_math_mayhem_hashtables.current_points = 1
-  then
+  then (
     Hashtbl.iteri
       current_math_mayhem_hashtables.current_points
       ~f:(fun ~key ~data ->
@@ -353,7 +370,10 @@ let math_mayhem_calc_scores game =
               current_math_mayhem_hashtables.player_positions
               ~f:(fun ((c, _), _) ->
               String.equal (Game.get_ip_address c) key)
-          ])
+          ]);
+    let span = Time_ns.Span.of_sec 5.0 in
+    (* find a way to display the time you have left [might be OPTIONAL]*)
+    Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ())
   else (
     let worst_perf = Array.create ~len:1 (Int.max_value, "") in
     (* tries to find player with lowest scores*)
