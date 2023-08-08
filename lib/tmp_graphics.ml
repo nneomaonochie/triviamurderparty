@@ -56,11 +56,11 @@ let player_creation_screen () =
   in
   ();
   (* testing animation *)
-  (* let stop_test = ref false in let coordinates = Array.create ~len:2 0 in
-     every 0.5 ~f:(fun () -> animation_test coordinates.(0) coordinates.(1);
-     Array.set coordinates 0 (coordinates.(0) + 10); Array.set coordinates 1
-     (coordinates.(1) + 10); if coordinates.(1) > 800 then stop_test := true)
-     ~stop:stop_test; *)
+  (*let stop_test = ref false in let coordinates = Array.create ~len:2 0 in
+    every 0.25 ~f:(fun () -> animation_test coordinates.(0) coordinates.(1);
+    Array.set coordinates 0 (coordinates.(0) + 10); Array.set coordinates 1
+    (coordinates.(1) + 10); if coordinates.(1) > 800 then stop_test := true)
+    ~stop:stop_test; *)
   (* testing animation again*)
   Graphics.draw_rect 375 400 600 200;
   Graphics.fill_rect 375 400 600 200;
@@ -236,6 +236,11 @@ let display_ending_graphics (game : Game.t) =
   Clock_ns.run_after span_of_winner (fun () -> display_winner ()) ()
 ;;
 
+(* these are the graphics for the final round *)
+let display_final_round (game : Game.t) =
+  Final_round.print_random_question ()
+;;
+
 let create_trivia_graphics (game : Game.t) =
   if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
      || game.questions_asked > 1
@@ -353,7 +358,7 @@ let display_math_mayhem_points
 
 (* cases: [maybe make it a list of losers] 1. multiple players have the
    lowest score 2. ALL players hve the lowest score *)
-let math_mayhem_calc_scores game =
+let math_mayhem_calc_scores (game : Game.t) =
   let get_int (i, s) = i in
   let get_ip (_, cs) = cs in
   (* if only one player is playing, then they need to get at least 15 to
@@ -364,13 +369,17 @@ let math_mayhem_calc_scores game =
       current_math_mayhem_hashtables.current_points
       ~f:(fun ~key ~data ->
       if data < 15
-      then
+      then (
+        (* adjusting the player in the player list *)
+        List.iter game.player_list ~f:(fun (c, p) ->
+          if String.equal (Game.get_ip_address c) key then p.living <- false);
         display_losers
           [ List.find_exn
               current_math_mayhem_hashtables.player_positions
-              ~f:(fun ((c, _), _) ->
+              ~f:(fun ((c, pl), _) ->
+              pl.living <- false;
               String.equal (Game.get_ip_address c) key)
-          ]);
+          ]));
     let span = Time_ns.Span.of_sec 5.0 in
     (* find a way to display the time you have left [might be OPTIONAL]*)
     Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ())
