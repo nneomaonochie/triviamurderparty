@@ -39,6 +39,50 @@ let animation_test x y =
 
 (* this asks user input for players' names so that we can initiatilize the
    players and create a game *)
+
+let draw_chalices () =
+  Graphics.set_color (Color.random ());
+  Graphics.fill_rect 175 300 50 200;
+  Graphics.fill_arc 200 500 100 50 (-180) 0;
+  Graphics.moveto 190 225;
+  Graphics.draw_string "1";
+  Graphics.set_color (Color.random ());
+  Graphics.fill_rect 550 300 50 200;
+  Graphics.fill_arc 575 500 100 50 (-180) 0;
+  Graphics.moveto 565 225;
+  Graphics.draw_string "2";
+  Graphics.set_color (Color.random ());
+  Graphics.fill_rect 925 300 50 200;
+  Graphics.fill_arc 950 500 100 50 (-180) 0;
+  Graphics.moveto 940 225;
+  Graphics.draw_string "3";
+  Graphics.set_color (Color.random ());
+  Graphics.fill_rect 1300 300 50 200;
+  Graphics.fill_arc 1325 500 100 50 (-180) 0;
+  Graphics.moveto 1315 225;
+  Graphics.draw_string "4"
+;;
+
+let display_chalice_instructions () =
+  Graphics.set_color Color.pastel_purple;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_color Color.white;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 635 400;
+  Graphics.draw_string "Chalices"
+;;
+
+let display_chalice_title () =
+  Graphics.set_color Color.pastel_purple;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_color Color.white;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 635 400;
+  Graphics.draw_string "Safe players, pick a chalice";
+  Graphics.moveto 535 350;
+  Graphics.draw_string "Choose wrong, you die"
+;;
+
 let player_creation_screen () =
   Graphics.open_graph " 1500x800";
   Graphics.set_color Color.black;
@@ -55,6 +99,9 @@ let player_creation_screen () =
         (Random.int 30))
   in
   ();
+<<<<<<< HEAD
+  Graphics.set_color Color.dark_red;
+=======
   (* testing animation *)
   (*let stop_test = ref false in let coordinates = Array.create ~len:2 0 in
     every 0.25 ~f:(fun () -> animation_test coordinates.(0) coordinates.(1);
@@ -62,12 +109,14 @@ let player_creation_screen () =
     (coordinates.(1) + 10); if coordinates.(1) > 800 then stop_test := true)
     ~stop:stop_test; *)
   (* testing animation again*)
+>>>>>>> e19b6d6a6eaf425ac7304ef0ffff942b54a96227
   Graphics.draw_rect 375 400 600 200;
   Graphics.fill_rect 375 400 600 200;
   Graphics.moveto 400 500;
   Graphics.set_color Color.red;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
-  Graphics.draw_string "Please enter your name into the console"
+  Graphics.draw_string "Please enter your name into the console";
+  draw_chalices ()
 ;;
 
 let display_losers loser_list =
