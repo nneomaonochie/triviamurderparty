@@ -516,6 +516,7 @@ let display_pp_participant_instructions participants =
 let start_pp_intro ~participants ~safe_players =
   current_pp_state.active_participants <- [];
   current_pp_state.safe_players <- [];
+  current_pp_state.all_passwords_guessed <- false;
   if List.is_empty safe_players
   then
     (* no safe players means that every player got the question wrong - so
@@ -567,7 +568,13 @@ let final_pp_instruction game =
   (* after we display the initial passwords, we will set a timer before the
      game runs out*)
   let span = Time_ns.Span.of_sec 60.0 in
-  Clock_ns.run_after span (fun () -> pp_end_minigame game) ()
+  (* we use the timer to call the minigame function if ALL the passwords are
+     not already guessed *)
+  Clock_ns.run_after
+    span
+    (fun () ->
+      if not current_pp_state.all_passwords_guessed then pp_end_minigame game)
+    ()
 ;;
 
 let display_pp_safe_player_instructions game =
@@ -626,5 +633,11 @@ let pp_guesses client query (game : Game.t) =
           String.equal client_ip (Game.get_ip_address c))
   then (
     Password_pain.check_guess client_ip current_pp_state query game;
-    display_player_passwords ())
+    display_player_passwords ());
+  let span = Time_ns.Span.of_sec 1.0 in
+  Clock_ns.run_after
+    span
+    (fun () ->
+      if current_pp_state.all_passwords_guessed then pp_end_minigame game)
+    ()
 ;;
