@@ -1,6 +1,6 @@
 (library
  (name triviamurderparty)
  (inline_tests)
- (libraries core async graphics cohttp curl lambdasoup yojson)
+ (libraries core async graphics cohttp yojson)
  (preprocess
   (pps ppx_jane)))
