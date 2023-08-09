@@ -10,6 +10,7 @@ let player_block_size = 125
 let current_math_mayhem_hashtables = Math_mayhem.create ()
 let current_pp_state = Password_pain.create ()
 let current_chalice_state = Chalices.create ()
+let final_round_category = Final_round.pick_random_question ()
 
 (* based off the number of players that are starting - index = numPlayers -
    1 *)
@@ -283,11 +284,212 @@ let display_ending_graphics (game : Game.t) =
   Clock_ns.run_after span_of_winner (fun () -> display_winner ()) ()
 ;;
 
+(* returns places of where places should be *)
+let shift_players
+  (players : (Socket.Address.Inet.t * Player.t * int * int * int) list)
+  =
+  List.iter players ~f:(fun (_, pl, x, y, num_spaces) ->
+    Graphics.set_color pl.color;
+    (* adjust the y so corners are not touching later *)
+    Graphics.fill_rect
+      (x + (player_block_size * num_spaces))
+      y
+      player_block_size
+      player_block_size;
+    if not pl.living then draw_skull x y;
+    Graphics.set_color pl.color;
+    Graphics.moveto x (y + 150);
+    Graphics.set_font
+      "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
+    Graphics.draw_string pl.name;
+    if x + (player_block_size * num_spaces) >= 1500
+    then () (* the player wins *))
+;;
+
+let display_final_round_question () =
+  let current_category = Final_round.pick_random_question () in
+  (* the category fill rect*)
+  Graphics.set_color Color.yellow;
+  Graphics.fill_rect 1100 225 350 100;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
+  Graphics.set_color Color.black;
+  Graphics.moveto 1100 225;
+  Graphics.draw_string current_category.category;
+  (* create a list of all the answer choices *)
+  let all_answer_choices =
+    current_category.right_answers @ current_category.wrong_answers
+  in
+  let rec display_answer_choices
+    (answers : string list)
+    ~(ind : int)
+    ~(y : int)
+    =
+    if ind = 3
+    then ()
+    else (
+      let current_choice = List.random_element_exn answers in
+      let choice_letter =
+        match ind with 0 -> "Q: " | 1 -> "W: " | 2 -> "E: " | _ -> "ERROR"
+      in
+      if List.mem
+           current_category.right_answers
+           current_choice
+           ~equal:String.equal
+      then
+        current_category.char_placements
+          <- current_category.char_placements @ [ true ];
+      Graphics.set_color Color.yellow;
+      Graphics.fill_rect 1100 y 350 50;
+      Graphics.set_font
+        "-*-fixed-medium-r-semicondensed--25-*-*-*-*-*-iso8859-1";
+      Graphics.set_color Color.black;
+      Graphics.moveto 1110 y;
+      Graphics.draw_string (choice_letter ^ current_choice);
+      (* we want to remove the choice we just displayed in the answer choices
+         so we dont repeat answer choices *)
+      let answers =
+        List.filter answers ~f:(fun choice ->
+          not (String.equal choice current_choice))
+      in
+      display_answer_choices answers ~ind:(ind + 1) ~y:(y - 60))
+  in
+  display_answer_choices all_answer_choices ~ind:0 ~y:150;
+  final_round_category.category <- current_category.category;
+  final_round_category.right_answers <- current_category.right_answers;
+  final_round_category.wrong_answers <- current_category.wrong_answers;
+  final_round_category.char_placements <- current_category.char_placements
+;;
+
+(* this handles the user's input for answering final round stuff *)
+(* we'll use timers? *)
+let final_round_user_input client query (game : Game.t) =
+  let query = String.uppercase query in
+  let client_ip = Game.get_ip_address client in
+  let player_answers_chars = String.to_list query in
+  let player_answers_bool_ar = Array.create ~len:3 false in
+  (*[ false; false; false ] in*)
+  List.iter player_answers_chars ~f:(fun char ->
+    let ind = match char with 'Q' -> 0 | 'W' -> 1 | 'E' -> 2 | _ -> 10 in
+    if ind <= 2 then Array.set player_answers_bool_ar ind true);
+  let player_answer_bools = Array.to_list player_answers_bool_ar in
+  (* determines if users made the right selections by comparing it with the
+     char placements list in the final round t *)
+  let num_correct =
+    List.fold2_exn
+      player_answer_bools
+      final_round_category.char_placements
+      ~init:0
+      ~f:(fun num_correct user_response actual_response ->
+      if Bool.equal user_response actual_response
+      then num_correct + 1
+      else num_correct)
+  in
+  (* adjusting this to number of spaces *)
+  final_round_category.final_players
+    <- List.map
+         final_round_category.final_players
+         ~f:(fun (c, pl, x, y, num_spaces) ->
+         if String.equal client_ip (Game.get_ip_address c)
+         then c, pl, x, y, num_correct
+         else c, pl, x, y, num_spaces)
+;;
+
 (* these are the graphics for the final round *)
 let display_final_round (game : Game.t) =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  (* set the inital spaces -> how much they increase by will be set in
+     shift_players*)
+  (* the ind is the y-coordinate *)
+  let fr_players =
+    List.mapi (Game.get_players_by_score game) ~f:(fun ind (c, pl) ->
+      ( c
+      , pl
+      , player_block_size * ((*List.length game.player_list*) 4 - ind)
+      , player_y_coord - (player_block_size * ind) - 50
+      , 0 ))
+  in
+  shift_players fr_players;
+  final_round_category.final_players <- fr_players;
+  (* now we display the first categories *)
+  display_final_round_question ();
+  (* like 10 second timer *)
+  (* reveal answer *)
+  (* shift player*)
+  (* repeat *)
   Final_round.print_random_question ()
 ;;
 
+(* users put all the letters they think applies into one string, we parse
+   individual chars to get their guesses *)
+(* game.game_state <- Game_over; display_ending_graphics game *)
+
+let fr_instructions_3 (game : Game.t) =
+  Graphics.set_color Color.pale_blue;
+  Graphics.fill_rect 500 250 600 300;
+  Graphics.set_color Color.black;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 545 425;
+  Graphics.draw_string "Player in first place";
+  Graphics.moveto 635 360;
+  Graphics.draw_string "only gets the ";
+  Graphics.moveto 635 295;
+  Graphics.draw_string "first 2 choices";
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after span (fun () -> display_final_round game) ()
+;;
+
+let fr_instructions_2 (game : Game.t) =
+  Graphics.set_color Color.pale_blue;
+  Graphics.fill_rect 500 250 600 300;
+  Graphics.set_color Color.black;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 600 425;
+  Graphics.draw_string "If you think none";
+  Graphics.moveto 535 375;
+  Graphics.draw_string "are correct, then type";
+  Graphics.moveto 700 310;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
+  Graphics.draw_string "\"NONE\"";
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after span (fun () -> fr_instructions_3 game) ()
+;;
+
+let final_round_instructions_1 (game : Game.t) =
+  Graphics.set_color Color.pale_blue;
+  Graphics.fill_rect 500 250 600 300;
+  Graphics.set_color Color.black;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 635 450;
+  Graphics.draw_string "Put the letters";
+  Graphics.moveto 535 400;
+  Graphics.draw_string "you think are correct";
+  Graphics.moveto 635 350;
+  Graphics.draw_string "as one string.";
+  Graphics.moveto 515 300;
+  Graphics.draw_string "Ex: \"QE\" or \"W\" or \"QWE\"";
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after span (fun () -> fr_instructions_2 game) ()
+;;
+
+let final_round_title () =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  Graphics.set_color Color.pale_blue;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
+  Graphics.set_color Color.black;
+  Graphics.moveto 575 375;
+  Graphics.draw_string "Final Round"
+;;
+
+let final_round_intro (game : Game.t) =
+  final_round_title ();
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after span (fun () -> final_round_instructions_1 game) ()
+;;
+
+(* the graphics for creating the trivia questions *)
 let create_trivia_graphics (game : Game.t) =
   if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
      || game.questions_asked > 1
@@ -325,6 +527,8 @@ let create_trivia_graphics (game : Game.t) =
     Graphics.draw_string (List.nth_exn question.answer_choices 3))
 ;;
 
+(* this is the graphics that displays the players in order of descending
+   scores *)
 let create_leaderboard_graphics (game : Game.t) =
   let rec display_pl_leaderboard x_coord y_coord players =
     if List.length players = 0
@@ -451,7 +655,7 @@ let math_mayhem_calc_scores (game : Game.t) =
     Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ())
 ;;
 
-(* displays the title of *)
+(* displays the title of Math Mayhem *)
 let display_math_mayhem_title () =
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1500 800;

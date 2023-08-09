@@ -13,6 +13,12 @@ val initialize_math_mayhem_graphics
   -> Game.t
   -> unit
 
+val final_round_user_input
+  :  Socket.Address.Inet.t
+  -> string
+  -> Game.t
+  -> unit
+
 val start_math_mayhem_intro : unit -> unit
 val math_mayhem_player_response : Socket.Address.Inet.t -> string -> unit
 
