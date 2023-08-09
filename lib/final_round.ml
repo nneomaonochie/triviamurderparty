@@ -1,18 +1,21 @@
 open! Core
 open! Yojson
+open! Async
 
 (* Module that will store final round questions randomly selected from JSON
    file*)
 
 type t =
-  { category : string
-  ; right_answers : string list
-  ; wrong_answers : string list
-  ; mutable correct_chars : char list
-      (* whatever the right answers char corresponds with, put in this list
-         to compare users input to correct chars *)
+  { mutable category : string
+  ; mutable right_answers : string list
+  ; mutable wrong_answers : string list
+  ; mutable char_placements : bool list
+      (* in order of Q, W, E - if char is a correct answer, it will be
+         true *)
+  ; mutable final_players :
+      (Socket.Address.Inet.t * Player.t * int * int * int) list
   }
-[@@deriving compare, equal, sexp_of]
+[@@deriving compare, sexp_of]
 
 (* Converting JSON file into Yojson datatype*)
 let get_data_from_file filename = Yojson.Basic.from_file filename
@@ -43,15 +46,15 @@ let pick_random_question () : t =
     |> to_list
     |> List.map ~f:(fun elem -> Basic.to_string elem)
   in
-  { category = c; right_answers; wrong_answers; correct_chars = [] }
+  { category = c
+  ; right_answers
+  ; wrong_answers
+  ; char_placements = []
+  ; final_players = []
+  }
 ;;
 
 let print_random_question () =
   let q = pick_random_question () in
   print_s [%message "Random Question: " (q : t)]
 ;;
-
-(* 
-
-   1. separate by the bullet point 2. put stuff in bb -strike in a the W list
-   3. put reats in the R list *)

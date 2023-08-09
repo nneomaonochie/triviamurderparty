@@ -10,6 +10,7 @@ let player_block_size = 125
 let current_math_mayhem_hashtables = Math_mayhem.create ()
 let current_pp_state = Password_pain.create ()
 let current_chalice_state = Chalices.create ()
+let final_round_category = Final_round.pick_random_question ()
 
 (* based off the number of players that are starting - index = numPlayers -
    1 *)
@@ -335,8 +336,8 @@ let display_final_round_question () =
            current_choice
            ~equal:String.equal
       then
-        current_category.correct_chars
-          <- current_category.correct_chars @ [ String.get choice_letter 0 ];
+        current_category.char_placements
+          <- current_category.char_placements @ [ true ];
       Graphics.set_color Color.yellow;
       Graphics.fill_rect 1100 y 350 50;
       Graphics.set_font
@@ -352,13 +353,45 @@ let display_final_round_question () =
       in
       display_answer_choices answers ~ind:(ind + 1) ~y:(y - 60))
   in
-  display_answer_choices all_answer_choices ~ind:0 ~y:150
+  display_answer_choices all_answer_choices ~ind:0 ~y:150;
+  final_round_category.category <- current_category.category;
+  final_round_category.right_answers <- current_category.right_answers;
+  final_round_category.wrong_answers <- current_category.wrong_answers;
+  final_round_category.char_placements <- current_category.char_placements
 ;;
 
 (* this handles the user's input for answering final round stuff *)
+(* we'll use timers? *)
 let final_round_user_input client query (game : Game.t) =
+  let query = String.uppercase query in
   let client_ip = Game.get_ip_address client in
-  ()
+  let player_answers_chars = String.to_list query in
+  let player_answers_bool_ar = Array.create ~len:3 false in
+  (*[ false; false; false ] in*)
+  List.iter player_answers_chars ~f:(fun char ->
+    let ind = match char with 'Q' -> 0 | 'W' -> 1 | 'E' -> 2 | _ -> 10 in
+    if ind <= 2 then Array.set player_answers_bool_ar ind true);
+  let player_answer_bools = Array.to_list player_answers_bool_ar in
+  (* determines if users made the right selections by comparing it with the
+     char placements list in the final round t *)
+  let num_correct =
+    List.fold2_exn
+      player_answer_bools
+      final_round_category.char_placements
+      ~init:0
+      ~f:(fun num_correct user_response actual_response ->
+      if Bool.equal user_response actual_response
+      then num_correct + 1
+      else num_correct)
+  in
+  (* adjusting this to number of spaces *)
+  final_round_category.final_players
+    <- List.map
+         final_round_category.final_players
+         ~f:(fun (c, pl, x, y, num_spaces) ->
+         if String.equal client_ip (Game.get_ip_address c)
+         then c, pl, x, y, num_correct
+         else c, pl, x, y, num_spaces)
 ;;
 
 (* these are the graphics for the final round *)
@@ -377,8 +410,13 @@ let display_final_round (game : Game.t) =
       , 0 ))
   in
   shift_players fr_players;
+  final_round_category.final_players <- fr_players;
   (* now we display the first categories *)
   display_final_round_question ();
+  (* like 10 second timer *)
+  (* reveal answer *)
+  (* shift player*)
+  (* repeat *)
   Final_round.print_random_question ()
 ;;
 
@@ -412,7 +450,7 @@ let fr_instructions_2 (game : Game.t) =
   Graphics.draw_string "are correct, then type";
   Graphics.moveto 700 310;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
-  Graphics.draw_string "\"none\"";
+  Graphics.draw_string "\"NONE\"";
   let span = Time_ns.Span.of_sec 3.0 in
   Clock_ns.run_after span (fun () -> fr_instructions_3 game) ()
 ;;
@@ -429,7 +467,6 @@ let final_round_instructions_1 (game : Game.t) =
   Graphics.moveto 635 350;
   Graphics.draw_string "as one string.";
   Graphics.moveto 515 300;
-  (* might change if I use different letters to represent *)
   Graphics.draw_string "Ex: \"QE\" or \"W\" or \"QWE\"";
   let span = Time_ns.Span.of_sec 3.0 in
   Clock_ns.run_after span (fun () -> fr_instructions_2 game) ()
@@ -618,7 +655,7 @@ let math_mayhem_calc_scores (game : Game.t) =
     Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ())
 ;;
 
-(* displays the title of *)
+(* displays the title of Math Mayhem *)
 let display_math_mayhem_title () =
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1500 800;
