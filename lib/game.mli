@@ -28,3 +28,4 @@ val get_ip_address : Socket.Address.Inet.t -> string
 val set_up_players : Socket.Address.Inet.t -> string -> t -> t * bool
 val ask_question : t -> unit
 val create : unit -> t
+val get_players_by_score : t -> (Socket.Address.Inet.t * Player.t) list
