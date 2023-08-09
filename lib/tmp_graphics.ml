@@ -9,6 +9,7 @@ let player_block_size = 125
 (* needs to be reset each time Math_Mayhem minigame is run*)
 let current_math_mayhem_hashtables = Math_mayhem.create ()
 let current_pp_state = Password_pain.create ()
+let current_chalice_state = Chalices.create ()
 
 (* based off the number of players that are starting - index = numPlayers -
    1 *)

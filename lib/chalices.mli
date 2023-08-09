@@ -2,8 +2,10 @@ open! Core
 open! Async
 
 type t =
-  { mutable chalice_poisoned : bool list
-  ; mutable participants : (Socket.Address.Inet.t * Player.t) list
-  ; mutable participants_choosing_chalices :
-      (Socket.Address.Inet.t * Player.t) list
+  { mutable chalice_poisoned : bool array
+  ; mutable chalice_pickers : (Socket.Address.Inet.t * Player.t) list
+  ; mutable chalice_choosers : (Socket.Address.Inet.t * Player.t) list
   }
+
+val poison_chalice : int -> t -> unit
+val create : unit -> t
