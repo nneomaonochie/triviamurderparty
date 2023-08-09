@@ -9,3 +9,4 @@ type t =
 
 val poison_chalice : int -> t -> unit
 val create : unit -> t
+val is_poisoned : int -> t -> bool
