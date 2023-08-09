@@ -5,6 +5,7 @@ type t =
   { category : string
   ; right_answers : string list
   ; wrong_answers : string list
+  ; mutable correct_chars : char list
   }
 [@@deriving compare, equal, sexp_of]
 

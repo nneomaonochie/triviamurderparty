@@ -123,6 +123,12 @@ end = struct
              game;
            game
          | _ -> game)
+      | Final_round ->
+        Tmp_graphics.final_round_user_input
+          client
+          (Protocol.Query_string.to_string query)
+          game;
+        game
       | _ -> game
     in
     Stack.push game_stack game;

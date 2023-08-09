@@ -285,18 +285,80 @@ let display_ending_graphics (game : Game.t) =
 
 (* returns places of where places should be *)
 let shift_players
-  (players : (Socket.Address.Inet.t * Player.t * int * int) list)
-  (num_spaces : int)
+  (players : (Socket.Address.Inet.t * Player.t * int * int * int) list)
   =
-  List.iter players ~f:(fun (_, pl, x, y) ->
+  List.iter players ~f:(fun (_, pl, x, y, num_spaces) ->
     Graphics.set_color pl.color;
-    Graphics.fill_rect x y player_block_size player_block_size;
+    (* adjust the y so corners are not touching later *)
+    Graphics.fill_rect
+      (x + (player_block_size * num_spaces))
+      y
+      player_block_size
+      player_block_size;
     if not pl.living then draw_skull x y;
     Graphics.set_color pl.color;
     Graphics.moveto x (y + 150);
     Graphics.set_font
       "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
-    Graphics.draw_string pl.name)
+    Graphics.draw_string pl.name;
+    if x + (player_block_size * num_spaces) >= 1500
+    then () (* the player wins *))
+;;
+
+let display_final_round_question () =
+  let current_category = Final_round.pick_random_question () in
+  (* the category fill rect*)
+  Graphics.set_color Color.yellow;
+  Graphics.fill_rect 1100 225 350 100;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
+  Graphics.set_color Color.black;
+  Graphics.moveto 1100 225;
+  Graphics.draw_string current_category.category;
+  (* create a list of all the answer choices *)
+  let all_answer_choices =
+    current_category.right_answers @ current_category.wrong_answers
+  in
+  let rec display_answer_choices
+    (answers : string list)
+    ~(ind : int)
+    ~(y : int)
+    =
+    if ind = 3
+    then ()
+    else (
+      let current_choice = List.random_element_exn answers in
+      let choice_letter =
+        match ind with 0 -> "Q: " | 1 -> "W: " | 2 -> "E: " | _ -> "ERROR"
+      in
+      if List.mem
+           current_category.right_answers
+           current_choice
+           ~equal:String.equal
+      then
+        current_category.correct_chars
+          <- current_category.correct_chars @ [ String.get choice_letter 0 ];
+      Graphics.set_color Color.yellow;
+      Graphics.fill_rect 1100 y 350 50;
+      Graphics.set_font
+        "-*-fixed-medium-r-semicondensed--25-*-*-*-*-*-iso8859-1";
+      Graphics.set_color Color.black;
+      Graphics.moveto 1110 y;
+      Graphics.draw_string (choice_letter ^ current_choice);
+      (* we want to remove the choice we just displayed in the answer choices
+         so we dont repeat answer choices *)
+      let answers =
+        List.filter answers ~f:(fun choice ->
+          not (String.equal choice current_choice))
+      in
+      display_answer_choices answers ~ind:(ind + 1) ~y:(y - 60))
+  in
+  display_answer_choices all_answer_choices ~ind:0 ~y:150
+;;
+
+(* this handles the user's input for answering final round stuff *)
+let final_round_user_input client query (game : Game.t) =
+  let client_ip = Game.get_ip_address client in
+  ()
 ;;
 
 (* these are the graphics for the final round *)
@@ -311,9 +373,12 @@ let display_final_round (game : Game.t) =
       ( c
       , pl
       , player_block_size * ((*List.length game.player_list*) 4 - ind)
-      , player_y_coord - (player_block_size * ind) - 50 ))
+      , player_y_coord - (player_block_size * ind) - 50
+      , 0 ))
   in
-  shift_players fr_players 0;
+  shift_players fr_players;
+  (* now we display the first categories *)
+  display_final_round_question ();
   Final_round.print_random_question ()
 ;;
 
@@ -365,7 +430,7 @@ let final_round_instructions_1 (game : Game.t) =
   Graphics.draw_string "as one string.";
   Graphics.moveto 515 300;
   (* might change if I use different letters to represent *)
-  Graphics.draw_string "Ex: \"AC\" or \"B\" or \"ABC\"";
+  Graphics.draw_string "Ex: \"QE\" or \"W\" or \"QWE\"";
   let span = Time_ns.Span.of_sec 3.0 in
   Clock_ns.run_after span (fun () -> fr_instructions_2 game) ()
 ;;
@@ -425,6 +490,8 @@ let create_trivia_graphics (game : Game.t) =
     Graphics.draw_string (List.nth_exn question.answer_choices 3))
 ;;
 
+(* this is the graphics that displays the players in order of descending
+   scores *)
 let create_leaderboard_graphics (game : Game.t) =
   let rec display_pl_leaderboard x_coord y_coord players =
     if List.length players = 0

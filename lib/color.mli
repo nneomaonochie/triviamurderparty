@@ -13,4 +13,5 @@ val dead_gray : int
 val pink : int
 val pastel_purple : int
 val pale_blue : int
+val yellow : int
 val random : unit -> int

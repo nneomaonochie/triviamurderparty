@@ -8,6 +8,9 @@ type t =
   { category : string
   ; right_answers : string list
   ; wrong_answers : string list
+  ; mutable correct_chars : char list
+      (* whatever the right answers char corresponds with, put in this list
+         to compare users input to correct chars *)
   }
 [@@deriving compare, equal, sexp_of]
 
@@ -40,7 +43,7 @@ let pick_random_question () : t =
     |> to_list
     |> List.map ~f:(fun elem -> Basic.to_string elem)
   in
-  { category = c; right_answers; wrong_answers }
+  { category = c; right_answers; wrong_answers; correct_chars = [] }
 ;;
 
 let print_random_question () =
