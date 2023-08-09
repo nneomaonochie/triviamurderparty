@@ -792,288 +792,466 @@
     "R": []
   },
   {
-    "category":  Human Blood Types
-o O+
-o P-
-o A-
-
-{
-      "category":  Died by Beheading
-o Maximilien Robespierre
-o Medusa
-o Marie Antoinette
-
-{
-        "category":  Andy Warhol Art Pieces
-o Silver Brando
-o Mickey Mouse
-o Mick Jagger
-
-{
-          "category":  Arthropods
-o beetle
-o oyster
-o crab
-
-{
-            "category":  German Composers
-o Pyotr Ilyich Tchaikovsky
-o George Frideric Handel
-o Hans Zimmer
-
-{
-              "category":  Coca-Cola Brands
-o Dunkin’ Donuts Original Iced Coffee
-o Smartwater
-o
-
-{
-                "category":  Training Exercises in Rocky Movies
-o Chasing a Chicken
-o Tearing up Carpet
-o Carrying Log on Shoulders
-
-{
-                  "category":  Dog Food Brands
-o American Journey
-o Kibbles ‘n Bits
-o Iams
-
-{
-                    "category":  Has More Than 6 Legs
-o tick
-o shrimp
-o cockroach
-
-{
-                      "category":  Baking Tools
-o distractor
-o Florence flask
-o suction tip
-
-{
-                        "category":  Old Testament Books
-o Lamentations
-o Jude
-o 1 Chronicles
-
-{
-                          "category":  Mark Twain Characters
-o Matilda Wormwood
-o Binx Bolling
-o Miss Trunchball
-
-{
-                            "category":  Knights of the Round Table
-o Sir Malfoy
-o Sir Pettigrew
-o Sir Umbridge
-
-{
-                              "category":  Chronicles of Narnia Books
-o New Moon
-o Breaking Dawno
-
-{
-                                "category":  One-Term U.S. Presidents
-o John Adams
-o Jimmy Carter
-o John Quincy Adams
-Final Round Questions III
-{
-                                  "category":  Matrix Characters
-o Sphinx
-o The Plague
-o Apoc
-
-{
-                                    "category":  States of New England
-o Boston
-o Maine
-o Maryland
-
-{
-                                      "category":  Always Happen on a Sunday
-o Federal Election Day (Germany)
-o Saint Patrick’s Day
-o Federal Election Day (Russia)
-
-{
-                                        "category":  Born in South Africa
-o Sodapoppin
-o Halle Berry
-o Shakira
-
-{
-                                          "category":  Agatha Christie Mysteries
-o The Signs of the Zodiac
-o Shutter Island
-o Murder on Oceanic Airline
-
-{
-                                            "category":  Types of Lettuce
-o coffee
-o greene
-o Boston
-
-{
-                                              "category":  Death Metal Subgenres
-o diseasecore
-o melodic death metal
-o goregrind
-
-{
-                                                "category":  Monogamous Animals
-o emperor penguins
-o dolphins
-o rabbits
-
-{
-                                                  "category":  Love Stories Where They Don’t End Up Together
-o Harold and Maude
-o (500) Days of Summer
-o Knocked Up
-
-{
-                                                    "category":  Roman Emperors
-o Marcus Aurelius
-o Claudius
-o Caligula
-
-{
-                                                      "category":  Films Scored by John Willams
-o Raiders of the Lost Ark
-o Jurassic World
-o The Exorcist
-
-{
-                                                        "category":  Contains Peanuts
-o Snickers
-o 100 Grand Bar
-o
-
-{
-                                                          "category":  Akira Kurosawa Films
-o My Neighbor Totoro
-o Ikiru
-o Throne of Blood
-
-{
-                                                            "category":  IKEA Products
-o Salskicer spoon
-o Kit Har meatballs
-o Nasho drapes
-
-{
-                                                              "category":  Moons of Jupiter
-o Grace
-o Gharange
-o Elara
-
-{
-                                                                "category":  WNBA Teams
-o Washington D.C. Supremes
-o New York Liberty
-o Toronto Geese
-
-{
-                                                                  "category":  Butterfly Life Cycle Stages
-o pupa
-o spore
-o chrysalis
-
-{
-                                                                    "category":  Walking Dead Characters
-o Stan Rizzo
-o Glenn Rhee
-o Michonne
-
-{
-                                                                      "category":  Adult Swim Cartoons
-o Disenchantment
-o Frisky Dingo
-o BoJack Horseman
-
-{
-                                                                        "category":  Dungeons & Dragons Abilities
-o charisma
-o intelligence
-o optimism
-
-{
-                                                                          "category":  Common Varieties of Fig
-o Brown Turkey
-o Norseman
-o Kadota
-
-{
-                                                                            "category":  Queen Songs
-o “We Will Rock You”
-o “Under Pressure”
-o “Radio Ga Ga”
-
-{
-                                                                              "category":  Movies About Time Travel
-o From Dusk Till Dawn
-o Back to the Future
-o
-
-{
-                                                                                "category":  Roald Dahl Books
-o Charlie and Grandpa Leave Home
-o Where the Sidewalk Ends
-o The Invention of Hugo Cabret
-
-{
-                                                                                  "category":  Anna Rice Novels
-o Blood Meridian
-o Interview with the Vampire
-o Blood Canticle
-
-{
-                                                                                    "category":  Actors in Sharknado 1-5
-o Mr. T
-o William Shatner
-o Jerry Springer
-
-{
-                                                                                      "category":  Snoopy’s Siblings
-o Marbles
-o Andy
-o Belle
-
-{
-                                                                                        "category":  Aesop’s Fables
-o The Prince and the Pauper
-o The Fisherman and the Little Fish
-o The Squid and the Whale
-
-{
-                                                                                          "category":  Leap Years
-o 1989
-o 2018
-o 2010
-
-{
-                                                                                            "category":  Poems That Rhyme
-o “The Road Not Taken” by Robert Frost
-o “Jabberwocky” by Lewis Carroll
-o “Doctor Faustus” by Christopher Marlowe
-
-{
-                                                                                              "category":  Beatles’ Songs
-o “Let it Be”
-o “Hello Goodbye”
-o “Love Shock”
-{
-                                                                                                "category":  Annette Funicello Movies
-o Bikini Dogs
-o Psycho Bikini Party
-o Two Piece Bucket Party
-
-{
-                                                                                                  "category":  States with Panhandles
-o Texas
-o Oregon
-o Idaho
-                                                                                                ]
+    "category": "Human Blood Types ",
+    "W": [
+      "P-"
+    ],
+    "R": [
+      "O+",
+      "A-"
+    ]
+  },
+  {
+    "category": "Died by Beheading",
+    "W": [],
+    "R": [
+      "Maximilien Robespierre",
+      "Medusa",
+      "Marie Antoinette"
+    ]
+  },
+  {
+    "category": "Andy Warhol Art Pieces",
+    "W": [
+      "Silver Brando"
+    ],
+    "R": [
+      " Mickey Mouse",
+      "Mick Jagger"
+    ]
+  },
+  {
+    "category": "Arthropods",
+    "W": [
+      "oyster"
+    ],
+    "R": [
+      "beetle",
+      "crab"
+    ]
+  },
+  {
+    "category": "German Composers",
+    "W": [
+      "Pyotr Ilyich Tchaikovsky"
+    ],
+    "R": [
+      "George Frideric Handel",
+      "Hans Zimmer"
+    ]
+  },
+  {
+    "category": "Coca-Cola Brands",
+    "W": [],
+    "R": [
+      "Fanta",
+      "Dunkin’ Donuts Original Iced Coffee",
+      "Smartwater"
+    ]
+  },
+  {
+    "category": "Training Exercises in Rocky Movies",
+    "W": [
+      "Tearing up Carpet"
+    ],
+    "R": [
+      "Chasing a Chicken",
+      "Carrying Log on Shoulders"
+    ]
+  },
+  {
+    "category": "Dog Food Brands",
+    "W": [],
+    "R": [
+      "American Journey",
+      "Kibbles ‘n Bits",
+      "Iams"
+    ]
+  },
+  {
+    "category": "Has More Than 6 Legs",
+    "W": [
+      "cockroach"
+    ],
+    "R": [
+      "tick, shrimp"
+    ]
+  },
+  {
+    "category": "Baking Tools",
+    "W": [
+      "distractor",
+      "Florence flask",
+      "suction tip"
+    ],
+    "R": []
+  },
+  {
+    "category": "Old Testament Books",
+    "W": [
+      "Jude"
+    ],
+    "R": [
+      "Lamentations",
+      "1 Chronicles"
+    ]
+  },
+  {
+    "category": "Mark Twain Characters",
+    "W": [
+      "Matilda Wormwood",
+      "Binx Bolling",
+      "Miss Trunchball"
+    ],
+    "R": []
+  },
+  {
+    "category": "Knights of the Round Table",
+    "W": [
+      "Sir Malfoy",
+      "Sir Pettigrew",
+      "Sir Umbridge"
+    ],
+    "R": []
+  },
+  {
+    "category": "Chronicles of Narnia Books",
+    "W": [
+      "New Moon",
+      "Breaking Dawn"
+    ],
+    "R": [
+      "The Silver Chair"
+    ]
+  },
+  {
+    "category": "One-Term U.S. Presidents",
+    "W": [],
+    "R": [
+      "John Adams",
+      "Jimmy Carter",
+      "John Quincy Adams"
+    ]
+  },
+  {
+    "category": "Matrix Characters",
+    "W": [
+      "Sphinx",
+      "The Plague"
+    ],
+    "R": [
+      "Apoc"
+    ]
+  },
+  {
+    "category": "States of New England",
+    "W": [
+      "Boston",
+      "Maryland"
+    ],
+    "R": [
+      "Maine"
+    ]
+  },
+  {
+    "category": "Always Happen on a Sunday",
+    "W": [
+      "Saint Patrick's Day"
+    ],
+    "R": [
+      "Federal Election Day (Germany)",
+      "Federal Election Day (Russia)"
+    ]
+  },
+  {
+    "category": "Born in South Africa",
+    "W": [
+      "Sodapoppin",
+      "Halle Berry",
+      "Shakira"
+    ],
+    "R": []
+  },
+  {
+    "category": "Agatha Christie Mysteries",
+    "W": [
+      "The Signs of the Zodiac",
+      "Shutter Island",
+      "Murder on Oceanic Airline"
+    ],
+    "R": []
+  },
+  {
+    "category": "Types of Lettuce",
+    "W": [
+      "coffee",
+      "greene"
+    ],
+    "R": [
+      "Boston"
+    ]
+  },
+  {
+    "category": "Death Metal Subgenres",
+    "W": [
+      "diseasecore"
+    ],
+    "R": [
+      "melodic death metal",
+      "goregrind"
+    ]
+  },
+  {
+    "category": "Monogamous Animals",
+    "W": [
+      "dolphins",
+      "rabbits"
+    ],
+    "R": [
+      "emperor penguins"
+    ]
+  },
+  {
+    "category": "Love Stories Where They Don't End Up Together",
+    "W": [
+      "Knocked Up"
+    ],
+    "R": [
+      "Harold and Maude",
+      "(500) Days of Summer"
+    ]
+  },
+  {
+    "category": "Roman Emperors",
+    "W": [],
+    "R": [
+      "Marcus Aurelius",
+      "Claudius",
+      "Caligula"
+    ]
+  },
+  {
+    "category": "Films Scored by John Willams",
+    "W": [
+      "Jurassic World",
+      "The Exorcist"
+    ],
+    "R": [
+      "Raiders of the Lost Ark"
+    ]
+  },
+  {
+    "category": "Contains Peanuts",
+    "W": [
+      "Twix",
+      "100 Grand Bar"
+    ],
+    "R": [
+      "Snickers"
+    ]
+  },
+  {
+    "category": "Akira Kurosawa Films",
+    "W": [
+      "My Neighbor Totoro"
+    ],
+    "R": [
+      "Ikiru",
+      "Throne of Blood"
+    ]
+  },
+  {
+    "category": "IKEA Products",
+    "W": [
+      "Salskicer spoon",
+      "Kit Har meatballs",
+      "Nasho drapes"
+    ],
+    "R": []
+  },
+  {
+    "category": "Moons of Jupiter",
+    "W": [
+      "Grace",
+      "Gharange"
+    ],
+    "R": [
+      "Elara"
+    ]
+  },
+  {
+    "category": "WNBA Teams",
+    "W": [
+      "Washington D.C. Supremes",
+      "Toronto Geese"
+    ],
+    "R": [
+      "New York Liberty"
+    ]
+  },
+  {
+    "category": "Butterfly Life Cycle Stages",
+    "W": [
+      "spore"
+    ],
+    "R": [
+      "pupa",
+      "chrysalis"
+    ]
+  },
+  {
+    "category": "Walking Dead Characters",
+    "W": [
+      "Stan Rizzo"
+    ],
+    "R": [
+      "Glenn Rhee",
+      "Michonne"
+    ]
+  },
+  {
+    "category": "Adult Swim Cartoons",
+    "W": [
+      "Frisky Dingo"
+    ],
+    "R": [
+      "Disenchantment",
+      "BoJack Horseman"
+    ]
+  },
+  {
+    "category": "Dungeons & Dragons Abilities",
+    "W": [
+      "optimism"
+    ],
+    "R": [
+      "charisma",
+      "intelligence"
+    ]
+  },
+  {
+    "category": "Common Varieties of Fig",
+    "W": [
+      "Norseman"
+    ],
+    "R": [
+      "Brown Turkey",
+      "Kadota"
+    ]
+  },
+  {
+    "category": "Queen Songs",
+    "W": [],
+    "R": [
+      "\"We Will Rock You\"",
+      "\"Under Pressure\"",
+      "\"Radio Ga Ga\""
+    ]
+  },
+  {
+    "category": "Movies About Time Travel",
+    "W": [
+      "From Dusk Till Dawn"
+    ],
+    "R": [
+      "Back to the Future",
+      "Groundhog Day"
+    ]
+  },
+  {
+    "category": "Roald Dahl Books",
+    "W": [
+      "Charlie and Grandpa Leave Home",
+      "Where the Sidewalk Ends",
+      "The Invention of Hugo Cabret"
+    ],
+    "R": []
+  },
+  {
+    "category": "Anna Rice Novels",
+    "W": [
+      "Blood Meridian"
+    ],
+    "R": [
+      "Interview with the Vampire",
+      "Blood Canticle"
+    ]
+  },
+  {
+    "category": "Actors in Sharknado 1-5",
+    "W": [
+      "Mr. T",
+      "William Shatner"
+    ],
+    "R": [
+      "Jerry Springer"
+    ]
+  },
+  {
+    "category": "Snoopy's Siblings",
+    "W": [],
+    "R": [
+      "Marbles",
+      "Andy",
+      "Belle"
+    ]
+  },
+  {
+    "category": "Aesop's Fables",
+    "W": [
+      "The Prince and the Pauper",
+      "he Squid and the Whale"
+    ],
+    "R": [
+      "The Fisherman and the Little Fish"
+    ]
+  },
+  {
+    "category": "Leap Years",
+    "W": [
+      "1989",
+      "2018",
+      "2010"
+    ],
+    "R": []
+  },
+  {
+    "category": "Poems That Rhyme",
+    "W": [
+      "\"The Road Not Taken\" by Robert Frost",
+      "\"Doctor Faustus\" by Christopher Marlowe"
+    ],
+    "R": [
+      "\"Jabberwocky\" by Lewis Carroll"
+    ]
+  },
+  {
+    "category": "Beatles' Songs",
+    "W": [
+      "Love Shock"
+    ],
+    "R": [
+      "Let it Be",
+      "Hello Goodbye"
+    ]
+  },
+  {
+    "category": "Annette Funicello Movies",
+    "W": [
+      "Bikini Dogs",
+      "Psycho Bikini Party",
+      "Two Piece Bucket Party"
+    ],
+    "R": []
+  },
+  {
+    "category": "States with Panhandles",
+    "W": [
+      "Oregon"
+    ],
+    "R": [
+      "Texas",
+      "Idaho"
+    ]
+  }
+]
