@@ -283,11 +283,6 @@ let display_ending_graphics (game : Game.t) =
   Clock_ns.run_after span_of_winner (fun () -> display_winner ()) ()
 ;;
 
-<<<<<<< HEAD
-(* these are the graphics for the final round *)
-let display_final_round (game : Game.t) =
-  Final_round.print_random_question ()
-=======
 (* returns places of where places should be *)
 let shift_players
   (players : (Socket.Address.Inet.t * Player.t * int * int) list)
@@ -315,7 +310,7 @@ let display_final_round (game : Game.t) =
     List.mapi (Game.get_players_by_score game) ~f:(fun ind (c, pl) ->
       ( c
       , pl
-      , player_block_size * (List.length game.player_list - ind)
+      , player_block_size * ((*List.length game.player_list*) 4 - ind)
       , player_y_coord - (player_block_size * ind) - 50 ))
   in
   shift_players fr_players 0;
@@ -384,7 +379,6 @@ let final_round_title () =
   Graphics.set_color Color.black;
   Graphics.moveto 575 375;
   Graphics.draw_string "Final Round"
->>>>>>> 0b2a59a9a027079683b8681e8c642051822fa533
 ;;
 
 let final_round_intro (game : Game.t) =
@@ -398,13 +392,8 @@ let create_trivia_graphics (game : Game.t) =
   if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
      || game.questions_asked > 1
   then (
-<<<<<<< HEAD
-    game.game_state <- Game_over;
-    display_ending_graphics game)
-=======
     game.game_state <- Final_round;
     final_round_intro game)
->>>>>>> 0b2a59a9a027079683b8681e8c642051822fa533
   else (
     let players = game.player_list in
     List.iter players ~f:(fun (_, player) ->
