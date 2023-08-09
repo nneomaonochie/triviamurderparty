@@ -67,4 +67,11 @@ let set_up_players client (query : string) t : t * bool =
   t, match t.game_state with Ongoing -> true | _ -> false
 ;;
 
-(* let get_final_questions = ;; *)
+let get_players_by_score t =
+  t.player_list
+  (* |> List.map ~f:snd *)
+  |> List.map ~f:(fun (c, player) -> player.score, c, player)
+  |> List.sort ~compare:[%compare: int * Socket.Address.Inet.t * Player.t]
+  |> List.map ~f:(fun (_, c, p) -> c, p)
+  |> List.rev
+;;

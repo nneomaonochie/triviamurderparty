@@ -283,17 +283,128 @@ let display_ending_graphics (game : Game.t) =
   Clock_ns.run_after span_of_winner (fun () -> display_winner ()) ()
 ;;
 
+<<<<<<< HEAD
 (* these are the graphics for the final round *)
 let display_final_round (game : Game.t) =
   Final_round.print_random_question ()
+=======
+(* returns places of where places should be *)
+let shift_players
+  (players : (Socket.Address.Inet.t * Player.t * int * int) list)
+  (num_spaces : int)
+  =
+  List.iter players ~f:(fun (_, pl, x, y) ->
+    Graphics.set_color pl.color;
+    Graphics.fill_rect x y player_block_size player_block_size;
+    if not pl.living then draw_skull x y;
+    Graphics.set_color pl.color;
+    Graphics.moveto x (y + 150);
+    Graphics.set_font
+      "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
+    Graphics.draw_string pl.name)
 ;;
 
+(* these are the graphics for the final round *)
+let display_final_round (game : Game.t) =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  (* set the inital spaces -> how much they increase by will be set in
+     shift_players*)
+  (* the ind is the y-coordinate *)
+  let fr_players =
+    List.mapi (Game.get_players_by_score game) ~f:(fun ind (c, pl) ->
+      ( c
+      , pl
+      , player_block_size * (List.length game.player_list - ind)
+      , player_y_coord - (player_block_size * ind) - 50 ))
+  in
+  shift_players fr_players 0;
+  Final_round.print_random_question ()
+;;
+
+(* users put all the letters they think applies into one string, we parse
+   individual chars to get their guesses *)
+(* game.game_state <- Game_over; display_ending_graphics game *)
+
+let fr_instructions_3 (game : Game.t) =
+  Graphics.set_color Color.pale_blue;
+  Graphics.fill_rect 500 250 600 300;
+  Graphics.set_color Color.black;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 545 425;
+  Graphics.draw_string "Player in first place";
+  Graphics.moveto 635 360;
+  Graphics.draw_string "only gets the ";
+  Graphics.moveto 635 295;
+  Graphics.draw_string "first 2 choices";
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after span (fun () -> display_final_round game) ()
+;;
+
+let fr_instructions_2 (game : Game.t) =
+  Graphics.set_color Color.pale_blue;
+  Graphics.fill_rect 500 250 600 300;
+  Graphics.set_color Color.black;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 600 425;
+  Graphics.draw_string "If you think none";
+  Graphics.moveto 535 375;
+  Graphics.draw_string "are correct, then type";
+  Graphics.moveto 700 310;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
+  Graphics.draw_string "\"none\"";
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after span (fun () -> fr_instructions_3 game) ()
+;;
+
+let final_round_instructions_1 (game : Game.t) =
+  Graphics.set_color Color.pale_blue;
+  Graphics.fill_rect 500 250 600 300;
+  Graphics.set_color Color.black;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 635 450;
+  Graphics.draw_string "Put the letters";
+  Graphics.moveto 535 400;
+  Graphics.draw_string "you think are correct";
+  Graphics.moveto 635 350;
+  Graphics.draw_string "as one string.";
+  Graphics.moveto 515 300;
+  (* might change if I use different letters to represent *)
+  Graphics.draw_string "Ex: \"AC\" or \"B\" or \"ABC\"";
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after span (fun () -> fr_instructions_2 game) ()
+;;
+
+let final_round_title () =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  Graphics.set_color Color.pale_blue;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
+  Graphics.set_color Color.black;
+  Graphics.moveto 575 375;
+  Graphics.draw_string "Final Round"
+>>>>>>> 0b2a59a9a027079683b8681e8c642051822fa533
+;;
+
+let final_round_intro (game : Game.t) =
+  final_round_title ();
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after span (fun () -> final_round_instructions_1 game) ()
+;;
+
+(* the graphics for creating the trivia questions *)
 let create_trivia_graphics (game : Game.t) =
   if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
      || game.questions_asked > 1
   then (
+<<<<<<< HEAD
     game.game_state <- Game_over;
     display_ending_graphics game)
+=======
+    game.game_state <- Final_round;
+    final_round_intro game)
+>>>>>>> 0b2a59a9a027079683b8681e8c642051822fa533
   else (
     let players = game.player_list in
     List.iter players ~f:(fun (_, player) ->
@@ -330,7 +441,9 @@ let create_leaderboard_graphics (game : Game.t) =
     if List.length players = 0
     then ()
     else (
-      let curr_player : Player.t = List.hd_exn players in
+      let (_, curr_player) : Socket.Address.Inet.t * Player.t =
+        List.hd_exn players
+      in
       Graphics.set_color curr_player.color;
       Graphics.set_color curr_player.color;
       Graphics.fill_rect x_coord y_coord player_block_size player_block_size;
@@ -351,12 +464,10 @@ let create_leaderboard_graphics (game : Game.t) =
   (* this sorts the players by their score, so the player with the highest
      score is at index 0*)
   let players_by_score =
-    game.player_list
-    |> List.map ~f:snd
-    |> List.map ~f:(fun player -> player.score, player)
-    |> List.sort ~compare:[%compare: int * Player.t]
-    |> List.map ~f:snd
-    |> List.rev
+    Game.get_players_by_score game
+    (* game.player_list |> List.map ~f:snd |> List.map ~f:(fun player ->
+       player.score, player) |> List.sort ~compare:[%compare: int * Player.t]
+       |> List.map ~f:snd |> List.rev *)
   in
   display_pl_leaderboard 300 600 players_by_score;
   (* transition to *)
@@ -745,6 +856,8 @@ let display_pp_safe_player_instructions game =
 (* participant clients input the password that the safe players must guess *)
 let pp_password_creation client query (game : Game.t) =
   let client_ip = Game.get_ip_address client in
+  (* we need queries to be all lowercase *)
+  let query = String.lowercase query in
   (* ensures that only players who got question wrong create passwords *)
   if List.exists
        current_pp_state.active_participants
@@ -829,6 +942,7 @@ let chalice_choosing client query (game : Game.t) =
 (* when the safe players guess the answer, this is what handles it *)
 let pp_guesses client query (game : Game.t) =
   let client_ip = Game.get_ip_address client in
+  let query = String.lowercase query in
   (* we only accept guesses that are from safe players and are 4 letters
      long *)
   if String.length query = 4

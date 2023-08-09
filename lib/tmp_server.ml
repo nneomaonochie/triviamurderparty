@@ -185,7 +185,9 @@ end = struct
     game.questions_asked <- game.questions_asked + 1;
     let correct_ans = q.correct_answer in
     let players = game.player_list in
-    let player_ans = String.of_char (Protocol.Query_char.to_char query) in
+    let player_ans =
+      String.uppercase (String.of_char (Protocol.Query_char.to_char query))
+    in
     let answer_is_correct = String.equal player_ans correct_ans in
     let player = find_player players client in
     player.answered_mr_question <- true;
@@ -227,14 +229,12 @@ end = struct
     let question = game.game_type in
     let ip_addr = Game.get_ip_address client in
     let () =
-      (* remove the questions asked from tmp_server - its handled in
-         tmp_graphics.leaderboard*)
-      if game.questions_asked < 10
-      then (
-        match question with
-        | Trivia q -> run_trivia_game game q client query
-        | _ -> ())
-      else Tmp_graphics.display_ending_graphics game
+      match game.game_state with
+      | Ongoing ->
+        (match question with
+         | Trivia q -> run_trivia_game game q client query
+         | _ -> ())
+      | _ -> ()
     in
     print_s [%message "" (game : Game.t)];
     Stack.push game_stack game;
