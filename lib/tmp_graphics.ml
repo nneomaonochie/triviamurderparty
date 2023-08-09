@@ -283,11 +283,6 @@ let display_ending_graphics (game : Game.t) =
   Clock_ns.run_after span_of_winner (fun () -> display_winner ()) ()
 ;;
 
-<<<<<<< HEAD
-(* these are the graphics for the final round *)
-let display_final_round (game : Game.t) =
-  Final_round.print_random_question ()
-=======
 (* returns places of where places should be *)
 let shift_players
   (players : (Socket.Address.Inet.t * Player.t * int * int) list)
@@ -384,7 +379,6 @@ let final_round_title () =
   Graphics.set_color Color.black;
   Graphics.moveto 575 375;
   Graphics.draw_string "Final Round"
->>>>>>> 0b2a59a9a027079683b8681e8c642051822fa533
 ;;
 
 let final_round_intro (game : Game.t) =
@@ -398,13 +392,8 @@ let create_trivia_graphics (game : Game.t) =
   if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
      || game.questions_asked > 1
   then (
-<<<<<<< HEAD
-    game.game_state <- Game_over;
-    display_ending_graphics game)
-=======
     game.game_state <- Final_round;
     final_round_intro game)
->>>>>>> 0b2a59a9a027079683b8681e8c642051822fa533
   else (
     let players = game.player_list in
     List.iter players ~f:(fun (_, player) ->
@@ -886,57 +875,6 @@ let pp_password_creation client query (game : Game.t) =
                   list)];
         game.game_type <- Password_pain true;
         display_pp_safe_player_instructions game))
-;;
-
-let chalice_picking client query (game : Game.t) =
-  let client_ip = Game.get_ip_address client in
-  if List.exists current_chalice_state.chalice_pickers ~f:(fun (c, p) ->
-       String.equal client_ip (Game.get_ip_address c))
-  then (
-    let chalice_number = Int.of_string query in
-    if chalice_number > 0 && chalice_number < 5
-    then
-      if Chalice.is_poisoned chalice_number current_chalice_state
-      then (
-        let list =
-          List.fold
-            current_chalice_state.chalice_choosers
-            ~init:[]
-            ~f:(fun accum (c, p) ->
-            if not (String.equal (Game.get_ip_address c) client_ip)
-            then accum @ [ c, p ]
-            else accum)
-        in
-        current_chalice_state.chalice_choosers <- list);
-    if List.is_empty current_chalice_state.chalice_choosers
-    then game.game_type <- Chalices true
-    else ())
-  else ()
-;;
-
-let chalice_choosing client query (game : Game.t) =
-  let client_ip = Game.get_ip_address client in
-  if List.exists current_chalice_state.chalice_choosers ~f:(fun (c, _) ->
-       String.equal client_ip (Game.get_ip_address c))
-  then (
-    let chalice_number = Int.of_string query in
-    if chalice_number > 0 && chalice_number < 5
-    then (
-      Chalices.poison_chalice chalice_number current_chalice_state;
-      let list =
-        List.fold
-          current_chalice_state.chalice_choosers
-          ~init:[]
-          ~f:(fun accum (c, p) ->
-          if not (String.equal (Game.get_ip_address c) client_ip)
-          then accum @ [ c, p ]
-          else accum)
-      in
-      current_chalice_state.chalice_choosers <- list);
-    if List.is_empty current_chalice_state.chalice_choosers
-    then game.game_type <- Chalices true
-    else ())
-  else ()
 ;;
 
 (* when the safe players guess the answer, this is what handles it *)

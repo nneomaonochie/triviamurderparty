@@ -31,3 +31,6 @@ val start_chalices_intro
   :  participants:(Socket.Address.Inet.t * Player.t) list
   -> safe_players:(Socket.Address.Inet.t * Player.t) list
   -> unit
+
+(* val chalice_choosing : Socket.Address.Inet.t -> string -> Game.t ->
+   unit *)
