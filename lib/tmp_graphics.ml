@@ -285,15 +285,32 @@ let display_ending_graphics (game : Game.t) =
 
 (* these are the graphics for the final round *)
 let display_final_round (game : Game.t) =
-  Final_round.print_random_question ()
+  Final_round.print_random_question ();
+  (* users put all the letters they think applies into one string, we parse
+     individual chars to get their guesses *)
+  game.game_state <- Game_over;
+  display_ending_graphics game
+;;
+
+let final_round_instructions (game : Game.t) =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  Graphics.set_color Color.pale_blue;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_color Color.black;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 635 400;
+  Graphics.draw_string "Input a 4";
+  Graphics.moveto 535 350;
+  Graphics.draw_string "letter password"
 ;;
 
 let create_trivia_graphics (game : Game.t) =
   if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
      || game.questions_asked > 1
   then (
-    game.game_state <- Game_over;
-    display_ending_graphics game)
+    game.game_state <- Final_round;
+    final_round_instructions game)
   else (
     let players = game.player_list in
     List.iter players ~f:(fun (_, player) ->
