@@ -229,12 +229,14 @@ end = struct
     let question = game.game_type in
     let ip_addr = Game.get_ip_address client in
     let () =
-      match game.game_state with
-      | Ongoing ->
-        (match question with
-         | Trivia q -> run_trivia_game game q client query
-         | _ -> ())
-      | _ -> ()
+      (* remove the questions asked from tmp_server - its handled in
+         tmp_graphics.leaderboard*)
+      if game.questions_asked < 10
+      then (
+        match question with
+        | Trivia q -> run_trivia_game game q client query
+        | _ -> ())
+      else Tmp_graphics.display_ending_graphics game
     in
     print_s [%message "" (game : Game.t)];
     Stack.push game_stack game;

@@ -877,57 +877,6 @@ let pp_password_creation client query (game : Game.t) =
         display_pp_safe_player_instructions game))
 ;;
 
-let chalice_picking client query (game : Game.t) =
-  let client_ip = Game.get_ip_address client in
-  if List.exists current_chalice_state.chalice_pickers ~f:(fun (c, p) ->
-       String.equal client_ip (Game.get_ip_address c))
-  then (
-    let chalice_number = Int.of_string query in
-    if chalice_number > 0 && chalice_number < 5
-    then
-      if Chalice.is_poisoned chalice_number current_chalice_state
-      then (
-        let list =
-          List.fold
-            current_chalice_state.chalice_choosers
-            ~init:[]
-            ~f:(fun accum (c, p) ->
-            if not (String.equal (Game.get_ip_address c) client_ip)
-            then accum @ [ c, p ]
-            else accum)
-        in
-        current_chalice_state.chalice_choosers <- list);
-    if List.is_empty current_chalice_state.chalice_choosers
-    then game.game_type <- Chalices true
-    else ())
-  else ()
-;;
-
-let chalice_choosing client query (game : Game.t) =
-  let client_ip = Game.get_ip_address client in
-  if List.exists current_chalice_state.chalice_choosers ~f:(fun (c, _) ->
-       String.equal client_ip (Game.get_ip_address c))
-  then (
-    let chalice_number = Int.of_string query in
-    if chalice_number > 0 && chalice_number < 5
-    then (
-      Chalices.poison_chalice chalice_number current_chalice_state;
-      let list =
-        List.fold
-          current_chalice_state.chalice_choosers
-          ~init:[]
-          ~f:(fun accum (c, p) ->
-          if not (String.equal (Game.get_ip_address c) client_ip)
-          then accum @ [ c, p ]
-          else accum)
-      in
-      current_chalice_state.chalice_choosers <- list);
-    if List.is_empty current_chalice_state.chalice_choosers
-    then game.game_type <- Chalices true
-    else ())
-  else ()
-;;
-
 (* when the safe players guess the answer, this is what handles it *)
 let pp_guesses client query (game : Game.t) =
   let client_ip = Game.get_ip_address client in
