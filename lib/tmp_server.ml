@@ -122,6 +122,18 @@ end = struct
              (Protocol.Query_string.to_string query)
              game;
            game
+         | Chalices false ->
+           Tmp_graphics.chalice_choosing
+             client
+             (Protocol.Query_string.to_string query)
+             game;
+           game
+         | Chalices true ->
+           Tmp_graphics.chalice_picking
+             client
+             (Protocol.Query_string.to_string query)
+             game;
+           game
          | _ -> game)
       | _ -> game
     in
@@ -167,9 +179,13 @@ end = struct
     Tmp_graphics.start_pp_intro ~participants ~safe_players
   ;;
 
+  let run_chalices ~participants ~safe_players ~game =
+    Tmp_graphics.start_chalices_intro ~participants ~safe_players ~game
+  ;;
+
   let pick_minigame ~participants ~safe_players (game : Game.t) =
     let minigames : Game.Game_kind.t list =
-      [ Math_mayhem; Password_pain false ]
+      (* [ Math_mayhem; Password_pain false; *) [ Chalices false ]
     in
     game.game_type <- List.random_element_exn minigames;
     (* for testing purposes*)
@@ -177,6 +193,7 @@ end = struct
     match game.game_type with
     | Math_mayhem -> run_math_mayhem ~players:participants game
     | Password_pain false -> run_password_pain ~participants ~safe_players
+    | Chalices false -> run_chalices ~participants ~safe_players ~game
     | _ -> ()
   ;;
 

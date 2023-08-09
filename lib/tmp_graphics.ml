@@ -283,117 +283,17 @@ let display_ending_graphics (game : Game.t) =
   Clock_ns.run_after span_of_winner (fun () -> display_winner ()) ()
 ;;
 
-(* returns places of where places should be *)
-let shift_players
-  (players : (Socket.Address.Inet.t * Player.t * int * int) list)
-  (num_spaces : int)
-  =
-  List.iter players ~f:(fun (_, pl, x, y) ->
-    Graphics.set_color pl.color;
-    Graphics.fill_rect x y player_block_size player_block_size;
-    if not pl.living then draw_skull x y;
-    Graphics.set_color pl.color;
-    Graphics.moveto x (y + 150);
-    Graphics.set_font
-      "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
-    Graphics.draw_string pl.name)
-;;
-
 (* these are the graphics for the final round *)
 let display_final_round (game : Game.t) =
-  Graphics.set_color Color.black;
-  Graphics.fill_rect 0 0 1500 800;
-  (* set the inital spaces -> how much they increase by will be set in
-     shift_players*)
-  (* the ind is the y-coordinate *)
-  let fr_players =
-    List.mapi (Game.get_players_by_score game) ~f:(fun ind (c, pl) ->
-      ( c
-      , pl
-      , player_block_size * (List.length game.player_list - ind)
-      , player_y_coord - (player_block_size * ind) - 50 ))
-  in
-  shift_players fr_players 0;
   Final_round.print_random_question ()
 ;;
 
-(* users put all the letters they think applies into one string, we parse
-   individual chars to get their guesses *)
-(* game.game_state <- Game_over; display_ending_graphics game *)
-
-let fr_instructions_3 (game : Game.t) =
-  Graphics.set_color Color.pale_blue;
-  Graphics.fill_rect 500 250 600 300;
-  Graphics.set_color Color.black;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
-  Graphics.moveto 545 425;
-  Graphics.draw_string "Player in first place";
-  Graphics.moveto 635 360;
-  Graphics.draw_string "only gets the ";
-  Graphics.moveto 635 295;
-  Graphics.draw_string "first 2 choices";
-  let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after span (fun () -> display_final_round game) ()
-;;
-
-let fr_instructions_2 (game : Game.t) =
-  Graphics.set_color Color.pale_blue;
-  Graphics.fill_rect 500 250 600 300;
-  Graphics.set_color Color.black;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
-  Graphics.moveto 600 425;
-  Graphics.draw_string "If you think none";
-  Graphics.moveto 535 375;
-  Graphics.draw_string "are correct, then type";
-  Graphics.moveto 700 310;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
-  Graphics.draw_string "\"none\"";
-  let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after span (fun () -> fr_instructions_3 game) ()
-;;
-
-let final_round_instructions_1 (game : Game.t) =
-  Graphics.set_color Color.pale_blue;
-  Graphics.fill_rect 500 250 600 300;
-  Graphics.set_color Color.black;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
-  Graphics.moveto 635 450;
-  Graphics.draw_string "Put the letters";
-  Graphics.moveto 535 400;
-  Graphics.draw_string "you think are correct";
-  Graphics.moveto 635 350;
-  Graphics.draw_string "as one string.";
-  Graphics.moveto 515 300;
-  (* might change if I use different letters to represent *)
-  Graphics.draw_string "Ex: \"AC\" or \"B\" or \"ABC\"";
-  let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after span (fun () -> fr_instructions_2 game) ()
-;;
-
-let final_round_title () =
-  Graphics.set_color Color.black;
-  Graphics.fill_rect 0 0 1500 800;
-  Graphics.set_color Color.pale_blue;
-  Graphics.fill_rect 500 250 500 300;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
-  Graphics.set_color Color.black;
-  Graphics.moveto 575 375;
-  Graphics.draw_string "Final Round"
-;;
-
-let final_round_intro (game : Game.t) =
-  final_round_title ();
-  let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after span (fun () -> final_round_instructions_1 game) ()
-;;
-
-(* the graphics for creating the trivia questions *)
 let create_trivia_graphics (game : Game.t) =
   if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
      || game.questions_asked > 1
   then (
-    game.game_state <- Final_round;
-    final_round_intro game)
+    game.game_state <- Game_over;
+    display_ending_graphics game)
   else (
     let players = game.player_list in
     List.iter players ~f:(fun (_, player) ->
@@ -430,9 +330,7 @@ let create_leaderboard_graphics (game : Game.t) =
     if List.length players = 0
     then ()
     else (
-      let (_, curr_player) : Socket.Address.Inet.t * Player.t =
-        List.hd_exn players
-      in
+      let curr_player : Player.t = List.hd_exn players in
       Graphics.set_color curr_player.color;
       Graphics.set_color curr_player.color;
       Graphics.fill_rect x_coord y_coord player_block_size player_block_size;
@@ -453,10 +351,12 @@ let create_leaderboard_graphics (game : Game.t) =
   (* this sorts the players by their score, so the player with the highest
      score is at index 0*)
   let players_by_score =
-    Game.get_players_by_score game
-    (* game.player_list |> List.map ~f:snd |> List.map ~f:(fun player ->
-       player.score, player) |> List.sort ~compare:[%compare: int * Player.t]
-       |> List.map ~f:snd |> List.rev *)
+    game.player_list
+    |> List.map ~f:snd
+    |> List.map ~f:(fun player -> player.score, player)
+    |> List.sort ~compare:[%compare: int * Player.t]
+    |> List.map ~f:snd
+    |> List.rev
   in
   display_pl_leaderboard 300 600 players_by_score;
   (* transition to *)
@@ -738,6 +638,8 @@ let draw_chalices () =
 ;;
 
 let display_chalice_instructions () =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
   Graphics.set_color Color.pastel_purple;
   Graphics.fill_rect 500 250 500 300;
   Graphics.set_color Color.white;
@@ -747,15 +649,19 @@ let display_chalice_instructions () =
 ;;
 
 let display_chalice_title_for_safe_players () =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
   Graphics.set_color Color.pastel_purple;
   Graphics.fill_rect 500 250 500 300;
   Graphics.set_color Color.white;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
   Graphics.moveto 635 400;
-  Graphics.draw_string "Safe players, pick a chalice"
+  Graphics.draw_string "Safe players, pick a chalice to poison"
 ;;
 
 let display_chalice_title_for_endangered_players () =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
   Graphics.set_color Color.pastel_purple;
   Graphics.fill_rect 500 250 500 300;
   Graphics.set_color Color.white;
@@ -766,7 +672,62 @@ let display_chalice_title_for_endangered_players () =
   Graphics.draw_string "Choose wrong, you die"
 ;;
 
-let start_chalices_intro ~participants ~safe_players =
+let chalice_picking client query (game : Game.t) =
+  display_chalice_title_for_safe_players ();
+  let client_ip = Game.get_ip_address client in
+  if List.exists current_chalice_state.chalice_pickers ~f:(fun (c, _) ->
+       String.equal client_ip (Game.get_ip_address c))
+  then (
+    let client, player =
+      List.find_exn current_chalice_state.chalice_pickers ~f:(fun (c, _) ->
+        String.equal client_ip (Game.get_ip_address c))
+    in
+    let chalice_number = Int.of_string query in
+    if chalice_number > 0 && chalice_number < 5
+    then (
+      if Chalices.is_poisoned chalice_number current_chalice_state
+      then player.living <- false
+      else ();
+      let list =
+        List.fold
+          current_chalice_state.chalice_pickers
+          ~init:[]
+          ~f:(fun accum (c, p) ->
+          if not (String.equal (Game.get_ip_address c) client_ip)
+          then accum @ [ c, p ]
+          else accum)
+      in
+      current_chalice_state.chalice_pickers <- list))
+  else ()
+;;
+
+let chalice_choosing client query (game : Game.t) =
+  display_chalice_title_for_safe_players ();
+  let client_ip = Game.get_ip_address client in
+  if List.exists current_chalice_state.chalice_choosers ~f:(fun (c, _) ->
+       String.equal client_ip (Game.get_ip_address c))
+  then (
+    let chalice_number = Int.of_string query in
+    if chalice_number > 0 && chalice_number < 5
+    then (
+      Chalices.poison_chalice chalice_number current_chalice_state;
+      let list =
+        List.fold
+          current_chalice_state.chalice_choosers
+          ~init:[]
+          ~f:(fun accum (c, p) ->
+          if not (String.equal (Game.get_ip_address c) client_ip)
+          then accum @ [ c, p ]
+          else accum)
+      in
+      current_chalice_state.chalice_choosers <- list);
+    if List.is_empty current_chalice_state.chalice_choosers
+    then game.game_type <- Chalices true
+    else ())
+  else ()
+;;
+
+let start_chalices_intro ~participants ~safe_players ~(game : Game.t) =
   current_chalice_state.chalice_choosers <- safe_players;
   current_chalice_state.chalice_pickers <- participants;
   if List.is_empty current_chalice_state.chalice_choosers
@@ -775,12 +736,18 @@ let start_chalices_intro ~participants ~safe_players =
     let second_chalice = Random.int 5 in
     Chalices.poison_chalice first_chalice current_chalice_state;
     Chalices.poison_chalice second_chalice current_chalice_state;
-    let span = Time_ns.Span.of_sec 3.0 in
-    Clock_ns.run_after
-      span
-      (fun () -> display_chalice_title_for_endangered_players ())
-      ())
-  else ()
+    game.game_type <- Chalices true)
+  else ();
+  let span = Time_ns.Span.of_sec 4.0 in
+  Clock_ns.run_after
+    span
+    (fun () ->
+      if not (List.is_empty current_chalice_state.chalice_choosers)
+      then display_chalice_title_for_safe_players ()
+      else display_chalice_title_for_endangered_players ())
+    ();
+  display_chalice_instructions ();
+  draw_chalices ()
 ;;
 
 let display_player_passwords () =
@@ -845,8 +812,6 @@ let display_pp_safe_player_instructions game =
 (* participant clients input the password that the safe players must guess *)
 let pp_password_creation client query (game : Game.t) =
   let client_ip = Game.get_ip_address client in
-  (* we need queries to be all lowercase *)
-  let query = String.lowercase query in
   (* ensures that only players who got question wrong create passwords *)
   if List.exists
        current_pp_state.active_participants
@@ -880,7 +845,6 @@ let pp_password_creation client query (game : Game.t) =
 (* when the safe players guess the answer, this is what handles it *)
 let pp_guesses client query (game : Game.t) =
   let client_ip = Game.get_ip_address client in
-  let query = String.lowercase query in
   (* we only accept guesses that are from safe players and are 4 letters
      long *)
   if String.length query = 4
