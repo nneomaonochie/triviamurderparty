@@ -1020,8 +1020,8 @@ let start_chalices_intro ~participants ~safe_players ~(game : Game.t) =
   current_chalice_state.chalice_pickers <- participants;
   if List.is_empty current_chalice_state.chalice_choosers
   then (
-    let first_chalice = Random.int 5 in
-    let second_chalice = Random.int 5 in
+    let first_chalice = Random.int 4 in
+    let second_chalice = Random.int 4 in
     Chalices.poison_chalice first_chalice current_chalice_state;
     Chalices.poison_chalice second_chalice current_chalice_state;
     game.game_type <- Chalices true)
