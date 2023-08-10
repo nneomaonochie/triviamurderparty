@@ -289,6 +289,10 @@ let display_ending_graphics (game : Game.t) =
 let shift_players
   (players : (Socket.Address.Inet.t * Player.t * int * int * int) list)
   =
+  print_s
+    [%message
+      ""
+        (players : (Socket.Address.Inet.t * Player.t * int * int * int) list)];
   List.iter players ~f:(fun (_, pl, x, y, num_spaces) ->
     Graphics.set_color pl.color;
     (* adjust the y so corners are not touching later *)
@@ -435,6 +439,11 @@ let calc_fr_answers () =
   reveal_fr_answer final_round_category.char_placements ~ind:0 ~y_coord:90;
   let span = Time_ns.Span.of_sec 2.0 in
   let%bind () = Clock_ns.after span in
+  print_s
+    [%message
+      ""
+        (final_round_category.player_guesses
+          : (Socket.Address.Inet.t * Player.t * bool list * bool) list)];
   shift_players final_round_category.final_players;
   return ()
 ;;

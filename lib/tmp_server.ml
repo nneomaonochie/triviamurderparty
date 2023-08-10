@@ -85,8 +85,8 @@ end = struct
   (* let count = Array.create ~len:1 0 *)
   (* gets the query from the client *)
   let handle_query_string client query =
-    let game : Game.t = Stack.pop_exn game_stack in
-    let%bind game =
+    let game : Game.t = Stack.top_exn game_stack in
+    let game =
       match game.game_state with
       | Player_Initializion ->
         let (g, finished_set_up) : Game.t * bool =
@@ -154,7 +154,6 @@ end = struct
         return game
       | _ -> return game
     in
-    Stack.push game_stack game;
     Core.print_s
       [%message
         "Received query"
@@ -263,21 +262,17 @@ end = struct
 
   (* this handles the chars a user inputs *)
   let handle_query_char client query : Protocol.Response.t Deferred.t =
-    let game = Stack.pop_exn game_stack in
+    let game = Stack.top_exn game_stack in
     let question = game.game_type in
     let ip_addr = Game.get_ip_address client in
     let%bind () =
       (* remove the questions asked from tmp_server - its handled in
          tmp_graphics.leaderboard*)
-      if game.questions_asked < 10
-      then (
-        match question with
-        | Trivia q -> run_trivia_game game q client query
-        | _ -> return ())
-      else return (Tmp_graphics.display_ending_graphics game)
+      match question with
+      | Trivia q -> run_trivia_game game q client query
+      | _ -> return ()
     in
     print_s [%message "" (game : Game.t)];
-    Stack.push game_stack game;
     Core.print_s
       [%message
         "Received query"
