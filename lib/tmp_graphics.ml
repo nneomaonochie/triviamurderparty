@@ -1042,8 +1042,7 @@ let start_chalices_intro ~participants ~safe_players ~(game : Game.t) =
         ();
         display_chalice_title_for_endangered_players ()))
     ();
-  display_chalice_instructions ();
-  draw_chalices ()
+  display_chalice_instructions ()
 ;;
 
 let display_player_passwords () =
