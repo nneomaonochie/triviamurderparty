@@ -941,7 +941,11 @@ let display_chalice_title_for_endangered_players () =
   Graphics.draw_string "Choose wrong, you die"
 ;;
 
-let chalice_ending losers game =
+let chalice_ending
+  (losers : ((Socket.Address.Inet.t * Player.t) * int) list)
+  (game : Game.t)
+  =
+  let losers = List.filter losers ~f:(fun ((_, p), _) -> not p.living) in
   display_losers losers;
   let span = Time_ns.Span.of_sec 3.0 in
   let%bind () = Clock_ns.after span in
