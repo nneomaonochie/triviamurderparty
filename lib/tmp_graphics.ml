@@ -281,7 +281,8 @@ let display_ending_graphics (game : Game.t) =
     (fun () -> display_alive_bonus ())
     ();
   let span_of_winner = Time_ns.Span.of_sec 6.0 in
-  Clock_ns.run_after span_of_winner (fun () -> display_winner ()) ()
+  (* Clock_ns.run_after span_of_winner (fun () -> display_winner ()) () *)
+  ()
 ;;
 
 (* returns places of where places should be *)
@@ -301,11 +302,7 @@ let shift_players
     Graphics.moveto x (y + 150);
     Graphics.set_font
       "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
-    Graphics.draw_string pl.name;
-    if x + (player_block_size * num_spaces) >= 1500
-    then (
-      game.game_state <- Game_over;
-      display_ending_graphics (* the player wins *)))
+    Graphics.draw_string pl.name)
 ;;
 
 let display_final_round_question () =
@@ -435,7 +432,11 @@ let calc_fr_answers () =
            then cl, pl, x, y, num_correct
            else cl, pl, x, y, num_spaces));
   reveal_fr_answer final_round_category.char_placements ~ind:0 ~y_coord:90;
-  shift_players final_round_category.final_players
+  let span = Time_ns.Span.of_sec 2.0 in
+  Clock_ns.run_after
+    span
+    (fun () -> shift_players final_round_category.final_players)
+    ()
 ;;
 
 (* these are the graphics for the final round *)
@@ -456,13 +457,19 @@ let display_final_round (game : Game.t) =
   shift_players fr_players;
   final_round_category.final_players <- fr_players;
   (* now we display the first categories *)
-  display_final_round_question ();
-  (* in the background players are submitting answers *)
-  let span = Time_ns.Span.of_sec 10.0 in
-  Clock_ns.run_after span (fun () -> calc_fr_answers ()) ();
-  (* reveal answer *)
-
-  (* shift player*)
+  (* LOOP THIS*)
+  while
+    not
+      (List.exists
+         final_round_category.final_players
+         ~f:(fun (_, _, x, _, _) -> x >= 1500))
+  do
+    display_final_round_question ();
+    (* in the background players are submitting answers *)
+    let span = Time_ns.Span.of_sec 10.0 in
+    Clock_ns.run_after span (fun () -> calc_fr_answers ()) ()
+    (* reveal answer *)
+  done;
   (* repeat *)
   Final_round.print_random_question ()
 ;;
