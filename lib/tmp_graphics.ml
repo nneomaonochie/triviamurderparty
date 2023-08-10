@@ -864,8 +864,6 @@ let display_chalice_title_for_safe_players () =
 ;;
 
 let display_chalice_title_for_endangered_players () =
-  Graphics.set_color Color.black;
-  Graphics.fill_rect 0 0 1500 800;
   Graphics.set_color Color.pastel_purple;
   Graphics.fill_rect 500 250 500 300;
   Graphics.set_color Color.white;
@@ -876,8 +874,15 @@ let display_chalice_title_for_endangered_players () =
   Graphics.draw_string "Choose wrong, you die"
 ;;
 
+let chalice_ending losers game =
+  display_losers losers;
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ()
+;;
+
 let chalice_picking client query (game : Game.t) =
-  display_chalice_title_for_safe_players ();
+  let coords = display_players current_chalice_state.chalice_pickers in
+  display_chalice_title_for_endangered_players ();
   let client_ip = Game.get_ip_address client in
   if List.exists current_chalice_state.chalice_pickers ~f:(fun (c, _) ->
        String.equal client_ip (Game.get_ip_address c))
@@ -902,11 +907,12 @@ let chalice_picking client query (game : Game.t) =
           else accum)
       in
       current_chalice_state.chalice_pickers <- list))
-  else ()
+  else ();
+  if List.is_empty current_chalice_state.chalice_pickers
+  then chalice_ending coords game
 ;;
 
 let chalice_choosing client query (game : Game.t) =
-  display_chalice_title_for_safe_players ();
   let client_ip = Game.get_ip_address client in
   if List.exists current_chalice_state.chalice_choosers ~f:(fun (c, _) ->
        String.equal client_ip (Game.get_ip_address c))
@@ -948,7 +954,10 @@ let start_chalices_intro ~participants ~safe_players ~(game : Game.t) =
     (fun () ->
       if not (List.is_empty current_chalice_state.chalice_choosers)
       then display_chalice_title_for_safe_players ()
-      else display_chalice_title_for_endangered_players ())
+      else (
+        let d = display_players current_chalice_state.chalice_pickers in
+        ();
+        display_chalice_title_for_endangered_players ()))
     ();
   display_chalice_instructions ();
   draw_chalices ()
