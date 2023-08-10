@@ -293,20 +293,24 @@ let shift_players
     [%message
       ""
         (players : (Socket.Address.Inet.t * Player.t * int * int * int) list)];
-  List.iter players ~f:(fun (_, pl, x, y, num_spaces) ->
-    Graphics.set_color pl.color;
-    (* adjust the y so corners are not touching later *)
-    Graphics.fill_rect
-      (x + (player_block_size * num_spaces))
-      y
-      player_block_size
-      player_block_size;
-    if not pl.living then draw_skull x y;
-    Graphics.set_color pl.color;
-    Graphics.moveto x (y + 150);
-    Graphics.set_font
-      "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
-    Graphics.draw_string pl.name)
+  let new_p =
+    List.map players ~f:(fun (c, pl, x, y, num_spaces) ->
+      Graphics.set_color Color.black;
+      Graphics.fill_rect x y 125 (125 + 200);
+      (* the + 200 is to get rid of the name *)
+      Graphics.set_color pl.color;
+      (* adjust the y so corners are not touching later *)
+      let new_x = x + (player_block_size * num_spaces) in
+      Graphics.fill_rect new_x y player_block_size player_block_size;
+      if not pl.living then draw_skull x y;
+      Graphics.set_color pl.color;
+      Graphics.moveto new_x (y + 150);
+      Graphics.set_font
+        "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
+      Graphics.draw_string pl.name;
+      c, pl, new_x, y, num_spaces)
+  in
+  final_round_category.final_players <- new_p
 ;;
 
 let display_final_round_question () =
@@ -443,7 +447,7 @@ let calc_fr_answers () =
 
 let final_round_round () =
   display_final_round_question ();
-  let span = Time_ns.Span.of_sec 10.0 in
+  let span = Time_ns.Span.of_sec 15.0 in
   let%bind () = Clock_ns.after span in
   calc_fr_answers ()
 ;;
