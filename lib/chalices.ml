@@ -15,9 +15,11 @@ let create () =
 ;;
 
 let poison_chalice (i : int) (chalice : t) =
-  if i < 4 && i >= 0 then Array.set chalice.chalice_poisoned i true else ()
+  if i - 1 < 4 && i - 1 >= 0
+  then Array.set chalice.chalice_poisoned (i - 1) true
+  else ()
 ;;
 
 let is_poisoned (i : int) (chalice : t) =
-  Array.get chalice.chalice_poisoned i
+  Array.get chalice.chalice_poisoned (i - 1)
 ;;
