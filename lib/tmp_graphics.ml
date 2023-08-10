@@ -44,6 +44,7 @@ let draw_chalices () =
   Graphics.draw_string "4"
 ;;
 
+(* display chalice instructions *)
 let display_chalice_instructions () =
   Graphics.set_color Color.pastel_purple;
   Graphics.fill_rect 500 250 500 300;
@@ -53,6 +54,7 @@ let display_chalice_instructions () =
   Graphics.draw_string "Chalices"
 ;;
 
+(* displays the chalice title screen*)
 let display_chalice_title () =
   Graphics.set_color Color.pastel_purple;
   Graphics.fill_rect 500 250 500 300;
@@ -64,6 +66,8 @@ let display_chalice_title () =
   Graphics.draw_string "Choose wrong, you die"
 ;;
 
+(* displays the very beginning where they ask players to submit their
+   names *)
 let player_creation_screen () =
   Graphics.open_graph " 1500x800";
   Graphics.set_color Color.black;
@@ -80,13 +84,6 @@ let player_creation_screen () =
         (Random.int 30))
   in
   ();
-  (* testing animation *)
-  (*let stop_test = ref false in let coordinates = Array.create ~len:2 0 in
-    every 0.25 ~f:(fun () -> animation_test coordinates.(0) coordinates.(1);
-    Array.set coordinates 0 (coordinates.(0) + 10); Array.set coordinates 1
-    (coordinates.(1) + 10); if coordinates.(1) > 800 then stop_test := true)
-    ~stop:stop_test; *)
-  (* testing animation again*)
   Graphics.set_color Color.dark_red;
   Graphics.draw_rect 375 400 600 200;
   Graphics.fill_rect 375 400 600 200;
@@ -96,6 +93,7 @@ let player_creation_screen () =
   Graphics.draw_string "Please enter your name into the console"
 ;;
 
+(* if players loser a game, it displays the losing players at the front *)
 let display_losers loser_list =
   let rec dpl x_coord loser_list =
     if List.length loser_list = 0
@@ -154,7 +152,7 @@ let rec paste_players x_coord ~players_left ~player_positions
       player_y_coord
       player_block_size
       player_block_size;
-    (* if player looks dead, put an x *)
+    (* if player looks dead, then we draw a skull *)
     if Bool.equal current_player.living false
     then draw_skull x_coord player_y_coord;
     Graphics.set_color current_player.color;
@@ -189,6 +187,7 @@ let display_players (players : (Socket.Address.Inet.t * Player.t) list)
     ~player_positions:[]
 ;;
 
+(* this is the coordinates of the questions for the trivia portion *)
 let get_correct_q_coords (game : Game.t) =
   let correct_ans =
     match game.game_type with Trivia q -> q.correct_answer | _ -> ""
@@ -201,6 +200,7 @@ let get_correct_q_coords (game : Game.t) =
   | _ -> 0, 0
 ;;
 
+(* this reveals the correct answer of the trivia portion *)
 let show_correct_answer (game : Game.t) =
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1500 800;
@@ -260,7 +260,7 @@ let display_ending_graphics (game : Game.t) =
     ();
   let span_of_winner = Time_ns.Span.of_sec 6.0 in
   (* Clock_ns.run_after span_of_winner (fun () -> display_winner ()) () *)
-  ()
+  return ()
 ;;
 
 (* returns places of where places should be *)
@@ -450,25 +450,30 @@ let display_final_round (game : Game.t) : unit Deferred.t =
   final_round_category.final_players <- fr_players;
   (* now we display the first categories *)
   (* LOOP THIS*)
-  Deferred.repeat_until_finished () (fun () ->
-    let continue_final_round =
-      not
-        (List.exists
-           final_round_category.final_players
-           ~f:(fun (_, _, x, _, _) -> x >= 1500))
-    in
-    if continue_final_round
-    then (
-      (* let span = Time_ns.Span.of_sec 15.0 in let%bind () = Clock_ns.after
-         span in *)
-      final_round_category.player_guesses
-        <- List.map
+  let () =
+    Deferred.repeat_until_finished () (fun () ->
+      let continue_final_round =
+        not
+          (List.exists
              final_round_category.final_players
-             ~f:(fun (c, pl, _, _, _) ->
-             c, pl, [ false; false; false ], false);
-      let%bind () = final_round_round () in
-      return (`Repeat ()))
-    else return (`Finished ()))
+             ~f:(fun (_, _, x, _, _) -> x >= 1500))
+      in
+      if continue_final_round
+      then (
+        (* let span = Time_ns.Span.of_sec 15.0 in let%bind () =
+           Clock_ns.after span in *)
+        final_round_category.player_guesses
+          <- List.map
+               final_round_category.final_players
+               ~f:(fun (c, pl, _, _, _) ->
+               c, pl, [ false; false; false ], false);
+        let%bind () = final_round_round () in
+        return (`Repeat ()))
+      else return (`Finished ()))
+  in
+  (* if finished *)
+  game.game_state <- Game_over;
+  display_ending_graphics game
 ;;
 
 (* while ) do final_round_round ();
@@ -478,7 +483,6 @@ let display_final_round (game : Game.t) : unit Deferred.t =
 
 (* users put all the letters they think applies into one string, we parse
    individual chars to get their guesses *)
-(* game.game_state <- Game_over; display_ending_graphics game *)
 
 let fr_instructions_3 (game : Game.t) =
   Graphics.set_color Color.pale_blue;

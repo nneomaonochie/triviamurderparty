@@ -4,8 +4,6 @@ open! Core
 open! Async
 
 val player_creation_screen : unit -> unit
-
-(* val display_beginning_instructions : unit -> unit *)
 val create_trivia_graphics : Game.t -> unit Deferred.t
 
 val initialize_math_mayhem_graphics

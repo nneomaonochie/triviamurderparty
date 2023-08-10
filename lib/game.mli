@@ -6,18 +6,16 @@ module Game_kind : sig
     | Leaderboard
     | Trivia of Question.t
     | Math_mayhem
+    (* if minigames are false, they are set to their set up mode, where other
+       players set up the game_state*)
+    (* if set to true, then players who must guess / pick will do so *)
     | Chalices of bool
     | Password_pain of bool
-      (* if false, it's in password creation mode; if true its in password
-         guessing mode*)
   [@@deriving compare, sexp_of]
 end
 
 type t =
-  { (* players should stay the same, but a player being dead or alive should
-       be mutable *)
-    mutable player_list :
-      (Socket.Address.Inet.t * Player.t) list (* a Client * Player touple *)
+  { mutable player_list : (Socket.Address.Inet.t * Player.t) list
   ; mutable game_type : Game_kind.t
   ; mutable game_state : Game_state.t
   ; mutable questions_asked : int

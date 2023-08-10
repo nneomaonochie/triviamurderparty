@@ -19,6 +19,11 @@ type t =
   }
 [@@deriving sexp_of, compare]
 
+(* this is the max players we are allowing in the game (in this
+   implementation, our max players is always FOUR )*)
+let max_players = 1
+
+(* creates a default Game.t *)
 let create () : t =
   { player_list = []
   ; game_type =
@@ -33,13 +38,13 @@ let get_ip_address client : string =
   let colon_index =
     String.index_exn (Socket.Address.Inet.to_string client) ':'
   in
-  (* this gives the IP address without the extra bits at *)
   let client_str =
     String.slice (Socket.Address.Inet.to_string client) 0 colon_index
   in
   client_str
 ;;
 
+(* this generates a questions for the trivia portion *)
 let ask_question (game : t) =
   match game.game_type with
   | Trivia _ ->
@@ -47,19 +52,18 @@ let ask_question (game : t) =
   | _ -> ()
 ;;
 
+(* this creates the players in Game.player_list *)
 let set_up_players client (query : string) t : t * bool =
   (* we need to ensure that we have 4 unique clients *)
-  if List.length t.player_list < 2
+  if List.length t.player_list < max_players
   then
     if not
-         (* they repeat IP adresses byt clients are differnet based off of
-            TIME... *)
          (List.exists t.player_list ~f:(fun (c, _) ->
             String.equal (get_ip_address c) (get_ip_address client)))
     then
       t.player_list
         <- t.player_list @ [ client, Player.name_create_single_player query ];
-  if List.length t.player_list = 2
+  if List.length t.player_list = max_players
   then (
     t.game_state <- Ongoing;
     ask_question t);
@@ -67,6 +71,8 @@ let set_up_players client (query : string) t : t * bool =
   t, match t.game_state with Ongoing -> true | _ -> false
 ;;
 
+(* this arranges the players with the player with the highest score at the
+   front *)
 let get_players_by_score t =
   t.player_list
   (* |> List.map ~f:snd *)
