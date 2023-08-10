@@ -237,30 +237,21 @@ let display_winner (c, (player : Player.t)) =
   Graphics.draw_string "The Winner"
 ;;
 
-let display_ending_graphics (game : Game.t) =
-  let display_alive_bonus () =
-    Graphics.set_color Color.black;
-    Graphics.fill_rect 0 0 1500 800;
-    let coords = display_players game.player_list in
-    let alive_players =
-      List.filter coords ~f:(fun ((c, p), x_coord) ->
-        if p.living then true else false)
-    in
-    List.iter alive_players ~f:(fun ((c, p), x_coord) ->
-      p.score <- p.score + 3000);
-    List.iter alive_players ~f:(fun ((c, p), x_coord) ->
-      Graphics.moveto (x_coord + 20) 550;
-      Graphics.set_color Color.green;
-      Graphics.draw_string "+3000")
+(* displays the bonus for living players being alive *)
+let display_alive_bonus (game : Game.t) =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  let coords = display_players game.player_list in
+  let alive_players =
+    List.filter coords ~f:(fun ((c, p), x_coord) ->
+      if p.living then true else false)
   in
-  let span_of_alive_bonus = Time_ns.Span.of_sec 6.0 in
-  Clock_ns.run_after
-    span_of_alive_bonus
-    (fun () -> display_alive_bonus ())
-    ();
-  let span_of_winner = Time_ns.Span.of_sec 6.0 in
-  (* Clock_ns.run_after span_of_winner (fun () -> display_winner ()) () *)
-  return ()
+  List.iter alive_players ~f:(fun ((c, p), x_coord) ->
+    p.score <- p.score + 3000);
+  List.iter alive_players ~f:(fun ((c, p), x_coord) ->
+    Graphics.moveto (x_coord + 20) 550;
+    Graphics.set_color Color.green;
+    Graphics.draw_string "+3000")
 ;;
 
 (* returns places of where places should be *)
@@ -471,9 +462,15 @@ let display_final_round (game : Game.t) : unit Deferred.t =
         return (`Repeat ()))
       else return (`Finished ()))
   in
+  let client, player, _, _, _ =
+    List.find_exn
+      final_round_category.final_players
+      ~f:(fun (c, pl, x, y, num_spaces) -> x >= 1500)
+  in
   (* if finished *)
   game.game_state <- Game_over;
-  display_ending_graphics game
+  display_winner (client, player);
+  return ()
 ;;
 
 (* while ) do final_round_round ();
@@ -556,9 +553,12 @@ let final_round_intro (game : Game.t) =
 (* the graphics for creating the trivia questions *)
 let create_trivia_graphics (game : Game.t) =
   if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
-     || game.questions_asked > 1
+     || game.questions_asked > 10
   then (
     game.game_state <- Final_round;
+    display_alive_bonus game;
+    let span = Time_ns.Span.of_sec 3.0 in
+    let%bind () = Clock_ns.after span in
     final_round_intro game)
   else (
     let players = game.player_list in

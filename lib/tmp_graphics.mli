@@ -34,7 +34,6 @@ val pp_password_creation
   -> unit Deferred.t
 
 val pp_guesses : Socket.Address.Inet.t -> string -> Game.t -> unit Deferred.t
-val display_ending_graphics : Game.t -> unit Deferred.t
 val draw_chalices : unit -> unit
 
 val start_chalices_intro
