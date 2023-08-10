@@ -940,8 +940,10 @@ let display_chalice_title_for_endangered_players () =
   Graphics.draw_string "Endangered players,";
   Graphics.moveto 535 400;
   Graphics.draw_string "pick a chalice";
-  Graphics.moveto 535 350;
-  Graphics.draw_string "Choose wrong, you die"
+  Graphics.moveto 550 350;
+  Graphics.draw_string "Choose wrong,";
+  Graphics.moveto 550 300;
+  Graphics.draw_string "then you die"
 ;;
 
 let chalice_ending
