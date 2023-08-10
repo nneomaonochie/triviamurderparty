@@ -363,10 +363,7 @@ let display_final_round_question () =
   final_round_category.category <- current_category.category;
   final_round_category.right_answers <- current_category.right_answers;
   final_round_category.wrong_answers <- current_category.wrong_answers;
-  final_round_category.char_placements <- current_category.char_placements;
-  final_round_category.player_guesses
-    <- List.map current_category.final_players ~f:(fun (c, pl, _, _, _) ->
-         c, pl, [ false; false; false ], false)
+  final_round_category.char_placements <- current_category.char_placements
 ;;
 
 (* this handles the user's input for answering final round stuff *)
@@ -439,11 +436,7 @@ let calc_fr_answers () =
   reveal_fr_answer final_round_category.char_placements ~ind:0 ~y_coord:90;
   let span = Time_ns.Span.of_sec 2.0 in
   let%bind () = Clock_ns.after span in
-  print_s
-    [%message
-      ""
-        (final_round_category.player_guesses
-          : (Socket.Address.Inet.t * Player.t * bool list * bool) list)];
+  print_s [%message "" (final_round_category : Final_round.t)];
   shift_players final_round_category.final_players;
   return ()
 ;;
@@ -483,8 +476,13 @@ let display_final_round (game : Game.t) : unit Deferred.t =
     in
     if continue_final_round
     then (
-      let span = Time_ns.Span.of_sec 15.0 in
-      let%bind () = Clock_ns.after span in
+      (* let span = Time_ns.Span.of_sec 15.0 in let%bind () = Clock_ns.after
+         span in *)
+      final_round_category.player_guesses
+        <- List.map
+             final_round_category.final_players
+             ~f:(fun (c, pl, _, _, _) ->
+             c, pl, [ false; false; false ], false);
       let%bind () = final_round_round () in
       return (`Repeat ()))
     else return (`Finished ()))
