@@ -9,6 +9,8 @@ type t =
   ; mutable char_placements : bool list
   ; mutable final_players :
       (Socket.Address.Inet.t * Player.t * int * int * int) list
+  ; mutable player_guesses :
+      (Socket.Address.Inet.t * Player.t * bool list * bool) list
   }
 [@@deriving compare, sexp_of]
 
