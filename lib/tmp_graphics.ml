@@ -93,8 +93,7 @@ let player_creation_screen () =
   Graphics.moveto 400 500;
   Graphics.set_color Color.red;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
-  Graphics.draw_string "Please enter your name into the console";
-  draw_chalices ()
+  Graphics.draw_string "Please enter your name into the console"
 ;;
 
 let display_losers loser_list =
@@ -912,7 +911,8 @@ let display_chalice_instructions () =
   Graphics.set_color Color.white;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
   Graphics.moveto 635 400;
-  Graphics.draw_string "Chalices"
+  Graphics.draw_string "Chalices";
+  draw_chalices ()
 ;;
 
 let display_chalice_title_for_safe_players () =
