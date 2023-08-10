@@ -985,8 +985,16 @@ let chalice_choosing client query (game : Game.t) =
           else accum)
       in
       current_chalice_state.chalice_choosers <- list);
+    print_s
+      [%message
+        "Chalice choosers"
+          (current_chalice_state.chalice_choosers
+            : (Async.Socket.Address.Inet.t * Player.t) list)];
     if List.is_empty current_chalice_state.chalice_choosers
-    then game.game_type <- Chalices true
+    then (
+      game.game_type <- Chalices true;
+      let coords = display_players current_chalice_state.chalice_pickers in
+      display_chalice_title_for_endangered_players ())
     else ())
   else ()
 ;;
