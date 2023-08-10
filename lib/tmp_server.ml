@@ -86,7 +86,7 @@ end = struct
   (* gets the query from the client *)
   let handle_query_string client query =
     let game : Game.t = Stack.pop_exn game_stack in
-    let game =
+    let%bind game =
       match game.game_state with
       | Player_Initializion ->
         let (g, finished_set_up) : Game.t * bool =
@@ -98,50 +98,61 @@ end = struct
         (* if we finished setting up players, display the graphics screen *)
         if Bool.equal finished_set_up true
         then (
-          match g.game_type with
-          | Trivia _ -> Tmp_graphics.create_trivia_graphics g
-          | _ -> ());
-        g
+          let%bind () =
+            match g.game_type with
+            | Trivia _ -> Tmp_graphics.create_trivia_graphics g
+            | _ -> return ()
+          in
+          return g)
+        else return g
       | Ongoing ->
         (match game.game_type with
          | Math_mayhem ->
            Tmp_graphics.math_mayhem_player_response
              client
              (Protocol.Query_string.to_string query);
-           game (* password creation mode*)
+           return game (* password creation mode*)
          | Password_pain false ->
-           Tmp_graphics.pp_password_creation
-             client
-             (Protocol.Query_string.to_string query)
-             game;
-           game
+           let%bind () =
+             Tmp_graphics.pp_password_creation
+               client
+               (Protocol.Query_string.to_string query)
+               game
+           in
+           return game
          (* password guessing mode *)
          | Password_pain true ->
-           Tmp_graphics.pp_guesses
-             client
-             (Protocol.Query_string.to_string query)
-             game;
-           game
+           let%bind () =
+             Tmp_graphics.pp_guesses
+               client
+               (Protocol.Query_string.to_string query)
+               game
+           in
+           return game
          | Chalices false ->
-           Tmp_graphics.chalice_choosing
-             client
-             (Protocol.Query_string.to_string query)
-             game;
-           game
+           let%bind () =
+             Tmp_graphics.chalice_choosing
+               client
+               (Protocol.Query_string.to_string query)
+               game
+           in
+           return game
          | Chalices true ->
-           Tmp_graphics.chalice_picking
-             client
-             (Protocol.Query_string.to_string query)
-             game;
-           game
-         | _ -> game)
+           let%bind () =
+             Tmp_graphics.chalice_picking
+               client
+               (Protocol.Query_string.to_string query)
+               game
+           in
+           return game
+         | _ -> return game)
       | Final_round ->
         Tmp_graphics.final_round_user_input
           client
           (Protocol.Query_string.to_string query)
           game;
-        game
-      | _ -> game
+        return game
+      | _ -> return game
     in
     Stack.push game_stack game;
     Core.print_s
@@ -175,10 +186,8 @@ end = struct
   let run_math_mayhem ~players game =
     Tmp_graphics.start_math_mayhem_intro ();
     let span = Time_ns.Span.of_sec 7.0 in
-    Clock_ns.run_after
-      span
-      (fun () -> Tmp_graphics.initialize_math_mayhem_graphics players game)
-      ()
+    let%bind () = Clock_ns.after span in
+    Tmp_graphics.initialize_math_mayhem_graphics players game
   ;;
 
   let run_password_pain ~participants ~safe_players =
@@ -198,9 +207,11 @@ end = struct
     (* game.game_type <- Password_pain false; *)
     match game.game_type with
     | Math_mayhem -> run_math_mayhem ~players:participants game
-    | Password_pain false -> run_password_pain ~participants ~safe_players
-    | Chalices false -> run_chalices ~participants ~safe_players ~game
-    | _ -> ()
+    | Password_pain false ->
+      return (run_password_pain ~participants ~safe_players)
+    | Chalices false ->
+      return (run_chalices ~participants ~safe_players ~game)
+    | _ -> return ()
   ;;
 
   (* this starts the trivia portion of the game *)
@@ -236,14 +247,18 @@ end = struct
             List.filter game.player_list ~f:(fun (_, p) ->
               Bool.equal p.answered_mr_question_wrong false)
           in
-          pick_minigame ~participants:players ~safe_players game)
+          let%bind () =
+            pick_minigame ~participants:players ~safe_players game
+          in
+          return ())
         else (
-          Game.ask_question game;
+          let () = Game.ask_question game in
           Tmp_graphics.create_trivia_graphics game)
       in
       let span = Time_ns.Span.of_sec 3.0 in
-      Clock_ns.run_after span (fun () -> func ()) ())
-    else ()
+      let%bind () = Clock_ns.after span in
+      func ())
+    else return ()
   ;;
 
   (* this handles the chars a user inputs *)
@@ -251,15 +266,15 @@ end = struct
     let game = Stack.pop_exn game_stack in
     let question = game.game_type in
     let ip_addr = Game.get_ip_address client in
-    let () =
+    let%bind () =
       (* remove the questions asked from tmp_server - its handled in
          tmp_graphics.leaderboard*)
       if game.questions_asked < 10
       then (
         match question with
         | Trivia q -> run_trivia_game game q client query
-        | _ -> ())
-      else Tmp_graphics.display_ending_graphics game
+        | _ -> return ())
+      else return (Tmp_graphics.display_ending_graphics game)
     in
     print_s [%message "" (game : Game.t)];
     Stack.push game_stack game;

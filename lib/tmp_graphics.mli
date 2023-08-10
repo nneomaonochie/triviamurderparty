@@ -6,12 +6,12 @@ open! Async
 val player_creation_screen : unit -> unit
 
 (* val display_beginning_instructions : unit -> unit *)
-val create_trivia_graphics : Game.t -> unit
+val create_trivia_graphics : Game.t -> unit Deferred.t
 
 val initialize_math_mayhem_graphics
   :  (Socket.Address.Inet.t * Player.t) list
   -> Game.t
-  -> unit
+  -> unit Deferred.t
 
 val final_round_user_input
   :  Socket.Address.Inet.t
@@ -28,8 +28,14 @@ val start_pp_intro
   -> unit
 
 val show_correct_answer : Game.t -> unit
-val pp_password_creation : Socket.Address.Inet.t -> string -> Game.t -> unit
-val pp_guesses : Socket.Address.Inet.t -> string -> Game.t -> unit
+
+val pp_password_creation
+  :  Socket.Address.Inet.t
+  -> string
+  -> Game.t
+  -> unit Deferred.t
+
+val pp_guesses : Socket.Address.Inet.t -> string -> Game.t -> unit Deferred.t
 val display_ending_graphics : Game.t -> unit
 val draw_chalices : unit -> unit
 
@@ -39,5 +45,14 @@ val start_chalices_intro
   -> game:Game.t
   -> unit
 
-val chalice_choosing : Socket.Address.Inet.t -> string -> Game.t -> unit
-val chalice_picking : Socket.Address.Inet.t -> string -> Game.t -> unit
+val chalice_choosing
+  :  Socket.Address.Inet.t
+  -> string
+  -> Game.t
+  -> unit Deferred.t
+
+val chalice_picking
+  :  Socket.Address.Inet.t
+  -> string
+  -> Game.t
+  -> unit Deferred.t

@@ -397,6 +397,7 @@ let final_round_user_input client query (game : Game.t) =
 
 (* blacks out the incorect answers that are on the board *)
 let rec reveal_fr_answer correct_char_bools ~ind ~y_coord =
+  Graphics.set_color Color.black;
   if ind = 3
   then ()
   else (
@@ -433,14 +434,20 @@ let calc_fr_answers () =
            else cl, pl, x, y, num_spaces));
   reveal_fr_answer final_round_category.char_placements ~ind:0 ~y_coord:90;
   let span = Time_ns.Span.of_sec 2.0 in
-  Clock_ns.run_after
-    span
-    (fun () -> shift_players final_round_category.final_players)
-    ()
+  let%bind () = Clock_ns.after span in
+  shift_players final_round_category.final_players;
+  return ()
+;;
+
+let final_round_round () =
+  display_final_round_question ();
+  let span = Time_ns.Span.of_sec 10.0 in
+  let%bind () = Clock_ns.after span in
+  calc_fr_answers ()
 ;;
 
 (* these are the graphics for the final round *)
-let display_final_round (game : Game.t) =
+let display_final_round (game : Game.t) : unit Deferred.t =
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1500 800;
   (* set the inital spaces -> how much they increase by will be set in
@@ -458,21 +465,26 @@ let display_final_round (game : Game.t) =
   final_round_category.final_players <- fr_players;
   (* now we display the first categories *)
   (* LOOP THIS*)
-  while
-    not
-      (List.exists
-         final_round_category.final_players
-         ~f:(fun (_, _, x, _, _) -> x >= 1500))
-  do
-    display_final_round_question ();
-    (* in the background players are submitting answers *)
-    let span = Time_ns.Span.of_sec 10.0 in
-    Clock_ns.run_after span (fun () -> calc_fr_answers ()) ()
-    (* reveal answer *)
-  done;
-  (* repeat *)
-  Final_round.print_random_question ()
+  Deferred.repeat_until_finished () (fun () ->
+    let continue_final_round =
+      not
+        (List.exists
+           final_round_category.final_players
+           ~f:(fun (_, _, x, _, _) -> x >= 1500))
+    in
+    if continue_final_round
+    then (
+      let span = Time_ns.Span.of_sec 15.0 in
+      let%bind () = Clock_ns.after span in
+      let%bind () = final_round_round () in
+      return (`Repeat ()))
+    else return (`Finished ()))
 ;;
+
+(* while ) do final_round_round ();
+
+   Clock_ns.run_after span (fun () -> ()) () done; *)
+(* return () *)
 
 (* users put all the letters they think applies into one string, we parse
    individual chars to get their guesses *)
@@ -490,7 +502,8 @@ let fr_instructions_3 (game : Game.t) =
   Graphics.moveto 635 295;
   Graphics.draw_string "first 2 choices";
   let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after span (fun () -> display_final_round game) ()
+  let%bind () = Clock_ns.after span in
+  display_final_round game
 ;;
 
 let fr_instructions_2 (game : Game.t) =
@@ -506,7 +519,8 @@ let fr_instructions_2 (game : Game.t) =
   Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
   Graphics.draw_string "\"NONE\"";
   let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after span (fun () -> fr_instructions_3 game) ()
+  let%bind () = Clock_ns.after span in
+  fr_instructions_3 game
 ;;
 
 let final_round_instructions_1 (game : Game.t) =
@@ -523,7 +537,8 @@ let final_round_instructions_1 (game : Game.t) =
   Graphics.moveto 515 300;
   Graphics.draw_string "Ex: \"QE\" or \"W\" or \"QWE\"";
   let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after span (fun () -> fr_instructions_2 game) ()
+  let%bind () = Clock_ns.after span in
+  fr_instructions_2 game
 ;;
 
 let final_round_title () =
@@ -540,7 +555,8 @@ let final_round_title () =
 let final_round_intro (game : Game.t) =
   final_round_title ();
   let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after span (fun () -> final_round_instructions_1 game) ()
+  let%bind () = Clock_ns.after span in
+  final_round_instructions_1 game
 ;;
 
 (* the graphics for creating the trivia questions *)
@@ -578,7 +594,8 @@ let create_trivia_graphics (game : Game.t) =
     Graphics.moveto 900 350;
     Graphics.draw_string (List.nth_exn question.answer_choices 2);
     Graphics.moveto 950 300;
-    Graphics.draw_string (List.nth_exn question.answer_choices 3))
+    Graphics.draw_string (List.nth_exn question.answer_choices 3);
+    return ())
 ;;
 
 (* this is the graphics that displays the players in order of descending
@@ -623,7 +640,8 @@ let create_leaderboard_graphics (game : Game.t) =
          { Question.question = ""; answer_choices = []; correct_answer = "" };
   Game.ask_question game;
   let span = Time_ns.Span.of_sec 5.0 in
-  Clock_ns.run_after span (fun () -> create_trivia_graphics game) ()
+  let%bind () = Clock_ns.after span in
+  create_trivia_graphics game
 ;;
 
 (* pastes the arithmetic stuff where they are supposed to be *)
@@ -686,8 +704,8 @@ let math_mayhem_calc_scores (game : Game.t) =
               String.equal (Game.get_ip_address c) key)
           ]));
     let span = Time_ns.Span.of_sec 5.0 in
-    (* find a way to display the time you have left [might be OPTIONAL]*)
-    Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ())
+    let%bind () = Clock_ns.after span in
+    create_leaderboard_graphics game)
   else (
     let worst_perf = Array.create ~len:1 (Int.max_value, "") in
     (* tries to find player with lowest scores*)
@@ -705,8 +723,8 @@ let math_mayhem_calc_scores (game : Game.t) =
     Player.player_loses losing_player;
     display_losers [ (c, losing_player), x_coord ];
     let span = Time_ns.Span.of_sec 5.0 in
-    (* find a way to display the time you have left [might be OPTIONAL]*)
-    Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ())
+    let%bind () = Clock_ns.after span in
+    create_leaderboard_graphics game)
 ;;
 
 (* displays the title of Math Mayhem *)
@@ -772,8 +790,8 @@ let initialize_math_mayhem_graphics
   current_math_mayhem_hashtables.player_positions <- player_positions;
   (* players have 30 seconds to accumulate as many points as possible *)
   let span = Time_ns.Span.of_sec 40.0 in
-  (* find a way to display the time you have left [might be OPTIONAL]*)
-  Clock_ns.run_after span (fun () -> math_mayhem_calc_scores game) ()
+  let%bind () = Clock_ns.after span in
+  math_mayhem_calc_scores game
 ;;
 
 (* when clients send queries in this mode, we update the screen based off of
@@ -931,7 +949,8 @@ let display_chalice_title_for_endangered_players () =
 let chalice_ending losers game =
   display_losers losers;
   let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ()
+  let%bind () = Clock_ns.after span in
+  create_leaderboard_graphics game
 ;;
 
 let chalice_picking client query (game : Game.t) =
@@ -964,31 +983,33 @@ let chalice_picking client query (game : Game.t) =
   else ();
   if List.is_empty current_chalice_state.chalice_pickers
   then chalice_ending coords game
+  else return ()
 ;;
 
 let chalice_choosing client query (game : Game.t) =
-  let client_ip = Game.get_ip_address client in
-  if List.exists current_chalice_state.chalice_choosers ~f:(fun (c, _) ->
-       String.equal client_ip (Game.get_ip_address c))
-  then (
-    let chalice_number = Int.of_string query in
-    if chalice_number > 0 && chalice_number < 5
-    then (
-      Chalices.poison_chalice chalice_number current_chalice_state;
-      let list =
-        List.fold
-          current_chalice_state.chalice_choosers
-          ~init:[]
-          ~f:(fun accum (c, p) ->
-          if not (String.equal (Game.get_ip_address c) client_ip)
-          then accum @ [ c, p ]
-          else accum)
-      in
-      current_chalice_state.chalice_choosers <- list);
-    if List.is_empty current_chalice_state.chalice_choosers
-    then game.game_type <- Chalices true
-    else ())
-  else ()
+  (let client_ip = Game.get_ip_address client in
+   if List.exists current_chalice_state.chalice_choosers ~f:(fun (c, _) ->
+        String.equal client_ip (Game.get_ip_address c))
+   then (
+     let chalice_number = Int.of_string query in
+     if chalice_number > 0 && chalice_number < 5
+     then (
+       Chalices.poison_chalice chalice_number current_chalice_state;
+       let list =
+         List.fold
+           current_chalice_state.chalice_choosers
+           ~init:[]
+           ~f:(fun accum (c, p) ->
+           if not (String.equal (Game.get_ip_address c) client_ip)
+           then accum @ [ c, p ]
+           else accum)
+       in
+       current_chalice_state.chalice_choosers <- list);
+     if List.is_empty current_chalice_state.chalice_choosers
+     then game.game_type <- Chalices true
+     else ())
+   else ())
+  |> return
 ;;
 
 let start_chalices_intro ~participants ~safe_players ~(game : Game.t) =
@@ -1037,7 +1058,8 @@ let pp_end_minigame game =
        ~f:(fun (_, pl, _, _, _) -> not pl.living)
      |> List.map ~f:(fun (c, pl, _, _, x_coord) -> (c, pl), x_coord));
   let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after span (fun () -> create_leaderboard_graphics game) ()
+  let%bind () = Clock_ns.after span in
+  create_leaderboard_graphics game
 ;;
 
 let final_pp_instruction game =
@@ -1056,11 +1078,10 @@ let final_pp_instruction game =
   let span = Time_ns.Span.of_sec 60.0 in
   (* we use the timer to call the minigame function if ALL the passwords are
      not already guessed *)
-  Clock_ns.run_after
-    span
-    (fun () ->
-      if not current_pp_state.all_passwords_guessed then pp_end_minigame game)
-    ()
+  let%bind () = Clock_ns.after span in
+  if not current_pp_state.all_passwords_guessed
+  then pp_end_minigame game
+  else return ()
 ;;
 
 let display_pp_safe_player_instructions game =
@@ -1073,7 +1094,8 @@ let display_pp_safe_player_instructions game =
   Graphics.moveto 535 350;
   Graphics.draw_string "Guess the password";
   let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after span (fun () -> final_pp_instruction game) ()
+  let%bind () = Clock_ns.after span in
+  final_pp_instruction game
 ;;
 
 (* participant clients input the password that the safe players must guess *)
@@ -1086,7 +1108,9 @@ let pp_password_creation client query (game : Game.t) =
        String.equal client_ip (Game.get_ip_address c))
   then
     if String.length query <> 4
-    then print_s [%message "Your password must be 4 letters."]
+    then (
+      print_s [%message "Your password must be 4 letters."];
+      return ())
     else (
       Password_pain.update_password client_ip current_pp_state ~query;
       (* that every password is a non empty string - all participating
@@ -1097,16 +1121,10 @@ let pp_password_creation client query (game : Game.t) =
            print_s [%message real_pw display_pw];
            not (String.is_empty real_pw))
       then (
-        print_s
-          [%message
-            ""
-              (current_pp_state.safe_players
-                : (Socket.Address.Inet.t * Player.t) list)
-              (current_pp_state.active_participants
-                : (Socket.Address.Inet.t * Player.t * string * string * int)
-                  list)];
         game.game_type <- Password_pain true;
-        display_pp_safe_player_instructions game))
+        display_pp_safe_player_instructions game)
+      else return ())
+  else return ()
 ;;
 
 (* when the safe players guess the answer, this is what handles it *)
@@ -1121,9 +1139,8 @@ let pp_guesses client query (game : Game.t) =
     Password_pain.check_guess client_ip current_pp_state query game;
     display_player_passwords ());
   let span = Time_ns.Span.of_sec 1.0 in
-  Clock_ns.run_after
-    span
-    (fun () ->
-      if current_pp_state.all_passwords_guessed then pp_end_minigame game)
-    ()
+  let%bind () = Clock_ns.after span in
+  if current_pp_state.all_passwords_guessed
+  then pp_end_minigame game
+  else return ()
 ;;
