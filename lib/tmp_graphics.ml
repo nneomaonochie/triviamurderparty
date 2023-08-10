@@ -6,7 +6,8 @@ open! Async
 (* for both width and heights of the players *)
 let player_block_size = 125
 
-(* needs to be reset each time Math_Mayhem minigame is run*)
+(* mutable instances of minigames that must be reset each time a minigame is
+   run *)
 let current_math_mayhem_hashtables = Math_mayhem.create ()
 let current_pp_state = Password_pain.create ()
 let current_chalice_state = Chalices.create ()
@@ -15,33 +16,11 @@ let final_round_category = Final_round.pick_random_question ()
 (* based off the number of players that are starting - index = numPlayers -
    1 *)
 let player_starting_x_coords = [ 687; 550; 437; 300 ]
+
+(* the standard y coordinate for where players are *)
 let player_y_coord = 620
 
-let every seconds ~f ~stop =
-  let open Async in
-  (* recursive loop *)
-  let rec loop () =
-    if !stop
-    then return ()
-    else
-      Clock.after (Time_float.Span.of_sec seconds)
-      >>= fun () ->
-      f ();
-      loop ()
-  in
-  don't_wait_for (loop ())
-;;
-
-let animation_test x y =
-  Graphics.set_color Color.red;
-  Graphics.fill_circle x y 50;
-  Graphics.set_color Color.black;
-  Graphics.fill_circle (x - 10) (y - 10) 50
-;;
-
-(* this asks user input for players' names so that we can initiatilize the
-   players and create a game *)
-
+(* this draws the chalices that need to appear for the Chalice minigame *)
 let draw_chalices () =
   Graphics.set_color (Color.random ());
   Graphics.fill_rect 175 300 50 200;
@@ -445,6 +424,7 @@ let calc_fr_answers () =
   return ()
 ;;
 
+(* this starts the sequence of the final round *)
 let final_round_round () =
   display_final_round_question ();
   let span = Time_ns.Span.of_sec 15.0 in
