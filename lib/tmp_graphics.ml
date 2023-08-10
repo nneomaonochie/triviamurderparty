@@ -248,6 +248,17 @@ let show_correct_answer (game : Game.t) =
   Graphics.draw_string "Correct Answer"
 ;;
 
+(* this is the winner *)
+let display_winner (c, (player : Player.t)) =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  (* let winner = List.hd_exn game.player_list in let _, p = winner in *)
+  let d = display_players [ c, player ] in
+  Graphics.set_color Color.green;
+  Graphics.moveto 680 400;
+  Graphics.draw_string "The Winner"
+;;
+
 let display_ending_graphics (game : Game.t) =
   let display_alive_bonus () =
     Graphics.set_color Color.black;
@@ -264,24 +275,14 @@ let display_ending_graphics (game : Game.t) =
       Graphics.set_color Color.green;
       Graphics.draw_string "+3000")
   in
-  let display_winner () =
-    Graphics.set_color Color.black;
-    Graphics.fill_rect 0 0 1500 800;
-    let winner = List.hd_exn game.player_list in
-    let _, p = winner in
-    let d = display_players [ winner ] in
-    Graphics.set_color Color.green;
-    Graphics.moveto 680 400;
-    Graphics.draw_string "The Winner";
-    ()
-  in
   let span_of_alive_bonus = Time_ns.Span.of_sec 6.0 in
   Clock_ns.run_after
     span_of_alive_bonus
     (fun () -> display_alive_bonus ())
     ();
   let span_of_winner = Time_ns.Span.of_sec 6.0 in
-  Clock_ns.run_after span_of_winner (fun () -> display_winner ()) ()
+  (* Clock_ns.run_after span_of_winner (fun () -> display_winner ()) () *)
+  ()
 ;;
 
 (* returns places of where places should be *)
@@ -301,9 +302,7 @@ let shift_players
     Graphics.moveto x (y + 150);
     Graphics.set_font
       "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
-    Graphics.draw_string pl.name;
-    if x + (player_block_size * num_spaces) >= 1500
-    then () (* the player wins *))
+    Graphics.draw_string pl.name)
 ;;
 
 let display_final_round_question () =
@@ -337,7 +336,10 @@ let display_final_round_question () =
            ~equal:String.equal
       then
         current_category.char_placements
-          <- current_category.char_placements @ [ true ];
+          <- current_category.char_placements @ [ true ]
+      else
+        current_category.char_placements
+          <- current_category.char_placements @ [ false ];
       Graphics.set_color Color.yellow;
       Graphics.fill_rect 1100 y 350 50;
       Graphics.set_font
@@ -357,41 +359,84 @@ let display_final_round_question () =
   final_round_category.category <- current_category.category;
   final_round_category.right_answers <- current_category.right_answers;
   final_round_category.wrong_answers <- current_category.wrong_answers;
-  final_round_category.char_placements <- current_category.char_placements
+  final_round_category.char_placements <- current_category.char_placements;
+  final_round_category.player_guesses
+    <- List.map current_category.final_players ~f:(fun (c, pl, _, _, _) ->
+         c, pl, [ false; false; false ], false)
 ;;
 
 (* this handles the user's input for answering final round stuff *)
 (* we'll use timers? *)
 let final_round_user_input client query (game : Game.t) =
-  let query = String.uppercase query in
   let client_ip = Game.get_ip_address client in
-  let player_answers_chars = String.to_list query in
-  let player_answers_bool_ar = Array.create ~len:3 false in
-  (*[ false; false; false ] in*)
-  List.iter player_answers_chars ~f:(fun char ->
-    let ind = match char with 'Q' -> 0 | 'W' -> 1 | 'E' -> 2 | _ -> 10 in
-    if ind <= 2 then Array.set player_answers_bool_ar ind true);
-  let player_answer_bools = Array.to_list player_answers_bool_ar in
-  (* determines if users made the right selections by comparing it with the
-     char placements list in the final round t *)
-  let num_correct =
-    List.fold2_exn
-      player_answer_bools
-      final_round_category.char_placements
-      ~init:0
-      ~f:(fun num_correct user_response actual_response ->
-      if Bool.equal user_response actual_response
-      then num_correct + 1
-      else num_correct)
-  in
-  (* adjusting this to number of spaces *)
-  final_round_category.final_players
-    <- List.map
-         final_round_category.final_players
-         ~f:(fun (c, pl, x, y, num_spaces) ->
-         if String.equal client_ip (Game.get_ip_address c)
-         then c, pl, x, y, num_correct
-         else c, pl, x, y, num_spaces)
+  (* we identify that the player has not previously guessed yet *)
+  if List.exists
+       final_round_category.player_guesses
+       ~f:(fun (c, _, _, has_guessed) ->
+       String.equal client_ip (Game.get_ip_address c) && not has_guessed)
+  then (
+    let query = String.uppercase query in
+    let player_answers_chars =
+      if String.equal query "NONE" then [] else String.to_list query
+    in
+    let player_answers_bool_ar = Array.create ~len:3 false in
+    (*[ false; false; false ] in*)
+    List.iter player_answers_chars ~f:(fun char ->
+      let ind = match char with 'Q' -> 0 | 'W' -> 1 | 'E' -> 2 | _ -> 10 in
+      if ind <= 2 then Array.set player_answers_bool_ar ind true);
+    let player_answer_bools = Array.to_list player_answers_bool_ar in
+    (* we put the players answer in the array of player guesses *)
+    final_round_category.player_guesses
+      <- List.map
+           final_round_category.player_guesses
+           ~f:(fun (c, pl, bool_list, has_guessed) ->
+           if String.equal client_ip (Game.get_ip_address c)
+           then c, pl, player_answer_bools, has_guessed
+           else c, pl, bool_list, has_guessed))
+;;
+
+(* blacks out the incorect answers that are on the board *)
+let rec reveal_fr_answer correct_char_bools ~ind ~y_coord =
+  if ind = 3
+  then ()
+  else (
+    if not (List.nth_exn correct_char_bools ind)
+    then Graphics.fill_rect 1100 y_coord 350 50;
+    reveal_fr_answer correct_char_bools ~ind:(ind + 1) ~y_coord:(y_coord - 60))
+;;
+
+(* evaluates how correct each player guess was to the real answer *)
+let calc_fr_answers () =
+  List.iter
+    final_round_category.player_guesses
+    ~f:(fun (c, _, player_answer_bools, _) ->
+    let client_ip = Game.get_ip_address c in
+    (* determines if users made the right selections by comparing it with the
+       char placements list in the final round t *)
+    let num_correct =
+      List.fold2_exn
+        player_answer_bools
+        final_round_category.char_placements
+        ~init:0
+        ~f:(fun num_correct user_response actual_response ->
+        if Bool.equal user_response actual_response
+        then num_correct + 1
+        else num_correct)
+    in
+    (* adjusting this to number of spaces *)
+    final_round_category.final_players
+      <- List.map
+           final_round_category.final_players
+           ~f:(fun (cl, pl, x, y, num_spaces) ->
+           if String.equal client_ip (Game.get_ip_address cl)
+           then cl, pl, x, y, num_correct
+           else cl, pl, x, y, num_spaces));
+  reveal_fr_answer final_round_category.char_placements ~ind:0 ~y_coord:90;
+  let span = Time_ns.Span.of_sec 2.0 in
+  Clock_ns.run_after
+    span
+    (fun () -> shift_players final_round_category.final_players)
+    ()
 ;;
 
 (* these are the graphics for the final round *)
@@ -412,10 +457,19 @@ let display_final_round (game : Game.t) =
   shift_players fr_players;
   final_round_category.final_players <- fr_players;
   (* now we display the first categories *)
-  display_final_round_question ();
-  (* like 10 second timer *)
-  (* reveal answer *)
-  (* shift player*)
+  (* LOOP THIS*)
+  while
+    not
+      (List.exists
+         final_round_category.final_players
+         ~f:(fun (_, _, x, _, _) -> x >= 1500))
+  do
+    display_final_round_question ();
+    (* in the background players are submitting answers *)
+    let span = Time_ns.Span.of_sec 10.0 in
+    Clock_ns.run_after span (fun () -> calc_fr_answers ()) ()
+    (* reveal answer *)
+  done;
   (* repeat *)
   Final_round.print_random_question ()
 ;;
@@ -494,8 +548,8 @@ let create_trivia_graphics (game : Game.t) =
   if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
      || game.questions_asked > 1
   then (
-    game.game_state <- Game_over;
-    display_ending_graphics game)
+    game.game_state <- Final_round;
+    final_round_intro game)
   else (
     let players = game.player_list in
     List.iter players ~f:(fun (_, player) ->

@@ -14,6 +14,9 @@ type t =
          true *)
   ; mutable final_players :
       (Socket.Address.Inet.t * Player.t * int * int * int) list
+  ; mutable player_guesses :
+      (Socket.Address.Inet.t * Player.t * bool list * bool) list
+      (* the last bool checks if user has answered *)
   }
 [@@deriving compare, sexp_of]
 
@@ -51,6 +54,7 @@ let pick_random_question () : t =
   ; wrong_answers
   ; char_placements = []
   ; final_players = []
+  ; player_guesses = []
   }
 ;;
 
