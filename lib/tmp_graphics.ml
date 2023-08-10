@@ -277,6 +277,7 @@ let shift_players
       Graphics.set_font
         "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
       Graphics.draw_string pl.name;
+      if not pl.living then draw_skull new_x y;
       c, pl, new_x, y, num_spaces)
   in
   final_round_category.final_players <- new_p
@@ -835,8 +836,6 @@ let math_mayhem_player_response client query =
         curr_client)
 ;;
 
-let create_decision_graphics () = ()
-
 (* this is the title screen for Password Pain *)
 let display_pp_title () =
   Graphics.set_color Color.black;
@@ -926,8 +925,10 @@ let display_chalice_title_for_safe_players () =
   Graphics.fill_rect 500 250 500 300;
   Graphics.set_color Color.white;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
-  Graphics.moveto 635 400;
-  Graphics.draw_string "Safe players, pick a chalice to poison"
+  Graphics.moveto 535 400;
+  Graphics.draw_string "Safe players, pick a";
+  Graphics.moveto 535 350;
+  Graphics.draw_string "chalice to poison"
 ;;
 
 let display_chalice_title_for_endangered_players () =
@@ -935,9 +936,11 @@ let display_chalice_title_for_endangered_players () =
   Graphics.fill_rect 500 250 500 300;
   Graphics.set_color Color.white;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
-  Graphics.moveto 635 400;
-  Graphics.draw_string "Endangered players, pick a chalice";
-  Graphics.moveto 635 350;
+  Graphics.moveto 535 450;
+  Graphics.draw_string "Endangered players,";
+  Graphics.moveto 535 400;
+  Graphics.draw_string "pick a chalice";
+  Graphics.moveto 535 350;
   Graphics.draw_string "Choose wrong, you die"
 ;;
 
@@ -985,6 +988,7 @@ let chalice_picking client query (game : Game.t) =
   else return ()
 ;;
 
+(* these are the people who decide which chalices to poison *)
 let chalice_choosing client query (game : Game.t) =
   (let client_ip = Game.get_ip_address client in
    if List.exists current_chalice_state.chalice_choosers ~f:(fun (c, _) ->
@@ -1022,12 +1026,17 @@ let chalice_choosing client query (game : Game.t) =
 let start_chalices_intro ~participants ~safe_players ~(game : Game.t) =
   current_chalice_state.chalice_choosers <- safe_players;
   current_chalice_state.chalice_pickers <- participants;
+  current_chalice_state.chalice_poisoned <- Array.create ~len:4 false;
   if List.is_empty current_chalice_state.chalice_choosers
+     (* if there are no safe placers, then we will randomly pick 2 chalices
+        (the same chalice may be picked twice )*)
   then (
     let first_chalice = Random.int 4 in
     let second_chalice = Random.int 4 in
     Chalices.poison_chalice first_chalice current_chalice_state;
     Chalices.poison_chalice second_chalice current_chalice_state;
+    print_s
+      [%message "" (current_chalice_state.chalice_poisoned : bool array)];
     game.game_type <- Chalices true)
   else ();
   let span = Time_ns.Span.of_sec 4.0 in
