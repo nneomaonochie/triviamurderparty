@@ -450,7 +450,7 @@ let display_final_round (game : Game.t) : unit Deferred.t =
   final_round_category.final_players <- fr_players;
   (* now we display the first categories *)
   (* LOOP THIS*)
-  let () =
+  let%bind () =
     Deferred.repeat_until_finished () (fun () ->
       let continue_final_round =
         not
