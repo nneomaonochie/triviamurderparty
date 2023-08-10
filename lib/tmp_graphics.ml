@@ -289,20 +289,28 @@ let display_ending_graphics (game : Game.t) =
 let shift_players
   (players : (Socket.Address.Inet.t * Player.t * int * int * int) list)
   =
-  List.iter players ~f:(fun (_, pl, x, y, num_spaces) ->
-    Graphics.set_color pl.color;
-    (* adjust the y so corners are not touching later *)
-    Graphics.fill_rect
-      (x + (player_block_size * num_spaces))
-      y
-      player_block_size
-      player_block_size;
-    if not pl.living then draw_skull x y;
-    Graphics.set_color pl.color;
-    Graphics.moveto x (y + 150);
-    Graphics.set_font
-      "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
-    Graphics.draw_string pl.name)
+  print_s
+    [%message
+      ""
+        (players : (Socket.Address.Inet.t * Player.t * int * int * int) list)];
+  let new_p =
+    List.map players ~f:(fun (c, pl, x, y, num_spaces) ->
+      Graphics.set_color Color.black;
+      Graphics.fill_rect x y 125 (125 + 200);
+      (* the + 200 is to get rid of the name *)
+      Graphics.set_color pl.color;
+      (* adjust the y so corners are not touching later *)
+      let new_x = x + (player_block_size * num_spaces) in
+      Graphics.fill_rect new_x y player_block_size player_block_size;
+      if not pl.living then draw_skull x y;
+      Graphics.set_color pl.color;
+      Graphics.moveto new_x (y + 150);
+      Graphics.set_font
+        "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
+      Graphics.draw_string pl.name;
+      c, pl, new_x, y, num_spaces)
+  in
+  final_round_category.final_players <- new_p
 ;;
 
 let display_final_round_question () =
@@ -359,10 +367,7 @@ let display_final_round_question () =
   final_round_category.category <- current_category.category;
   final_round_category.right_answers <- current_category.right_answers;
   final_round_category.wrong_answers <- current_category.wrong_answers;
-  final_round_category.char_placements <- current_category.char_placements;
-  final_round_category.player_guesses
-    <- List.map current_category.final_players ~f:(fun (c, pl, _, _, _) ->
-         c, pl, [ false; false; false ], false)
+  final_round_category.char_placements <- current_category.char_placements
 ;;
 
 (* this handles the user's input for answering final round stuff *)
@@ -435,13 +440,14 @@ let calc_fr_answers () =
   reveal_fr_answer final_round_category.char_placements ~ind:0 ~y_coord:90;
   let span = Time_ns.Span.of_sec 2.0 in
   let%bind () = Clock_ns.after span in
+  print_s [%message "" (final_round_category : Final_round.t)];
   shift_players final_round_category.final_players;
   return ()
 ;;
 
 let final_round_round () =
   display_final_round_question ();
-  let span = Time_ns.Span.of_sec 10.0 in
+  let span = Time_ns.Span.of_sec 15.0 in
   let%bind () = Clock_ns.after span in
   calc_fr_answers ()
 ;;
@@ -474,8 +480,13 @@ let display_final_round (game : Game.t) : unit Deferred.t =
     in
     if continue_final_round
     then (
-      let span = Time_ns.Span.of_sec 15.0 in
-      let%bind () = Clock_ns.after span in
+      (* let span = Time_ns.Span.of_sec 15.0 in let%bind () = Clock_ns.after
+         span in *)
+      final_round_category.player_guesses
+        <- List.map
+             final_round_category.final_players
+             ~f:(fun (c, pl, _, _, _) ->
+             c, pl, [ false; false; false ], false);
       let%bind () = final_round_round () in
       return (`Repeat ()))
     else return (`Finished ()))

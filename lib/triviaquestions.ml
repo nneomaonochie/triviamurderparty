@@ -1,9 +1,7 @@
-(*open! Core let question content : string = let open Soup in *)
-open! Core
-open! Yojson
-
 (* Module that will store questions that are randomly selected from JSON
    file*)
+open! Core
+open! Yojson
 
 (* Converting JSON file into Yojson datatype*)
 let get_data_from_file filename = Yojson.Basic.from_file filename
@@ -14,6 +12,8 @@ let get_question_array file_name =
   json |> to_list
 ;;
 
+(* randomly pulls a questions from the trivia.json and assigns it to key
+   letters*)
 let pick_random_question () : Question.t =
   let open Yojson.Basic.Util in
   let array =
@@ -39,6 +39,8 @@ let pick_random_question () : Question.t =
   { question = q; answer_choices = ans_choices; correct_answer = c_ans }
 ;;
 
+(* used for testing, code that picks a random questions and prints it to the
+   terminal *)
 let print_random_question () =
   let q = pick_random_question () in
   print_s [%message "Random Question: " (q : Question.t)]

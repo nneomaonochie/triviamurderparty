@@ -3,6 +3,8 @@
 open! Core
 open! Async
 
+(* this stack is for storing game so that multiple parts of the server module
+   is able to access the current game *)
 let game_stack = Stack.create ()
 
 (* [Protocol] defines the communication between the server and the client. *)
@@ -85,8 +87,8 @@ end = struct
   (* let count = Array.create ~len:1 0 *)
   (* gets the query from the client *)
   let handle_query_string client query =
-    let game : Game.t = Stack.pop_exn game_stack in
-    let%bind game =
+    let game : Game.t = Stack.top_exn game_stack in
+    let game =
       match game.game_state with
       | Player_Initializion ->
         let (g, finished_set_up) : Game.t * bool =
@@ -154,7 +156,6 @@ end = struct
         return game
       | _ -> return game
     in
-    Stack.push game_stack game;
     Core.print_s
       [%message
         "Received query"
@@ -183,6 +184,7 @@ end = struct
     player
   ;;
 
+  (* this runs the math mayhem code *)
   let run_math_mayhem ~players game =
     Tmp_graphics.start_math_mayhem_intro ();
     let span = Time_ns.Span.of_sec 7.0 in
@@ -190,27 +192,20 @@ end = struct
     Tmp_graphics.initialize_math_mayhem_graphics players game
   ;;
 
-  let run_password_pain ~participants ~safe_players =
-    Tmp_graphics.start_pp_intro ~participants ~safe_players
-  ;;
-
-  let run_chalices ~participants ~safe_players ~game =
-    Tmp_graphics.start_chalices_intro ~participants ~safe_players ~game
-  ;;
-
+  (* randomly picks a minigame to run after at least one person answers a
+     trivia question incorrectly *)
   let pick_minigame ~participants ~safe_players (game : Game.t) =
     let minigames : Game.Game_kind.t list =
-      (* [ Math_mayhem; Password_pain false; *) [ Chalices false ]
+      [ Math_mayhem; Password_pain false; Chalices false ]
     in
     game.game_type <- List.random_element_exn minigames;
-    (* for testing purposes*)
-    (* game.game_type <- Password_pain false; *)
     match game.game_type with
     | Math_mayhem -> run_math_mayhem ~players:participants game
     | Password_pain false ->
-      return (run_password_pain ~participants ~safe_players)
+      return (Tmp_graphics.start_pp_intro ~participants ~safe_players)
     | Chalices false ->
-      return (run_chalices ~participants ~safe_players ~game)
+      return
+        (Tmp_graphics.start_chalices_intro ~participants ~safe_players ~game)
     | _ -> return ()
   ;;
 
@@ -261,29 +256,22 @@ end = struct
     else return ()
   ;;
 
-  (* this handles the chars a user inputs *)
+  (* this handles the chars a user inputs - chars should only occur for the
+     Trivia guessing *)
   let handle_query_char client query : Protocol.Response.t Deferred.t =
-    let game = Stack.pop_exn game_stack in
+    let game = Stack.top_exn game_stack in
     let question = game.game_type in
     let ip_addr = Game.get_ip_address client in
     let%bind () =
-      (* remove the questions asked from tmp_server - its handled in
-         tmp_graphics.leaderboard*)
-      if game.questions_asked < 10
-      then (
-        match question with
-        | Trivia q -> run_trivia_game game q client query
-        | _ -> return ())
-      else return (Tmp_graphics.display_ending_graphics game)
+      match question with
+      | Trivia q -> run_trivia_game game q client query
+      | _ -> return ()
     in
-    print_s [%message "" (game : Game.t)];
-    Stack.push game_stack game;
     Core.print_s
       [%message
         "Received query"
           (client : Socket.Address.Inet.t)
           (query : Protocol.Query_char.t)];
-    (* changing this into a deferred type *)
     return
       { Protocol.Response.response_message =
           [%string "I have received your query! You said: CHAR"]
@@ -300,9 +288,6 @@ end = struct
         ; Rpc.Rpc.implement Protocol.rpc_char handle_query_char
         ]
   ;;
-
-  (* idea: add an admin command for manual intervention in case the timing
-     flops *)
 
   let serve port (game : Game.t) =
     let%bind server =
@@ -325,16 +310,11 @@ end = struct
           ~doc:"INT port that the server should listen on"
       in
       fun () ->
-        (* this is where we do our beginning functions *)
-        let game : Game.t = Game.create () in
+        let game = Game.create () in
         Stack.push game_stack game;
-        let bool = Tmp_graphics.player_creation_screen () in
-        ();
-        (* to do later: intialize_graphics *)
+        Tmp_graphics.player_creation_screen ();
         serve port game]
   ;;
-
-  (* the first call with string will be to change the PC names *)
 
   let command =
     Command.async
