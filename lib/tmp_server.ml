@@ -84,7 +84,6 @@ end
 module Server : sig
   val command : Command.t
 end = struct
-  (* let count = Array.create ~len:1 0 *)
   (* gets the query from the client *)
   let handle_query_string client query =
     let game : Game.t = Stack.top_exn game_stack in
@@ -97,8 +96,7 @@ end = struct
             (Protocol.Query_string.to_string query)
             game
         in
-        (* if we finished setting up players, display the graphics screen *)
-        if Bool.equal finished_set_up true
+        if finished_set_up
         then (
           let%bind () =
             match g.game_type with
@@ -113,8 +111,9 @@ end = struct
            Tmp_graphics.math_mayhem_player_response
              client
              (Protocol.Query_string.to_string query);
-           return game (* password creation mode*)
+           return game
          | Password_pain false ->
+           (* password creation mode*)
            let%bind () =
              Tmp_graphics.pp_password_creation
                client
@@ -161,7 +160,6 @@ end = struct
         "Received query"
           (client : Socket.Address.Inet.t)
           (query : Protocol.Query_string.t)];
-    (* changing this into a deferred type *)
     return
       { Protocol.Response.response_message =
           [%string
@@ -170,6 +168,7 @@ end = struct
       }
   ;;
 
+  (* this finds a player in a list *)
   let find_player
     (player_list : (Socket.Address.Inet.t * Player.t) list)
     (client_ip : Socket.Address.Inet.t)
