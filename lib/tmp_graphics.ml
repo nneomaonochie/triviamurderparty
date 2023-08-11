@@ -293,10 +293,15 @@ let shift_players
       (* adjust the y so corners are not touching later *)
       let new_x = x + (player_block_size * num_spaces) in
       (* animation_shift pl ~current_x:x ~x_stop:new_x ~y; *)
-      (* every 0.25 ~f:(fun () -> Graphics.fill_rect x y player_block_size
-         player_block_size; let x = x + 10 in ()) ~stop:(ref (x >=
-         new_x)); *)
-      Graphics.fill_rect new_x y player_block_size player_block_size;
+      every
+        0.25
+        ~f:(fun () ->
+          Graphics.set_color pl.color;
+          Graphics.fill_rect x y player_block_size player_block_size;
+          let x = x + 10 in
+          ())
+        ~stop:(ref (x >= new_x));
+      (* Graphics.fill_rect new_x y player_block_size player_block_size; *)
       if not pl.living then draw_skull x y;
       Graphics.set_color pl.color;
       Graphics.moveto new_x (y + 150);
@@ -579,8 +584,10 @@ let final_round_intro (game : Game.t) =
 
 (* the graphics for creating the trivia questions *)
 let create_trivia_graphics (game : Game.t) =
-  if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
-     || game.questions_asked > 9
+  if List.fold game.player_list ~init:0 ~f:(fun living_counter (_, p) ->
+       if p.living then living_counter + 1 else living_counter)
+     < 2
+     || game.questions_asked > 0
   then (
     game.game_state <- Final_round;
     display_alive_bonus game;
