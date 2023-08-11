@@ -34,13 +34,13 @@ val pp_password_creation
   -> unit Deferred.t
 
 val pp_guesses : Socket.Address.Inet.t -> string -> Game.t -> unit Deferred.t
-val draw_chalices : unit -> unit
+val draw_chalices : unit -> unit Deferred.t
 
 val start_chalices_intro
   :  participants:(Socket.Address.Inet.t * Player.t) list
   -> safe_players:(Socket.Address.Inet.t * Player.t) list
   -> game:Game.t
-  -> unit
+  -> unit Deferred.t
 
 val chalice_choosing
   :  Socket.Address.Inet.t

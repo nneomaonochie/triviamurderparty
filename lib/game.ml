@@ -21,7 +21,7 @@ type t =
 
 (* this is the max players we are allowing in the game (in this
    implementation, our max players is always FOUR )*)
-let max_players = 2
+let max_players = 1
 
 (* creates a default Game.t *)
 let create () : t =
@@ -67,7 +67,6 @@ let set_up_players client (query : string) t : t * bool =
   then (
     t.game_state <- Ongoing;
     ask_question t);
-  print_s [%message "" (t : t)];
   t, match t.game_state with Ongoing -> true | _ -> false
 ;;
 

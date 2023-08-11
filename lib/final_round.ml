@@ -29,6 +29,7 @@ let get_question_array file_name =
   json |> to_list
 ;;
 
+(* this picks a random category from the final_round_questions.json *)
 let pick_random_question () : t =
   let open Yojson.Basic.Util in
   let array =
@@ -58,6 +59,7 @@ let pick_random_question () : t =
   }
 ;;
 
+(* this is for debugging purposes *)
 let print_random_question () =
   let q = pick_random_question () in
   print_s [%message "Random Question: " (q : t)]

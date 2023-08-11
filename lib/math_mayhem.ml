@@ -34,6 +34,3 @@ let get_questions () =
   in
   question_string, correct_answer
 ;;
-
-(* 6. [do last] the case where only one player is sent - get other players to
-   play or that they must reach 20 correct Q's *)
