@@ -254,6 +254,28 @@ let display_alive_bonus (game : Game.t) =
     Graphics.draw_string "+3000")
 ;;
 
+(* This is the core logic that actually runs the game. We have implemented
+   all of this for you, but feel free to read this file as a reference. *)
+let every seconds ~f ~stop =
+  let open Async in
+  (* recursive loop *)
+  let rec loop () =
+    if !stop
+    then return ()
+    else
+      Clock.after (Time_float.Span.of_sec seconds)
+      >>= fun () ->
+      f ();
+      loop ()
+  in
+  don't_wait_for (loop ())
+;;
+
+(* let rec animation_shift (player : Player.t) ~current_x ~x_stop ~y = if
+   current_x >= x_stop then () else ( Graphics.set_color player.color;
+   Graphics.fill_rect current_x y player_block_size player_block_size);
+   animation_shift player ~current_x:(x + 50) ~x_stop ~y ;; *)
+
 (* returns places of where places should be *)
 let shift_players
   (players : (Socket.Address.Inet.t * Player.t * int * int * int) list)
@@ -270,6 +292,10 @@ let shift_players
       Graphics.set_color pl.color;
       (* adjust the y so corners are not touching later *)
       let new_x = x + (player_block_size * num_spaces) in
+      (* animation_shift pl ~current_x:x ~x_stop:new_x ~y; *)
+      (* every 0.25 ~f:(fun () -> Graphics.fill_rect x y player_block_size
+         player_block_size; let x = x + 10 in ()) ~stop:(ref (x >=
+         new_x)); *)
       Graphics.fill_rect new_x y player_block_size player_block_size;
       if not pl.living then draw_skull x y;
       Graphics.set_color pl.color;
@@ -407,7 +433,7 @@ let calc_fr_answers () =
            if String.equal client_ip (Game.get_ip_address cl)
            then cl, pl, x, y, num_correct
            else cl, pl, x, y, num_spaces));
-  reveal_fr_answer final_round_category.char_placements ~ind:0 ~y_coord:90;
+  reveal_fr_answer final_round_category.char_placements ~ind:0 ~y_coord:150;
   let span = Time_ns.Span.of_sec 2.0 in
   let%bind () = Clock_ns.after span in
   print_s [%message "" (final_round_category : Final_round.t)];
@@ -554,7 +580,7 @@ let final_round_intro (game : Game.t) =
 (* the graphics for creating the trivia questions *)
 let create_trivia_graphics (game : Game.t) =
   if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
-     || game.questions_asked > 10
+     || game.questions_asked > 0
   then (
     game.game_state <- Final_round;
     display_alive_bonus game;
