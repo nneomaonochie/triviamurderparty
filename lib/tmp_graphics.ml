@@ -580,7 +580,7 @@ let final_round_intro (game : Game.t) =
 (* the graphics for creating the trivia questions *)
 let create_trivia_graphics (game : Game.t) =
   if List.for_all game.player_list ~f:(fun (_, p) -> not p.living)
-     || game.questions_asked > 0
+     || game.questions_asked > 9
   then (
     game.game_state <- Final_round;
     display_alive_bonus game;
