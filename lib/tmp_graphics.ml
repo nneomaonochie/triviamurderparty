@@ -47,6 +47,25 @@ let player_creation_screen () =
   Graphics.draw_string "Please enter your name into the console"
 ;;
 
+let rec display_timer sec =
+  if sec = -1
+  then (
+    Graphics.set_color Color.black;
+    Graphics.fill_rect 30 30 50 50;
+    return ())
+  else (
+    Graphics.set_color Color.white;
+    Graphics.fill_rect 30 30 50 50;
+    Graphics.set_color Color.dark_red;
+    Graphics.moveto 30 30;
+    Graphics.set_font
+      "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+    Graphics.draw_string (Int.to_string sec);
+    let span = Time_ns.Span.of_sec 1.0 in
+    let%bind () = Clock_ns.after span in
+    display_timer (sec - 1))
+;;
+
 (* if players loser a game, it displays the losing players at the front *)
 let display_losers loser_list =
   let rec dpl x_coord loser_list =
@@ -401,8 +420,7 @@ let calc_fr_answers () =
 (* this starts the sequence of the final round *)
 let final_round_round () =
   display_final_round_question ();
-  let span = Time_ns.Span.of_sec 15.0 in
-  let%bind () = Clock_ns.after span in
+  let%bind () = display_timer 15 in
   calc_fr_answers ()
 ;;
 
@@ -746,7 +764,7 @@ let initialize_math_mayhem_graphics
   current_math_mayhem_hashtables.player_positions <- player_positions;
   (* players have 30 seconds to accumulate as many points as possible *)
   let span = Time_ns.Span.of_sec 40.0 in
-  let%bind () = Clock_ns.after span in
+  let%bind () = display_timer 40 in
   math_mayhem_calc_scores game
 ;;
 
@@ -1065,10 +1083,9 @@ let final_pp_instruction game =
   Clock_ns.run_after span (fun () -> display_player_passwords ()) ();
   (* after we display the initial passwords, we will set a timer before the
      game runs out*)
-  let span = Time_ns.Span.of_sec 60.0 in
+  let%bind () = display_timer 60 in
   (* we use the timer to call the minigame function if ALL the passwords are
      not already guessed *)
-  let%bind () = Clock_ns.after span in
   if not current_pp_state.all_passwords_guessed
   then pp_end_minigame game
   else return ()
