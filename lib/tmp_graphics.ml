@@ -566,7 +566,7 @@ let create_trivia_graphics (game : Game.t) =
   if List.fold game.player_list ~init:0 ~f:(fun living_counter (_, p) ->
        if p.living then living_counter + 1 else living_counter)
      < 2
-     || game.questions_asked > 0
+     || game.questions_asked > 9
   then (
     game.game_state <- Final_round;
     display_alive_bonus game;
