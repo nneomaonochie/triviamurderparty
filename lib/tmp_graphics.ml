@@ -271,10 +271,12 @@ let every seconds ~f ~stop =
   don't_wait_for (loop ())
 ;;
 
-(* let rec animation_shift (player : Player.t) ~current_x ~x_stop ~y = if
-   current_x >= x_stop then () else ( Graphics.set_color player.color;
-   Graphics.fill_rect current_x y player_block_size player_block_size);
-   animation_shift player ~current_x:(x + 50) ~x_stop ~y ;; *)
+let animation_shift (player : Player.t) ~current_x ~y =
+  Graphics.set_color player.color;
+  Graphics.fill_rect current_x y player_block_size player_block_size;
+  Graphics.set_color Color.black;
+  Graphics.fill_rect current_x y 20 player_block_size
+;;
 
 (* returns places of where places should be *)
 let shift_players
@@ -293,18 +295,19 @@ let shift_players
       (* adjust the y so corners are not touching later *)
       let new_x = x + (player_block_size * num_spaces) in
       (* animation_shift pl ~current_x:x ~x_stop:new_x ~y; *)
+      let stop_animation = ref false in
+      let coord = Array.create ~len:1 x in
       every
-        0.25
+        0.01
         ~f:(fun () ->
-          Graphics.set_color pl.color;
-          Graphics.fill_rect x y player_block_size player_block_size;
-          let x = x + 10 in
-          ())
-        ~stop:(ref (x >= new_x));
+          animation_shift pl ~current_x:coord.(0) ~y;
+          Array.set coord 0 (coord.(0) + 10);
+          if coord.(0) >= new_x then stop_animation := true)
+        ~stop:stop_animation;
       (* Graphics.fill_rect new_x y player_block_size player_block_size; *)
       if not pl.living then draw_skull x y;
       Graphics.set_color pl.color;
-      Graphics.moveto new_x (y + 150);
+      Graphics.moveto (new_x + 20) (y + 150);
       Graphics.set_font
         "-*-fixed-medium-r-semicondensed--30-*-*-*-*-*-iso8859-1";
       Graphics.draw_string pl.name;
@@ -505,30 +508,6 @@ let display_final_round (game : Game.t) : unit Deferred.t =
   return ()
 ;;
 
-(* while ) do final_round_round ();
-
-   Clock_ns.run_after span (fun () -> ()) () done; *)
-(* return () *)
-
-(* users put all the letters they think applies into one string, we parse
-   individual chars to get their guesses *)
-
-let fr_instructions_3 (game : Game.t) =
-  Graphics.set_color Color.pale_blue;
-  Graphics.fill_rect 500 250 600 300;
-  Graphics.set_color Color.black;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
-  Graphics.moveto 545 425;
-  Graphics.draw_string "Player in first place";
-  Graphics.moveto 635 360;
-  Graphics.draw_string "only gets the ";
-  Graphics.moveto 635 295;
-  Graphics.draw_string "first 2 choices";
-  let span = Time_ns.Span.of_sec 3.0 in
-  let%bind () = Clock_ns.after span in
-  display_final_round game
-;;
-
 let fr_instructions_2 (game : Game.t) =
   Graphics.set_color Color.pale_blue;
   Graphics.fill_rect 500 250 600 300;
@@ -541,9 +520,9 @@ let fr_instructions_2 (game : Game.t) =
   Graphics.moveto 700 310;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
   Graphics.draw_string "\"NONE\"";
-  let span = Time_ns.Span.of_sec 3.0 in
+  let span = Time_ns.Span.of_sec 4.0 in
   let%bind () = Clock_ns.after span in
-  fr_instructions_3 game
+  display_final_round game
 ;;
 
 let final_round_instructions_1 (game : Game.t) =
@@ -559,7 +538,7 @@ let final_round_instructions_1 (game : Game.t) =
   Graphics.draw_string "as one string.";
   Graphics.moveto 515 300;
   Graphics.draw_string "Ex: \"QE\" or \"W\" or \"QWE\"";
-  let span = Time_ns.Span.of_sec 3.0 in
+  let span = Time_ns.Span.of_sec 4.0 in
   let%bind () = Clock_ns.after span in
   fr_instructions_2 game
 ;;
