@@ -198,7 +198,6 @@ end = struct
       [ Math_mayhem; Password_pain false; Chalices false ]
     in
     game.game_type <- List.random_element_exn minigames;
-    game.game_type <- Chalices false;
     match game.game_type with
     | Math_mayhem -> run_math_mayhem ~players:participants game
     | Password_pain false ->
