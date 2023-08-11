@@ -21,7 +21,7 @@ type t =
 
 (* this is the max players we are allowing in the game (in this
    implementation, our max players is always FOUR )*)
-let max_players = 1
+let max_players = 2
 
 (* creates a default Game.t *)
 let create () : t =

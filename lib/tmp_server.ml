@@ -228,7 +228,7 @@ end = struct
       Tmp_graphics.show_correct_answer game;
       let func () =
         if List.exists players ~f:(fun (_, player) ->
-             player.answered_mr_question_wrong)
+             player.answered_mr_question_wrong && player.living)
         then (
           let players =
             List.fold players ~init:[] ~f:(fun accum (client, player) ->
