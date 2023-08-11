@@ -10,17 +10,6 @@ type t =
   }
 [@@deriving compare, equal, sexp_of]
 
-(* this is the default player *)
-let default_create_single_player () =
-  { name = ""
-  ; score = 0
-  ; living = true
-  ; answered_mr_question = false
-  ; answered_mr_question_wrong = false
-  ; color = Color.random ()
-  }
-;;
-
 (* creates a player with the name *)
 let name_create_single_player str =
   { name = str

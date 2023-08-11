@@ -12,9 +12,6 @@ type t =
   }
 [@@deriving compare, equal, sexp_of]
 
-(* creates a default Player.t *)
-val default_create_single_player : unit -> t
-
 (* creates a Player.t with the string as the given name *)
 val name_create_single_player : string -> t
 val player_loses : t -> unit
