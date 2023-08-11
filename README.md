@@ -1,10 +1,10 @@
 ## triviamurderparty
-This is the JSIP Personal Project emulating the Jackbox game Trivia Murder Party - beyond the prototype.
+This is the JSIP Personal Project emulating the Jackbox game Trivia Murder Party - beyond the prototype. The game is intended for 4 players, but you can edit the number of players in the game.ml variable **max_players**. If allowing more than 4 players, adjust the player coordinates in the Tmp_graphics.ml. The game starts up and allows players to answer trivia questions. Players who answer incorrectly are dragged into playing the minigames, of which there are three, Math Mayhem, Password Pain, and Chalices. 
 
 If you are the server, input this into the terminal: 
 dune exec bin/main.exe -- tmp-server server -port 8181
 
-If you are the client, use the send-message feature to submit your name and participate in minigames such as Math Mayhem, Password Pain, and Chalices.
+If you are the client, use the send-message feature to submit your name and participate in minigames.
 Use the send-char feature to submit your answer to the trivia games.
 **localhost** should be used for when you have the same computer for the server and a client. 
 Use the AWS box url of the server port to hook up a client from another computer 
@@ -28,3 +28,6 @@ To submit your answers for trivia questions, do **./trivia_input answer** where 
 To submit your answers for minigames, do **./minigame_input answer**
 
 What you input for minigames will vary depending on which minigame you are playing
+
+# Tmp_server
+This module is used to create the server where clients can connect to the game. The main drivers are the **handle_query_string** function and the **handle_query_char** function, which take in queries from the client and use the user input to update the game state. Chars are used for the trivia ques
