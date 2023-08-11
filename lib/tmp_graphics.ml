@@ -20,52 +20,6 @@ let player_starting_x_coords = [ 687; 550; 437; 300 ]
 (* the standard y coordinate for where players are *)
 let player_y_coord = 620
 
-(* this draws the chalices that need to appear for the Chalice minigame *)
-let draw_chalices () =
-  Graphics.set_color (Color.random ());
-  Graphics.fill_rect 175 300 50 200;
-  Graphics.fill_arc 200 500 100 50 (-180) 0;
-  Graphics.moveto 190 225;
-  Graphics.draw_string "1";
-  Graphics.set_color (Color.random ());
-  Graphics.fill_rect 550 300 50 200;
-  Graphics.fill_arc 575 500 100 50 (-180) 0;
-  Graphics.moveto 565 225;
-  Graphics.draw_string "2";
-  Graphics.set_color (Color.random ());
-  Graphics.fill_rect 925 300 50 200;
-  Graphics.fill_arc 950 500 100 50 (-180) 0;
-  Graphics.moveto 940 225;
-  Graphics.draw_string "3";
-  Graphics.set_color (Color.random ());
-  Graphics.fill_rect 1300 300 50 200;
-  Graphics.fill_arc 1325 500 100 50 (-180) 0;
-  Graphics.moveto 1315 225;
-  Graphics.draw_string "4"
-;;
-
-(* display chalice instructions *)
-let display_chalice_instructions () =
-  Graphics.set_color Color.pastel_purple;
-  Graphics.fill_rect 500 250 500 300;
-  Graphics.set_color Color.white;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
-  Graphics.moveto 635 400;
-  Graphics.draw_string "Chalices"
-;;
-
-(* displays the chalice title screen*)
-let display_chalice_title () =
-  Graphics.set_color Color.pastel_purple;
-  Graphics.fill_rect 500 250 500 300;
-  Graphics.set_color Color.white;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
-  Graphics.moveto 635 400;
-  Graphics.draw_string "Safe players, pick a chalice";
-  Graphics.moveto 535 350;
-  Graphics.draw_string "Choose wrong, you die"
-;;
-
 (* displays the very beginning where they ask players to submit their
    names *)
 let player_creation_screen () =
@@ -843,53 +797,29 @@ let math_mayhem_player_response client query =
         curr_client)
 ;;
 
-(* this is the title screen for Password Pain *)
-let display_pp_title () =
-  Graphics.set_color Color.black;
-  Graphics.fill_rect 0 0 1500 800;
-  Graphics.set_color Color.pink;
+(* displays the chalice title screen*)
+let display_chalice_title () =
+  Graphics.set_color Color.pastel_purple;
   Graphics.fill_rect 500 250 500 300;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
-  Graphics.set_color Color.black;
-  Graphics.moveto 575 375;
-  Graphics.draw_string "Password Pain"
-;;
-
-(* these are the directions for the participants of the password pain
-   minigame*)
-let display_pp_participant_instructions participants =
-  let playing_players = display_players participants in
-  Graphics.set_color Color.pink;
-  Graphics.fill_rect 500 250 500 300;
-  Graphics.set_color Color.black;
+  Graphics.set_color Color.white;
   Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
   Graphics.moveto 635 400;
-  Graphics.draw_string "Input a 4";
+  Graphics.draw_string "Chalices"
+;;
+
+(* display chalice instructions *)
+let display_chalice_instructions () =
+  Graphics.set_color Color.pastel_purple;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_color Color.white;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 635 400;
+  Graphics.draw_string "Safe players, pick a chalice";
   Graphics.moveto 535 350;
-  Graphics.draw_string "letter password";
-  (* fixed the format for the record field *)
-  current_pp_state.active_participants
-    <- List.map playing_players ~f:(fun ((c, p), i) -> c, p, "", "", i)
+  Graphics.draw_string "Choose wrong, you die"
 ;;
 
-let start_pp_intro ~participants ~safe_players =
-  current_pp_state.active_participants <- [];
-  current_pp_state.safe_players <- [];
-  current_pp_state.all_passwords_guessed <- false;
-  if List.is_empty safe_players
-  then
-    (* no safe players means that every player got the question wrong - so
-       everyone can guess each others passwords EXCEPT their own *)
-    current_pp_state.safe_players <- participants
-  else current_pp_state.safe_players <- safe_players;
-  display_pp_title ();
-  let span = Time_ns.Span.of_sec 3.0 in
-  Clock_ns.run_after
-    span
-    (fun () -> display_pp_participant_instructions participants)
-    ()
-;;
-
+(* this draws the chalices onto the screen *)
 let draw_chalices () =
   Graphics.set_color (Color.random ());
   Graphics.fill_rect 175 300 50 200;
@@ -913,18 +843,8 @@ let draw_chalices () =
   Graphics.draw_string "4"
 ;;
 
-let display_chalice_instructions () =
-  Graphics.set_color Color.black;
-  Graphics.fill_rect 0 0 1500 800;
-  Graphics.set_color Color.pastel_purple;
-  Graphics.fill_rect 500 250 500 300;
-  Graphics.set_color Color.white;
-  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
-  Graphics.moveto 635 400;
-  Graphics.draw_string "Chalices";
-  draw_chalices ()
-;;
-
+(* this displays the instructions for the safe players who choose a chalice
+   to poison *)
 let display_chalice_title_for_safe_players () =
   Graphics.set_color Color.black;
   Graphics.fill_rect 0 0 1500 800;
@@ -938,6 +858,8 @@ let display_chalice_title_for_safe_players () =
   Graphics.draw_string "chalice to poison"
 ;;
 
+(* this displays the instructions for players who must pick a chalice to
+   drink *)
 let display_chalice_title_for_endangered_players () =
   Graphics.set_color Color.pastel_purple;
   Graphics.fill_rect 500 250 500 300;
@@ -953,6 +875,7 @@ let display_chalice_title_for_endangered_players () =
   Graphics.draw_string "then you die"
 ;;
 
+(* this ends the chalice minigame *)
 let chalice_ending
   (losers : ((Socket.Address.Inet.t * Player.t) * int) list)
   (game : Game.t)
@@ -964,6 +887,7 @@ let chalice_ending
   create_leaderboard_graphics game
 ;;
 
+(* handles the queries from the players who have to pick a cup to drink *)
 let chalice_picking client query (game : Game.t) =
   let coords = display_players current_chalice_state.chalice_pickers in
   display_chalice_title_for_endangered_players ();
@@ -1027,6 +951,8 @@ let chalice_choosing client query (game : Game.t) =
   |> return
 ;;
 
+(* this is the function that starts the instructions for the Chalices
+   minigame *)
 let start_chalices_intro ~participants ~safe_players ~(game : Game.t) =
   current_chalice_state.chalice_choosers <- safe_players;
   current_chalice_state.chalice_pickers <- participants;
@@ -1055,6 +981,8 @@ let start_chalices_intro ~participants ~safe_players ~(game : Game.t) =
   display_chalice_instructions ()
 ;;
 
+(* this shows the display_passwords of the players who have created
+   password *)
 let display_player_passwords () =
   Graphics.set_color Color.black;
   Graphics.fill_rect 500 250 600 400;
@@ -1065,6 +993,55 @@ let display_player_passwords () =
     ~f:(fun (c, p, real_pw, display_pw, i) ->
     Graphics.moveto i (player_y_coord - 100);
     Graphics.draw_string display_pw)
+;;
+
+(* this is the title screen for Password Pain *)
+let display_pp_title () =
+  Graphics.set_color Color.black;
+  Graphics.fill_rect 0 0 1500 800;
+  Graphics.set_color Color.pink;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--60-*-*-*-*-*-iso8859-1";
+  Graphics.set_color Color.black;
+  Graphics.moveto 575 375;
+  Graphics.draw_string "Password Pain"
+;;
+
+(* these are the directions for the participants of the password pain
+   minigame*)
+let display_pp_participant_instructions participants =
+  let playing_players = display_players participants in
+  Graphics.set_color Color.pink;
+  Graphics.fill_rect 500 250 500 300;
+  Graphics.set_color Color.black;
+  Graphics.set_font "-*-fixed-medium-r-semicondensed--50-*-*-*-*-*-iso8859-1";
+  Graphics.moveto 635 400;
+  Graphics.draw_string "Input a 4";
+  Graphics.moveto 535 350;
+  Graphics.draw_string "letter password";
+  (* fixed the format for the record field *)
+  current_pp_state.active_participants
+    <- List.map playing_players ~f:(fun ((c, p), i) -> c, p, "", "", i)
+;;
+
+(* this starts the intro instructions for the password pain minigame *)
+
+let start_pp_intro ~participants ~safe_players =
+  current_pp_state.active_participants <- [];
+  current_pp_state.safe_players <- [];
+  current_pp_state.all_passwords_guessed <- false;
+  if List.is_empty safe_players
+  then
+    (* no safe players means that every player got the question wrong - so
+       everyone can guess each others passwords EXCEPT their own *)
+    current_pp_state.safe_players <- participants
+  else current_pp_state.safe_players <- safe_players;
+  display_pp_title ();
+  let span = Time_ns.Span.of_sec 3.0 in
+  Clock_ns.run_after
+    span
+    (fun () -> display_pp_participant_instructions participants)
+    ()
 ;;
 
 (* this ends the minigame for password pain *)
@@ -1079,6 +1056,7 @@ let pp_end_minigame game =
   create_leaderboard_graphics game
 ;;
 
+(* these are the final set of instructions for the Password Pain minigame *)
 let final_pp_instruction game =
   Graphics.set_color Color.pink;
   Graphics.fill_rect 500 250 500 300;
@@ -1101,6 +1079,7 @@ let final_pp_instruction game =
   else return ()
 ;;
 
+(* these are the instructions for the safe players for Password Pain *)
 let display_pp_safe_player_instructions game =
   Graphics.set_color Color.pink;
   Graphics.fill_rect 500 250 500 300;
