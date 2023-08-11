@@ -282,10 +282,6 @@ let animation_shift (player : Player.t) ~current_x ~y =
 let shift_players
   (players : (Socket.Address.Inet.t * Player.t * int * int * int) list)
   =
-  print_s
-    [%message
-      ""
-        (players : (Socket.Address.Inet.t * Player.t * int * int * int) list)];
   let new_p =
     List.map players ~f:(fun (c, pl, x, y, num_spaces) ->
       Graphics.set_color Color.black;
@@ -444,7 +440,6 @@ let calc_fr_answers () =
   reveal_fr_answer final_round_category.char_placements ~ind:0 ~y_coord:150;
   let span = Time_ns.Span.of_sec 2.0 in
   let%bind () = Clock_ns.after span in
-  print_s [%message "" (final_round_category : Final_round.t)];
   shift_players final_round_category.final_players;
   return ()
 ;;
@@ -566,7 +561,7 @@ let create_trivia_graphics (game : Game.t) =
   if List.fold game.player_list ~init:0 ~f:(fun living_counter (_, p) ->
        if p.living then living_counter + 1 else living_counter)
      < 2
-     || game.questions_asked > 0
+     || game.questions_asked > 9
   then (
     game.game_state <- Final_round;
     display_alive_bonus game;
@@ -1022,11 +1017,6 @@ let chalice_choosing client query (game : Game.t) =
            else accum)
        in
        current_chalice_state.chalice_choosers <- list);
-     print_s
-       [%message
-         "Chalice choosers"
-           (current_chalice_state.chalice_choosers
-             : (Async.Socket.Address.Inet.t * Player.t) list)];
      if List.is_empty current_chalice_state.chalice_choosers
      then (
        game.game_type <- Chalices true;
@@ -1049,8 +1039,6 @@ let start_chalices_intro ~participants ~safe_players ~(game : Game.t) =
     let second_chalice = Random.int 4 in
     Chalices.poison_chalice first_chalice current_chalice_state;
     Chalices.poison_chalice second_chalice current_chalice_state;
-    print_s
-      [%message "" (current_chalice_state.chalice_poisoned : bool array)];
     game.game_type <- Chalices true)
   else ();
   let span = Time_ns.Span.of_sec 4.0 in
@@ -1137,9 +1125,7 @@ let pp_password_creation client query (game : Game.t) =
        String.equal client_ip (Game.get_ip_address c))
   then
     if String.length query <> 4
-    then (
-      print_s [%message "Your password must be 4 letters."];
-      return ())
+    then return ()
     else (
       Password_pain.update_password client_ip current_pp_state ~query;
       (* that every password is a non empty string - all participating
@@ -1147,7 +1133,6 @@ let pp_password_creation client query (game : Game.t) =
       if List.for_all
            current_pp_state.active_participants
            ~f:(fun (_, _, real_pw, display_pw, _) ->
-           print_s [%message real_pw display_pw];
            not (String.is_empty real_pw))
       then (
         game.game_type <- Password_pain true;

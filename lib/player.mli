@@ -17,11 +17,4 @@ val default_create_single_player : unit -> t
 
 (* creates a Player.t with the string as the given name *)
 val name_create_single_player : string -> t
-
-(* creates a Player.t list of default players *)
-val create_multi_players : unit -> t list
-
-(* changes a player's name so long as the previous name was an empty
-   string *)
-val update_name : t -> string -> unit
 val player_loses : t -> unit

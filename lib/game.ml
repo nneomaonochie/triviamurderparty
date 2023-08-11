@@ -67,7 +67,6 @@ let set_up_players client (query : string) t : t * bool =
   then (
     t.game_state <- Ongoing;
     ask_question t);
-  print_s [%message "" (t : t)];
   t, match t.game_state with Ongoing -> true | _ -> false
 ;;
 
