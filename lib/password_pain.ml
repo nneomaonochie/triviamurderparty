@@ -59,8 +59,8 @@ let rec compare_answers ~real_pw ~guess ~index ~result =
 
 (* takes in a guess as a string and finds similarites with passwords *)
 let check_guess client_ip t (guess : string) (game : Game.t) =
-  (* the client string is for Every Player Mode - we dont want to guess our
-     own password *)
+  (* the client string is for if every player is participating in the
+     minigame - we dont want to guess our own password *)
   let updated_pp_positions =
     List.map t.active_participants ~f:(fun (c, pl, real_pw, display_pw, i) ->
       let real_p = real_pw in

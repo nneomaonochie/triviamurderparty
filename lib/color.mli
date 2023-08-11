@@ -1,4 +1,6 @@
 open! Core
+(* this module keeps track of the colors used for when we display things to
+   Graphics *)
 
 val black : int
 val white : int
